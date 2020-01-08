@@ -1,6 +1,5 @@
 # Comethylated Analysis Pipeline ------------------------------------------
 # Charles Mordaunt
-# 1/6/19
 
 # Load Packages ####
 .libPaths("/share/lasallelab/Charles/comethylated/R")
