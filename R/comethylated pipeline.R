@@ -3,7 +3,7 @@
 
 # Load Packages ####
 .libPaths("/share/lasallelab/Charles/comethylated/R")
-sapply(c("tidyverse", "bsseq", "dmrseq", "WGCNA", "openxlsx"), require, character.only = TRUE)
+sapply(c("tidyverse", "bsseq", "dmrseq", "WGCNA", "openxlsx", "scales"), require, character.only = TRUE)
 
 # Functions ####
 getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz", 
@@ -76,12 +76,48 @@ getRegions <- function(bs, maxGap = 150, n = 3, covMin = 10, methSD = 0.05, save
         return(regions)
 }
 
-# Read and Filter Bismark CpG Reports ###
+plotRegionStats <- function(regions, histCol = "#3366CC", lineCol = "#FF3366", nBreaks = 4, save = TRUE, 
+                            file = "Region_Plots.pdf", width = 11, height = 8.5, verbose = TRUE){
+        if(verbose){
+                message("[plotRegionStats] Plotting histograms of region statistics")
+        }
+        regions <- reshape2::melt(regions[,c("RegionID", "width", "n", "covMin", "covMean", "methMean", "methSD")], 
+                                  id.vars = "RegionID")
+        medians <- aggregate(value ~ variable, data = regions, FUN = median)
+        gg <- ggplot(data = regions)
+        gg <- gg +
+                geom_histogram(aes(x = value), bins = 100, fill = histCol, color = histCol) +
+                geom_vline(data = medians, aes(xintercept = value), color = lineCol) +
+                facet_wrap(vars(variable), nrow = 2, ncol = 3, scales = "free") +
+                scale_x_continuous(breaks = breaks_pretty(n = nBreaks)) +
+                scale_y_continuous(expand = expand_scale(mult = c(0.008, 0.05))) +
+                theme_bw(base_size = 24) +
+                theme(panel.grid = element_blank(), panel.border = element_rect(color = "black", size = 1.25),
+                      legend.position = "none", strip.text.x = element_text(size = 16), 
+                      axis.ticks.x = element_line(size = 1.25), axis.ticks.y = element_blank(), 
+                      axis.title = element_blank(), strip.background = element_blank(), 
+                      plot.margin = unit(c(0,1,1,0.4), "lines"), panel.spacing.y = unit(0, "lines"), 
+                      axis.text.x = element_text(size = 12, color = "black"), axis.text.y = element_blank())
+        if(save){
+                if(verbose){
+                        message("[plotRegionStats] Saving plots as ", file)
+                }
+                ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
+        }
+        if(verbose){
+                message("[plotRegionStats] Complete!")
+        }
+        return(gg)
+}
+
+# Read and Filter Bismark CpG Reports ####
 colData <- read.xlsx("sample_info.xlsx", colNames = TRUE, rowNames = TRUE)
 colData <- colData[4:9,] # subset for testing
 bs <- getCpGs(colData)
 
 # Call and Filter Regions ####
 regions <- getRegions(bs)
+plotRegionStats(regions)
+
 
 
