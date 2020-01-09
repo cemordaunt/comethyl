@@ -3,7 +3,7 @@
 
 # Load Packages ####
 .libPaths("/share/lasallelab/Charles/comethylated/R")
-sapply(c("tidyverse", "bsseq", "dmrseq", "WGCNA", "openxlsx", "scales"), require, character.only = TRUE)
+sapply(c("scales", "openxlsx", "tidyverse", "bsseq", "dmrseq", "WGCNA"), require, character.only = TRUE)
 
 # Functions ####
 getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz", 
@@ -76,7 +76,7 @@ getRegions <- function(bs, maxGap = 150, n = 3, covMin = 10, methSD = 0.05, save
         return(regions)
 }
 
-plotRegionStats <- function(regions, histCol = "#3366CC", lineCol = "#FF3366", nBreaks = 4, save = TRUE, 
+plotRegionStats <- function(regions, bins = 100, histCol = "#3366CC", lineCol = "#FF3366", nBreaks = 4, save = TRUE, 
                             file = "Region_Plots.pdf", width = 11, height = 8.5, verbose = TRUE){
         if(verbose){
                 message("[plotRegionStats] Plotting histograms of region statistics")
@@ -86,7 +86,7 @@ plotRegionStats <- function(regions, histCol = "#3366CC", lineCol = "#FF3366", n
         medians <- aggregate(value ~ variable, data = regions, FUN = median)
         gg <- ggplot(data = regions)
         gg <- gg +
-                geom_histogram(aes(x = value), bins = 100, fill = histCol, color = histCol) +
+                geom_histogram(aes(x = value), bins = bins, fill = histCol, color = histCol) +
                 geom_vline(data = medians, aes(xintercept = value), color = lineCol) +
                 facet_wrap(vars(variable), nrow = 2, ncol = 3, scales = "free") +
                 scale_x_continuous(breaks = breaks_pretty(n = nBreaks)) +
@@ -94,7 +94,7 @@ plotRegionStats <- function(regions, histCol = "#3366CC", lineCol = "#FF3366", n
                 theme_bw(base_size = 24) +
                 theme(panel.grid = element_blank(), panel.border = element_rect(color = "black", size = 1.25),
                       legend.position = "none", strip.text.x = element_text(size = 16), 
-                      axis.ticks.x = element_line(size = 1.25), axis.ticks.y = element_blank(), 
+                      axis.ticks.x = element_line(size = 1.25, color = "black"), axis.ticks.y = element_blank(), 
                       axis.title = element_blank(), strip.background = element_blank(), 
                       plot.margin = unit(c(0,1,1,0.4), "lines"), panel.spacing.y = unit(0, "lines"), 
                       axis.text.x = element_text(size = 12, color = "black"), axis.text.y = element_blank())
@@ -110,6 +110,42 @@ plotRegionStats <- function(regions, histCol = "#3366CC", lineCol = "#FF3366", n
         return(gg)
 }
 
+plotSDstats <- function(regions, bins = 100, nBreaks = 4, legend.position = c(1.085,0.938), save = TRUE, 
+                        file = "SD_Plots.pdf", width = 8.5, height = 8.5, verbose = TRUE){
+        if(verbose){
+                message("[plotSDstats] Plotting methylation SD vs region statistics")
+        }
+        regions <- reshape2::melt(regions[,c("RegionID", "n", "covMin", "covMean", "methMean", "methSD")], 
+                                  id.vars = c("RegionID", "methSD"))
+        gg <- ggplot(data = regions)
+        gg <- gg +
+                geom_bin2d(aes(x = value, y = methSD, color = ..count..), bins = bins) +
+                facet_wrap(vars(variable), nrow = 2, ncol = 2, scales = "free_x") +
+                scale_fill_continuous(name = "Count", trans = "log10") +
+                scale_color_continuous(guide = FALSE, trans = "log10") +
+                scale_x_continuous(breaks = breaks_pretty(n = nBreaks), expand = expand_scale(mult = c(0.0062, 0.05))) +
+                scale_y_continuous(breaks = breaks_pretty(n = nBreaks), expand = expand_scale(mult = c(0.006, 0.05))) +
+                theme_bw(base_size = 24) +
+                theme(panel.grid = element_blank(), panel.border = element_rect(color = "black", size = 1.25),
+                      legend.position = legend.position, legend.background = element_blank(),
+                      legend.title = element_text(size = 14), legend.text = element_text(size = 12),
+                      strip.text.x = element_text(size = 16), 
+                      axis.ticks = element_line(size = 1.25, color = "black"), axis.title.x = element_blank(),
+                      axis.title.y = element_text(size = 14, color = "black"), 
+                      strip.background = element_blank(), plot.margin = unit(c(0.5,6,1,1), "lines"), 
+                      panel.spacing.y = unit(0, "lines"), axis.text = element_text(size = 12, color = "black"))
+        if(save){
+                if(verbose){
+                        message("[plotSDstats] Saving plots as ", file)
+                }
+                ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
+        }
+        if(verbose){
+                message("[plotSDstats] Complete!")
+        }
+        return(gg)
+}
+
 # Read and Filter Bismark CpG Reports ####
 colData <- read.xlsx("sample_info.xlsx", colNames = TRUE, rowNames = TRUE)
 colData <- colData[4:9,] # subset for testing
@@ -118,6 +154,6 @@ bs <- getCpGs(colData)
 # Call and Filter Regions ####
 regions <- getRegions(bs)
 plotRegionStats(regions)
-
+plotSDstats(regions)
 
 
