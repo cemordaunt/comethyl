@@ -3,7 +3,7 @@
 
 # Load Packages ####
 .libPaths("/share/lasallelab/Charles/comethylated/R")
-sapply(c("scales", "openxlsx", "tidyverse", "bsseq", "dmrseq", "WGCNA"), require, character.only = TRUE)
+sapply(c("scales", "openxlsx", "tidyverse", "bsseq", "dmrseq", "WGCNA", "sva"), require, character.only = TRUE)
 
 # Functions ####
 getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz", 
@@ -76,7 +76,7 @@ getRegions <- function(bs, maxGap = 150, n = 3, covMin = 10, methSD = 0.05, save
         return(regions)
 }
 
-plotRegionStats <- function(regions, bins = 100, histCol = "#3366CC", lineCol = "#FF3366", nBreaks = 4, save = TRUE, 
+plotRegionStats <- function(regions, bins = 100, histCol = "#132B43", lineCol = "red", nBreaks = 4, save = TRUE, 
                             file = "Region_Plots.pdf", width = 11, height = 8.5, verbose = TRUE){
         if(verbose){
                 message("[plotRegionStats] Plotting histograms of region statistics")
@@ -146,6 +146,46 @@ plotSDstats <- function(regions, bins = 100, nBreaks = 4, legend.position = c(1.
         return(gg)
 }
 
+getRegionMeth <- function(regions, bs, type = "raw", save = TRUE, file = "Region_Methylation.rds", verbose = TRUE){
+        if(verbose){
+                message("[getRegionMeth] Calculating region methylation from BSseq object")
+        }
+        meth <- getMeth(bs, regions = regions[,c("chr", "start", "end")], type = type, what = "perRegion")
+        rownames(meth) <- regions$RegionID
+        if(save){
+                if(verbose){
+                        message("[getRegionMeth] Saving region methylation as ", file)
+                }
+                saveRDS(meth, file = file)
+        }
+        if(verbose){
+                message("[getRegionMeth] Complete!")
+        }
+        return(meth)
+}
+
+adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1), save = TRUE, 
+                             file = "Adjusted_Region_Methylation.rds", verbose = TRUE){
+        if(verbose){
+                message("[adjustRegionMeth] Determining number of principal components to adjust for")
+        }
+        n.pc <- num.sv(meth, mod = mod, seed = 5)
+        if(verbose){
+                message("[adjustRegionMeth] Adjusting region methylation for the top ", n.pc, " principal components")
+        }
+        methAdj <- sva_network(meth, n.pc = n.pc) %>% t()
+        if(save){
+                if(verbose){
+                        message("[adjustRegionMeth] Saving adjusted region methylation as ", file)
+                }
+                saveRDS(methAdj, file = file)
+        }
+        if(verbose){
+                message("[adjustRegionMeth] Complete!")
+        }
+        return(methAdj)
+}
+
 # Read and Filter Bismark CpG Reports ####
 colData <- read.xlsx("sample_info.xlsx", colNames = TRUE, rowNames = TRUE)
 colData <- colData[4:9,] # subset for testing
@@ -155,5 +195,21 @@ bs <- getCpGs(colData)
 regions <- getRegions(bs)
 plotRegionStats(regions)
 plotSDstats(regions)
+
+# Adjust Methylation Data for PCs ####
+meth <- getRegionMeth(regions, bs = bs)
+mod <- model.matrix(~1, data = pData(bs))
+methAdj <- adjustRegionMeth(meth, mod = mod)
+
+sampleTree <- (1 - cor(t(methAdj))) %>% as.dist() %>% hclust(method = "average")
+pdf(file = "Sample_Dendrogram.pdf", height = 5, width = 11)
+par(mar = c(0, 5, 1, 0))
+plot(sampleTree, main = "", sub = "", xlab = "", cex = 0.8, cex.lab = 1, cex.axis = 1)
+invisible(dev.off())
+
+
+
+
+
 
 
