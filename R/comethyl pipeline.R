@@ -1,4 +1,4 @@
-# Comethylated Analysis Pipeline ------------------------------------------
+# Comethyl Analysis Pipeline ------------------------------------------
 # Charles Mordaunt
 
 # Load Packages ####
