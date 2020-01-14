@@ -31,9 +31,6 @@ getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz",
                 }
                 saveRDS(bs, file = file)
         }
-        if(verbose){
-                message("[getCpGs] Complete!")
-        }
         return(bs)
 }
 
@@ -70,9 +67,6 @@ getRegions <- function(bs, maxGap = 150, n = 3, covMin = 10, methSD = 0.05, save
                 }
                 write.table(regions, file = file, quote = FALSE, sep = "\t", row.names = FALSE)
         }
-        if(verbose){
-                message("[getRegions] Complete!")
-        }
         return(regions)
 }
 
@@ -103,9 +97,6 @@ plotRegionStats <- function(regions, bins = 100, histCol = "#132B43", lineCol = 
                         message("[plotRegionStats] Saving plots as ", file)
                 }
                 ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
-        }
-        if(verbose){
-                message("[plotRegionStats] Complete!")
         }
         return(gg)
 }
@@ -140,9 +131,6 @@ plotSDstats <- function(regions, bins = 100, nBreaks = 4, legend.position = c(1.
                 }
                 ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
         }
-        if(verbose){
-                message("[plotSDstats] Complete!")
-        }
         return(gg)
 }
 
@@ -157,9 +145,6 @@ getRegionMeth <- function(regions, bs, type = "raw", save = TRUE, file = "Region
                         message("[getRegionMeth] Saving region methylation as ", file)
                 }
                 saveRDS(meth, file = file)
-        }
-        if(verbose){
-                message("[getRegionMeth] Complete!")
         }
         return(meth)
 }
@@ -179,9 +164,6 @@ adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
                         message("[adjustRegionMeth] Saving adjusted region methylation as ", file)
                 }
                 saveRDS(methAdj, file = file)
-        }
-        if(verbose){
-                message("[adjustRegionMeth] Complete!")
         }
         return(methAdj)
 }
@@ -226,9 +208,6 @@ plotDendro <- function(x, transpose = TRUE, corType = c("pearson", "bicor"), max
                         message("[plotDendro] Saving plot as ", file)
                 }
         }
-        if(verbose){
-                message("[plotDendro] Complete!")
-        }
         return(tree)
 }
 
@@ -261,7 +240,6 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
                 message("[getSoftPower] At soft power threshold = ", sft$powerEstimate, 
                         ", fit = ", round(sft$fitIndices$SFT.R.sq[sft$fitIndices$Power == sft$powerEstimate], 3), 
                         " and mean connectivity = ", round(sft$fitIndices$mean.k.[sft$fitIndices$Power == sft$powerEstimate], 1))
-                message("[getSoftPower] Complete!")
         }
         return(sft)
 }
@@ -298,9 +276,6 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
                         message("[plotSoftPower] Saving plots as ", file)
                 }
                 ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
-        }
-        if(verbose){
-                message("[plotSoftPower] Complete!")
         }
         return(gg)
 }
