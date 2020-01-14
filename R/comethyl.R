@@ -214,15 +214,6 @@ plotDendro <- function(x, transpose = TRUE, corType = c("pearson", "bicor"), max
 getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor"), maxPOutliers = 0.1, 
                          RsquaredCut = 0.8, verbose = TRUE){
         corType <- match.arg(corType)
-        if(corType == "pearson"){
-                corFnc <- "cor"
-        } else {
-                if(corType == "bicor"){
-                        corFnc <- corType
-                } else {
-                        message("[getSoftPower] Error: corType must be either pearson or bicor")
-                }
-        }
         if(verbose){
                 message("[getSoftPower] Analyzing scale-free topology with ", corType, 
                         " correlation to determine best soft-thresholding power")
@@ -230,9 +221,19 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
         } else {
                 verboseNum <- 0
         }
-        sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector, networkType = "signed", 
-                                 corFnc = corFnc, corOptions = list(maxPOutliers = maxPOutliers), blockSize = 40000, 
-                                 verbose = verboseNum)
+        if(corType == "pearson"){
+                sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector, 
+                                         networkType = "signed", corFnc = "cor", blockSize = 40000, verbose = verboseNum)
+        } else {
+                if(corType == "bicor"){
+                        sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector, 
+                                                 networkType = "signed", corFnc = "bicor", 
+                                                 corOptions = list(maxPOutliers = maxPOutliers), blockSize = 40000, 
+                                                 verbose = verboseNum)
+                } else {
+                        stop("[getSoftPower] Error: corType must be either pearson or bicor")
+                }
+        }
         if(is.na(sft$powerEstimate)){
                 sft$powerEstimate <- sft$fitIndices$Power[sft$fitIndices$SFT.R.sq == max(sft$fitIndices$SFT.R.sq)]
         }
