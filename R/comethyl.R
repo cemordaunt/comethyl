@@ -54,8 +54,8 @@ getRegions <- function(bs, maxGap = 150, n = 3, covMin = 10, methSD = 0.05, save
         regions$covMin <- DelayedArray::rowMins(cov)
         regions <- regions[regions$covMin >= covMin,]
         meth <- getMeth(bs, regions = regions[,c("chr", "start", "end")], type = "raw", what = "perRegion")
-        regions$methMean <- DelayedMatrixStats::rowMeans2(meth)
-        regions$methSD <- DelayedMatrixStats::rowSds(meth)
+        regions$methMean <- DelayedMatrixStats::rowMeans2(meth, na.rm = TRUE)
+        regions$methSD <- DelayedMatrixStats::rowSds(meth, na.rm = TRUE)
         regions <- regions[regions$methSD >= methSD,]
         regions$RegionID <- paste("Region", 1:nrow(regions), sep = "_")
         regions$width <- regions$end - regions$start
@@ -168,32 +168,35 @@ adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
         return(methAdj)
 }
 
-plotDendro <- function(x, transpose = TRUE, corType = c("pearson", "bicor"), maxPOutliers = 0.1, save = TRUE, 
-                       file = "Dendrogram.pdf", width = 11, height = 5, cex = 0.8, cex.axis = 1, cex.lab = 1, 
-                       verbose = TRUE){
+getDendro <- function(x, transpose = TRUE, corType = c("pearson", "bicor"), maxPOutliers = 0.1, verbose = TRUE){
         if(transpose){
                 if(verbose){
-                        message("[plotDendro] Transposing data")
+                        message("[getDendro] Transposing data")
                 }
                 x <- t(x)
         }
         corType <- match.arg(corType)
         if(corType == "pearson"){
                 if(verbose){
-                        message("[plotDendro] Clustering samples using pearson correlation")
+                        message("[getDendro] Clustering samples using pearson correlation")
                 }
                 cor <- (1 - cor(x))
         } else {
                 if(corType == "bicor"){
                         if(verbose){
-                                message("[plotDendro] Clustering samples using bicor correlation")
+                                message("[getDendro] Clustering samples using bicor correlation")
                         }
                         cor <- (1 - bicor(x, maxPOutliers = maxPOutliers))
                 } else {
-                        message("[plotDendro] Error: corType must be either pearson or bicor")
+                        stop("[getDendro] Error: corType must be either pearson or bicor")
                 }
         }
-        tree <- as.dist(cor) %>% hclust(method = "average")
+        dendro <- as.dist(cor) %>% hclust(method = "average")
+        return(dendro)
+}
+
+plotDendro <- function(dendro, save = TRUE, file = "Dendrogram.pdf", width = 11, height = 5, cex = 0.7, cex.axis = 1, 
+                       cex.lab = 1, verbose = TRUE){
         if(save){
                 pdf(file = file, width = width, height = height)
         }
@@ -201,14 +204,13 @@ plotDendro <- function(x, transpose = TRUE, corType = c("pearson", "bicor"), max
                 message("[plotDendro] Plotting dendrogram")
         }
         par(mar = c(1,5,1,1))
-        plot(tree, main = "", sub = "", xlab = "", cex = cex, cex.axis = cex.axis, cex.lab = cex.lab, frame.plot = TRUE)
+        plot(dendro, main = "", sub = "", xlab = "", cex = cex, cex.axis = cex.axis, cex.lab = cex.lab, frame.plot = TRUE)
         if(save){
                 invisible(dev.off())
                 if(verbose){
                         message("[plotDendro] Saving plot as ", file)
                 }
         }
-        return(tree)
 }
 
 getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor"), maxPOutliers = 0.1, 
@@ -258,7 +260,7 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
         gg <- ggplot(data = fitIndices)
         gg <- gg +
                 geom_vline(aes(xintercept = powerEstimate), color = lineCol) +
-                geom_text(aes(x = powerEstimate, y = 0, label = powerEstimate), color = lineCol, nudge_x = 1) +
+                geom_text(aes(x = powerEstimate, y = 0, label = powerEstimate), color = lineCol, nudge_x = -1) +
                 geom_point(aes(x = power, y = value), color = pointCol, size = 1.2) +
                 facet_wrap(vars(variable), nrow = 1, ncol = 2, scales = "free_y") +
                 xlab("Soft Power Threshold") +
@@ -290,7 +292,12 @@ enableWGCNAThreads(nThreads = 6)
 colData <- read.xlsx("sample_info.xlsx", rowNames = TRUE)
 bs <- getCpGs(colData)
 
-# Call and Filter Regions ####
+# Call Regions without Filtering ####
+regions_unf <- getRegions(bs, covMin = 0, methSD = 0, save = FALSE)
+plotRegionStats(regions_unf, file = "Unfiltered_Region_Plots.pdf")
+plotSDstats(regions_unf, file = "Unfiltered_SD_Plots.pdf")
+
+# Call Regions with Filtering ####
 regions <- getRegions(bs)
 plotRegionStats(regions)
 plotSDstats(regions)
@@ -299,8 +306,10 @@ plotSDstats(regions)
 meth <- getRegionMeth(regions, bs = bs)
 mod <- model.matrix(~1, data = pData(bs))
 methAdj <- adjustRegionMeth(meth, mod = mod)
-tree <- plotDendro(methAdj, file = "Sample_Dendrogram_by_Region_Methylation.pdf")
+dendro <- getDendro(methAdj)
+plotDendro(dendro, file = "Sample_Dendrogram_by_Region_Methylation.pdf")
 
 # Select Soft Power Threshold ####
 sft <- getSoftPower(methAdj)
 plotSoftPower(sft)
+
