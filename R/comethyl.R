@@ -186,9 +186,132 @@ adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
         return(methAdj)
 }
 
+plotDendro <- function(x, transpose = TRUE, corType = c("pearson", "bicor"), maxPOutliers = 0.1, save = TRUE, 
+                       file = "Dendrogram.pdf", width = 11, height = 5, cex = 0.8, cex.axis = 1, cex.lab = 1, 
+                       verbose = TRUE){
+        if(transpose){
+                if(verbose){
+                        message("[plotDendro] Transposing data")
+                }
+                x <- t(x)
+        }
+        corType <- match.arg(corType)
+        if(corType == "pearson"){
+                if(verbose){
+                        message("[plotDendro] Clustering samples using pearson correlation")
+                }
+                cor <- (1 - cor(x))
+        } else {
+                if(corType == "bicor"){
+                        if(verbose){
+                                message("[plotDendro] Clustering samples using bicor correlation")
+                        }
+                        cor <- (1 - bicor(x, maxPOutliers = maxPOutliers))
+                } else {
+                        message("[plotDendro] Error: corType must be either pearson or bicor")
+                }
+        }
+        tree <- as.dist(cor) %>% hclust(method = "average")
+        if(save){
+                pdf(file = file, width = width, height = height)
+        }
+        if(verbose){
+                message("[plotDendro] Plotting dendrogram")
+        }
+        par(mar = c(1,5,1,1))
+        plot(tree, main = "", sub = "", xlab = "", cex = cex, cex.axis = cex.axis, cex.lab = cex.lab, frame.plot = TRUE)
+        if(save){
+                invisible(dev.off())
+                if(verbose){
+                        message("[plotDendro] Saving plot as ", file)
+                }
+        }
+        if(verbose){
+                message("[plotDendro] Complete!")
+        }
+        return(tree)
+}
+
+getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor"), maxPOutliers = 0.1, 
+                         RsquaredCut = 0.8, verbose = TRUE){
+        corType <- match.arg(corType)
+        if(corType == "pearson"){
+                corFnc <- "cor"
+        } else {
+                if(corType == "bicor"){
+                        corFnc <- corType
+                } else {
+                        message("[getSoftPower] Error: corType must be either pearson or bicor")
+                }
+        }
+        if(verbose){
+                message("[getSoftPower] Analyzing scale-free topology with ", corType, 
+                        " correlation to determine best soft-thresholding power")
+                verboseNum <- 10
+        } else {
+                verboseNum <- 0
+        }
+        sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector, networkType = "signed", 
+                                 corFnc = corFnc, corOptions = list(maxPOutliers = maxPOutliers), blockSize = 40000, 
+                                 verbose = verboseNum)
+        if(is.na(sft$powerEstimate)){
+                sft$powerEstimate <- sft$fitIndices$Power[sft$fitIndices$SFT.R.sq == max(sft$fitIndices$SFT.R.sq)]
+        }
+        if(verbose){
+                message("[getSoftPower] At soft power threshold = ", sft$powerEstimate, 
+                        ", fit = ", round(sft$fitIndices$SFT.R.sq[sft$fitIndices$Power == sft$powerEstimate], 3), 
+                        " and mean connectivity = ", round(sft$fitIndices$mean.k.[sft$fitIndices$Power == sft$powerEstimate], 1))
+                message("[getSoftPower] Complete!")
+        }
+        return(sft)
+}
+
+plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 4, save = TRUE, 
+                          file = "Soft_Power_Plots.pdf", width = 8.5, height = 5, verbose = TRUE){
+        if(verbose){
+                message("[plotSoftPower] Plotting scale-free topology fit and mean connectivity by soft power threshold")
+        }
+        fitIndices <- data.frame(power = sft$fitIndices$Power, 
+                                 fit = -sign(sft$fitIndices[,"slope"]) * sft$fitIndices[,"SFT.R.sq"],
+                                 log10_meanConnectivity = log10(sft$fitIndices$mean.k.),
+                                 powerEstimate = sft$powerEstimate) %>% 
+                reshape2::melt(id.vars = c("power", "powerEstimate"))
+        gg <- ggplot(data = fitIndices)
+        gg <- gg +
+                geom_vline(aes(xintercept = powerEstimate), color = lineCol) +
+                geom_text(aes(x = powerEstimate, y = 0, label = powerEstimate), color = lineCol, nudge_x = 1) +
+                geom_point(aes(x = power, y = value), color = pointCol, size = 1.2) +
+                facet_wrap(vars(variable), nrow = 1, ncol = 2, scales = "free_y") +
+                xlab("Soft Power Threshold") +
+                scale_x_continuous(breaks = breaks_pretty(n = nBreaks)) +
+                scale_y_continuous(breaks = breaks_pretty(n = nBreaks)) +
+                expand_limits(x = 0, y = c(0,1)) +
+                theme_bw(base_size = 24) +
+                theme(panel.grid = element_blank(), panel.border = element_rect(color = "black", size = 1.25),
+                      legend.position = "none", strip.text.x = element_text(size = 16), 
+                      axis.ticks = element_line(size = 1.25, color = "black"), axis.title.x = element_text(size = 14), 
+                      axis.title.y = element_blank(), strip.background = element_blank(), 
+                      plot.margin = unit(c(0,1,1,0.4), "lines"), panel.spacing.y = unit(0, "lines"), 
+                      axis.text = element_text(size = 12, color = "black"))
+        if(save){
+                if(verbose){
+                        message("[plotSoftPower] Saving plots as ", file)
+                }
+                ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
+        }
+        if(verbose){
+                message("[plotSoftPower] Complete!")
+        }
+        return(gg)
+}
+
+# Set Global Options ####
+options(stringsAsFactors = FALSE)
+Sys.setenv(R_THREADS = 1)
+enableWGCNAThreads(nThreads = 6)
+
 # Read and Filter Bismark CpG Reports ####
-colData <- read.xlsx("sample_info.xlsx", colNames = TRUE, rowNames = TRUE)
-colData <- colData[4:9,] # subset for testing
+colData <- read.xlsx("sample_info.xlsx", rowNames = TRUE)
 bs <- getCpGs(colData)
 
 # Call and Filter Regions ####
@@ -200,16 +323,8 @@ plotSDstats(regions)
 meth <- getRegionMeth(regions, bs = bs)
 mod <- model.matrix(~1, data = pData(bs))
 methAdj <- adjustRegionMeth(meth, mod = mod)
+tree <- plotDendro(methAdj, file = "Sample_Dendrogram_by_Region_Methylation.pdf")
 
-sampleTree <- (1 - cor(t(methAdj))) %>% as.dist() %>% hclust(method = "average")
-pdf(file = "Sample_Dendrogram.pdf", height = 5, width = 11)
-par(mar = c(0, 5, 1, 0))
-plot(sampleTree, main = "", sub = "", xlab = "", cex = 0.8, cex.lab = 1, cex.axis = 1)
-invisible(dev.off())
-
-
-
-
-
-
-
+# Select Soft Power Threshold ####
+sft <- getSoftPower(methAdj)
+plotSoftPower(sft)
