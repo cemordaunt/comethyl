@@ -82,16 +82,18 @@ plotRegionStats <- function(regions, bins = 100, histCol = "#132B43", lineCol = 
         gg <- gg +
                 geom_histogram(aes(x = value), bins = bins, fill = histCol, color = histCol) +
                 geom_vline(data = medians, aes(xintercept = value), color = lineCol) +
-                facet_wrap(vars(variable), nrow = 2, ncol = 3, scales = "free") +
+                facet_wrap(vars(variable), nrow = 2, ncol = 3, scales = "free", strip.position = "bottom") +
                 scale_x_continuous(breaks = breaks_pretty(n = nBreaks)) +
                 scale_y_continuous(expand = expand_scale(mult = c(0.008, 0.05))) +
                 theme_bw(base_size = 24) +
-                theme(panel.grid = element_blank(), panel.border = element_rect(color = "black", size = 1.25),
-                      legend.position = "none", strip.text.x = element_text(size = 16), 
+                theme(axis.text.x = element_text(size = 12, color = "black"), axis.text.y = element_blank(),
                       axis.ticks.x = element_line(size = 1.25, color = "black"), axis.ticks.y = element_blank(), 
-                      axis.title = element_blank(), strip.background = element_blank(), 
-                      plot.margin = unit(c(0,1,1,0.4), "lines"), panel.spacing.y = unit(0, "lines"), 
-                      axis.text.x = element_text(size = 12, color = "black"), axis.text.y = element_blank())
+                      axis.title = element_blank(), legend.position = "none", 
+                      panel.border = element_rect(color = "black", size = 1.25), 
+                      panel.grid = element_blank(), panel.spacing.x = unit(0.6, "lines"),
+                      panel.spacing.y = unit(0.8, "lines"), plot.margin = unit(c(1,1,0.3,0.6), "lines"),
+                      strip.background = element_blank(), strip.placement = "outside", 
+                      strip.switch.pad.wrap = unit(0, "lines"), strip.text.x = element_text(size = 16))
         if(save){
                 if(verbose){
                         message("[plotRegionStats] Saving plots as ", file)
@@ -101,7 +103,7 @@ plotRegionStats <- function(regions, bins = 100, histCol = "#132B43", lineCol = 
         return(gg)
 }
 
-plotSDstats <- function(regions, bins = 100, nBreaks = 4, legend.position = c(1.085,0.938), save = TRUE, 
+plotSDstats <- function(regions, bins = 100, nBreaks = 4, legend.position = c(1.09,0.9), save = TRUE, 
                         file = "SD_Plots.pdf", width = 8.5, height = 8.5, verbose = TRUE){
         if(verbose){
                 message("[plotSDstats] Plotting methylation SD vs region statistics")
@@ -111,20 +113,22 @@ plotSDstats <- function(regions, bins = 100, nBreaks = 4, legend.position = c(1.
         gg <- ggplot(data = regions)
         gg <- gg +
                 geom_bin2d(aes(x = value, y = methSD, color = ..count..), bins = bins) +
-                facet_wrap(vars(variable), nrow = 2, ncol = 2, scales = "free_x") +
+                facet_wrap(vars(variable), nrow = 2, ncol = 2, scales = "free_x", strip.position = "bottom") +
                 scale_fill_continuous(name = "Count", trans = "log10") +
                 scale_color_continuous(guide = FALSE, trans = "log10") +
                 scale_x_continuous(breaks = breaks_pretty(n = nBreaks), expand = expand_scale(mult = c(0.0062, 0.05))) +
                 scale_y_continuous(breaks = breaks_pretty(n = nBreaks), expand = expand_scale(mult = c(0.006, 0.05))) +
                 theme_bw(base_size = 24) +
-                theme(panel.grid = element_blank(), panel.border = element_rect(color = "black", size = 1.25),
-                      legend.position = legend.position, legend.background = element_blank(),
-                      legend.title = element_text(size = 14), legend.text = element_text(size = 12),
-                      strip.text.x = element_text(size = 16), 
-                      axis.ticks = element_line(size = 1.25, color = "black"), axis.title.x = element_blank(),
-                      axis.title.y = element_text(size = 14, color = "black"), 
-                      strip.background = element_blank(), plot.margin = unit(c(0.5,6,1,1), "lines"), 
-                      panel.spacing.y = unit(0, "lines"), axis.text = element_text(size = 12, color = "black"))
+                theme(axis.text = element_text(size = 12, color = "black"), 
+                      axis.ticks = element_line(size = 1.25, color = "black"),
+                      axis.title.x = element_blank(), axis.title.y = element_text(size = 16, color = "black"),
+                      legend.background = element_blank(), legend.position = legend.position, 
+                      legend.text = element_text(size = 12), legend.title = element_text(size = 16), 
+                      panel.border = element_rect(color = "black", size = 1.25), panel.grid = element_blank(), 
+                      panel.spacing.x = unit(1, "lines"), panel.spacing.y = unit(0.8, "lines"), 
+                      plot.margin = unit(c(1,6,0.3,1), "lines"), strip.background = element_blank(), 
+                      strip.placement = "outside", strip.switch.pad.wrap = unit(0, "lines"), 
+                      strip.text.x = element_text(size = 16))
         if(save){
                 if(verbose){
                         message("[plotSDstats] Saving plots as ", file)
@@ -248,7 +252,7 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
 }
 
 plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 4, save = TRUE, 
-                          file = "Soft_Power_Plots.pdf", width = 8.5, height = 5, verbose = TRUE){
+                          file = "Soft_Power_Plots.pdf", width = 8.5, height = 4.25, verbose = TRUE){
         if(verbose){
                 message("[plotSoftPower] Plotting scale-free topology fit and mean connectivity by soft power threshold")
         }
@@ -262,18 +266,20 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
                 geom_vline(aes(xintercept = powerEstimate), color = lineCol) +
                 geom_text(aes(x = powerEstimate, y = 0, label = powerEstimate), color = lineCol, nudge_x = -1) +
                 geom_point(aes(x = power, y = value), color = pointCol, size = 1.2) +
-                facet_wrap(vars(variable), nrow = 1, ncol = 2, scales = "free_y") +
+                facet_wrap(vars(variable), nrow = 1, ncol = 2, scales = "free_y", strip.position = "left") +
                 xlab("Soft Power Threshold") +
                 scale_x_continuous(breaks = breaks_pretty(n = nBreaks)) +
                 scale_y_continuous(breaks = breaks_pretty(n = nBreaks)) +
                 expand_limits(x = 0, y = c(0,1)) +
                 theme_bw(base_size = 24) +
-                theme(panel.grid = element_blank(), panel.border = element_rect(color = "black", size = 1.25),
-                      legend.position = "none", strip.text.x = element_text(size = 16), 
-                      axis.ticks = element_line(size = 1.25, color = "black"), axis.title.x = element_text(size = 14), 
-                      axis.title.y = element_blank(), strip.background = element_blank(), 
-                      plot.margin = unit(c(0,1,1,0.4), "lines"), panel.spacing.y = unit(0, "lines"), 
-                      axis.text = element_text(size = 12, color = "black"))
+                theme(axis.text = element_text(size = 12, color = "black"),
+                      axis.ticks = element_line(size = 1.25, color = "black"), axis.title.x = element_text(size = 16),
+                      axis.title.y = element_blank(), legend.position = "none", 
+                      panel.border = element_rect(color = "black", size = 1.25), 
+                      panel.grid = element_blank(), panel.spacing.x = unit(0.3, "lines"),
+                      panel.spacing.y = unit(0.8, "lines"), plot.margin = unit(c(1,1,0.7,0.2), "lines"),
+                      strip.background = element_blank(), strip.placement = "outside", 
+                      strip.switch.pad.wrap = unit(0, "lines"), strip.text.x = element_text(size = 16))
         if(save){
                 if(verbose){
                         message("[plotSoftPower] Saving plots as ", file)
@@ -312,4 +318,3 @@ plotDendro(dendro, file = "Sample_Dendrogram_by_Region_Methylation.pdf")
 # Select Soft Power Threshold ####
 sft <- getSoftPower(methAdj)
 plotSoftPower(sft)
-
