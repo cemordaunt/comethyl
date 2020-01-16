@@ -310,6 +310,31 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
         return(gg)
 }
 
+getModules <- function(methAdj, power = NULL, corType = c("pearson", "bicor"), deepSplit = 4, minModuleSize = 10, 
+                       mergeCutHeight = 0.1, nThreads = 6, save = TRUE, file = "Modules.rds", verbose = TRUE){
+        if(is.null(power)){
+                stop("[getModules] You must select a soft power threshold")
+        }
+        if(verbose){
+                message("[getModules] Constructing network and detecting modules in blocks")
+                verboseNum <- 10
+        } else {
+                verboseNum <- 0
+        }
+        corType <- match.arg(corType)
+        modules <- blockwiseModules(methAdj, checkMissingData = FALSE, maxBlockSize = 40000, corType = corType, 
+                                    power = power, networkType = "signed", TOMtype = "signed", deepSplit = deepSplit, 
+                                    minModuleSize = minModuleSize, mergeCutHeight = mergeCutHeight, nThreads = nThreads,
+                                    verbose = verboseNum)
+        if(save){
+                if(verbose){
+                        message("[getModules] Saving modules as ", file)
+                }
+                saveRDS(modules, file = file)
+        }
+        return(modules)
+}
+
 # Set Global Options ####
 options(stringsAsFactors = FALSE)
 Sys.setenv(R_THREADS = 1)
@@ -340,3 +365,5 @@ plotDendro(dendro, file = "Sample_Dendrogram.pdf")
 sft <- getSoftPower(methAdj)
 plotSoftPower(sft)
 
+# Get Comethylation Modules ####
+modules <- getModules(methAdj, power = sft$powerEstimate)
