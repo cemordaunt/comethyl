@@ -3,7 +3,7 @@
 
 # Load Packages ####
 .libPaths("/share/lasallelab/Charles/comethylated/R")
-sapply(c("scales", "openxlsx", "tidyverse", "bsseq", "dmrseq", "WGCNA", "sva"), require, character.only = TRUE)
+sapply(c("scales", "openxlsx", "tidyverse", "ggdendro", "bsseq", "dmrseq", "WGCNA", "sva"), require, character.only = TRUE)
 
 # Functions ####
 getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz", 
@@ -172,49 +172,70 @@ adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
         return(methAdj)
 }
 
-getDendro <- function(x, transpose = TRUE, corType = c("pearson", "bicor"), maxPOutliers = 0.1, verbose = TRUE){
+getDendro <- function(x, transpose = FALSE, distance = c("euclidean", "pearson", "bicor"), maxPOutliers = 0.1, 
+                      verbose = TRUE){
         if(transpose){
                 if(verbose){
                         message("[getDendro] Transposing data")
                 }
                 x <- t(x)
         }
-        corType <- match.arg(corType)
-        if(corType == "pearson"){
+        distance <- match.arg(distance)
+        if(distance == "euclidean"){
                 if(verbose){
-                        message("[getDendro] Clustering samples using pearson correlation")
-                }
-                cor <- (1 - cor(x))
-        } else {
-                if(corType == "bicor"){
-                        if(verbose){
-                                message("[getDendro] Clustering samples using bicor correlation")
-                        }
-                        cor <- (1 - bicor(x, maxPOutliers = maxPOutliers))
+                        message("[getDendro] Clustering with euclidean distance")
+                        dist <- dist(x)
                 } else {
-                        stop("[getDendro] Error: corType must be either pearson or bicor")
+                        if(distance == "pearson"){
+                                if(verbose){
+                                        message("[getDendro] Clustering with pearson correlation as the distance")
+                                }
+                                dist <- (1 - cor(x)) %>% as.dist()
+                        } else {
+                                if(distance == "bicor"){
+                                        if(verbose){
+                                                message("[getDendro] Clustering with bicor correlation as the distance")
+                                        }
+                                        dist <- (1 - bicor(x, maxPOutliers = maxPOutliers)) %>% as.dist()
+                                } else {
+                                        stop("[getDendro] Error: Distance must be either euclidean, pearson, or bicor")
+                                }
+                        }
                 }
         }
-        dendro <- as.dist(cor) %>% hclust(method = "average")
+        dendro <- hclust(dist, method = "average")
         return(dendro)
 }
 
-plotDendro <- function(dendro, save = TRUE, file = "Dendrogram.pdf", width = 11, height = 5, cex = 0.7, cex.axis = 1, 
-                       cex.lab = 1, verbose = TRUE){
-        if(save){
-                pdf(file = file, width = width, height = height)
-        }
+plotDendro <- function(dendro, textSize = 2.5, expandX = c(2,2), expandY = c(7,2), nBreaks = 4, save = TRUE,
+                       file = "Dendrogram.pdf", width = 11, height = 4.25){
         if(verbose){
                 message("[plotDendro] Plotting dendrogram")
         }
-        par(mar = c(1,5,1,1))
-        plot(dendro, main = "", sub = "", xlab = "", cex = cex, cex.axis = cex.axis, cex.lab = cex.lab, frame.plot = TRUE)
+        dendroPlot <- dendro_data(dendro)
+        fix <- dendroPlot$segments$yend == 0
+        dendroPlot$segments$yend[fix] <- dendroPlot$segments$y[fix] - max(dendroPlot$segments$y) * 0.05
+        dendroPlot$labels$y <- dendroPlot$segments$yend[fix] - max(dendroPlot$segments$y) * 0.01
+        gg <- ggplot()
+        gg <- gg +
+                geom_segment(data = dendroPlot$segments, aes(x = x, y = y, xend = xend, yend = yend), lwd = 0.3) +
+                geom_text(data = dendroPlot$labels, aes(x = x, y = y, label = label), angle = 90, hjust = 1, 
+                          size = textSize) +
+                scale_x_continuous(expand = expand_scale(add = expandX)) +
+                scale_y_continuous(expand = expand_scale(add = expandY), breaks = breaks_pretty(n = nBreaks)) +
+                ylab("Height") +
+                theme_dendro() +
+                theme(plot.margin = unit(c(1,1,0,1), "lines"), 
+                      panel.background = element_rect(color = "black", size = 1.1),
+                      axis.ticks.y = element_line(), axis.text.y = element_text(size = 12), 
+                      axis.title.y = element_text(size = 16, angle = 90, vjust = 2))
         if(save){
-                invisible(dev.off())
                 if(verbose){
-                        message("[plotDendro] Saving plot as ", file)
+                        message("[plotDendro] Saving dendrogram plot as ", file)
                 }
+                ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
         }
+        return(gg)
 }
 
 getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor"), maxPOutliers = 0.1, 
@@ -313,8 +334,9 @@ meth <- getRegionMeth(regions, bs = bs)
 mod <- model.matrix(~1, data = pData(bs))
 methAdj <- adjustRegionMeth(meth, mod = mod)
 dendro <- getDendro(methAdj)
-plotDendro(dendro, file = "Sample_Dendrogram_by_Region_Methylation.pdf")
+plotDendro(dendro, file = "Sample_Dendrogram.pdf")
 
 # Select Soft Power Threshold ####
 sft <- getSoftPower(methAdj)
 plotSoftPower(sft)
+
