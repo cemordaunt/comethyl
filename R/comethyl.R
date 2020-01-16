@@ -49,13 +49,13 @@ getRegions <- function(bs, maxGap = 150, n = 3, covMin = 10, methSD = 0.05, save
                         " reads in all samples and methylation SD of at least ", methSD * 100, "%")
         }
         cov <- getCoverage(bs, regions = regions[,c("chr", "start", "end")], what = "perRegionTotal")
-        regions$covMean <- DelayedMatrixStats::rowMeans2(cov)
-        regions$covSD <- DelayedMatrixStats::rowSds(cov)
+        regions$covMean <- DelayedMatrixStats::rowMeans2(cov) %>% round(digits = 5)
+        regions$covSD <- DelayedMatrixStats::rowSds(cov) %>% round(digits = 5)
         regions$covMin <- DelayedArray::rowMins(cov)
         regions <- regions[regions$covMin >= covMin,]
         meth <- getMeth(bs, regions = regions[,c("chr", "start", "end")], type = "raw", what = "perRegion")
-        regions$methMean <- DelayedMatrixStats::rowMeans2(meth, na.rm = TRUE)
-        regions$methSD <- DelayedMatrixStats::rowSds(meth, na.rm = TRUE)
+        regions$methMean <- DelayedMatrixStats::rowMeans2(meth, na.rm = TRUE) %>% round(digits = 5)
+        regions$methSD <- DelayedMatrixStats::rowSds(meth, na.rm = TRUE) %>% round(digits = 5)
         regions <- regions[regions$methSD >= methSD,]
         regions$RegionID <- paste("Region", 1:nrow(regions), sep = "_")
         regions$width <- regions$end - regions$start
