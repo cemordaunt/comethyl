@@ -207,8 +207,8 @@ getDendro <- function(x, transpose = FALSE, distance = c("euclidean", "pearson",
         return(dendro)
 }
 
-plotDendro <- function(dendro, textSize = 2.5, expandX = c(2,2), expandY = c(7,2), nBreaks = 4, save = TRUE,
-                       file = "Dendrogram.pdf", width = 11, height = 4.25){
+plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(2,2), expandY = c(7,2), nBreaks = 4, save = TRUE,
+                       file = "Dendrogram.pdf", width = 11, height = 4.25, verbose = TRUE){
         if(verbose){
                 message("[plotDendro] Plotting dendrogram")
         }
@@ -219,16 +219,19 @@ plotDendro <- function(dendro, textSize = 2.5, expandX = c(2,2), expandY = c(7,2
         gg <- ggplot()
         gg <- gg +
                 geom_segment(data = dendroPlot$segments, aes(x = x, y = y, xend = xend, yend = yend), lwd = 0.3) +
-                geom_text(data = dendroPlot$labels, aes(x = x, y = y, label = label), angle = 90, hjust = 1, 
-                          size = textSize) +
                 scale_x_continuous(expand = expand_scale(add = expandX)) +
                 scale_y_continuous(expand = expand_scale(add = expandY), breaks = breaks_pretty(n = nBreaks)) +
                 ylab("Height") +
                 theme_dendro() +
                 theme(plot.margin = unit(c(1,1,0,1), "lines"), 
                       panel.background = element_rect(color = "black", size = 1.1),
-                      axis.ticks.y = element_line(), axis.text.y = element_text(size = 12), 
+                      axis.ticks.y = element_line(), axis.text.y = element_text(size = 12, color = "black"), 
                       axis.title.y = element_text(size = 16, angle = 90, vjust = 2))
+        if(label){
+                gg <- gg +
+                        geom_text(data = dendroPlot$labels, aes(x = x, y = y, label = label), angle = 90, hjust = 1, 
+                                  size = labelSize)
+        }
         if(save){
                 if(verbose){
                         message("[plotDendro] Saving dendrogram plot as ", file)
@@ -335,6 +338,25 @@ getModules <- function(methAdj, power = NULL, corType = c("pearson", "bicor"), d
         return(modules)
 }
 
+plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pdf", width = 11, height = 4.25, verbose = TRUE){
+        if(verbose){
+                message("[plotRegionDendro] Plotting region dendrograms and modules for each block")
+        }
+        blockColors <- lapply(modules$blockGenes, function(x) modules$colors[x])
+        blockNames <- paste("Block ", 1:length(modules$dendrograms), " (", sapply(modules$blockGenes, length), " regions)", sep = "")
+        if(save){
+                if(verbose){
+                        message("[plotRegionDendro] Saving region dendrogram plot as ", file)
+                }
+                pdf(file = file, width = width, height = height)
+        }
+        invisible(mapply(FUN = plotDendroAndColors, dendro = modules$dendrograms, colors = blockColors, main = blockNames, 
+                         MoreArgs = list(groupLabels = "Modules", dendroLabels = FALSE, marAll = c(1.5,5,3,1.5), saveMar = FALSE, 
+                                         cex.lab = 1.2, cex.colorLabels = 1.2, autoColorHeight = FALSE, lwd = 0.8, 
+                                         colorHeight = 0.15, cex.axis = 1, frame.plot = TRUE)))
+        invisible(dev.off())
+}
+
 # Set Global Options ####
 options(stringsAsFactors = FALSE)
 Sys.setenv(R_THREADS = 1)
@@ -367,3 +389,4 @@ plotSoftPower(sft)
 
 # Get Comethylation Modules ####
 modules <- getModules(methAdj, power = sft$powerEstimate)
+plotRegionDendro(modules)
