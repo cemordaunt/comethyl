@@ -27,7 +27,7 @@ getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz",
         }
         if(save){
                 if(verbose){
-                        message("[getCpGs] Saving BSseq object as ", file)
+                        message("[getCpGs] Saving file as ", file)
                 }
                 saveRDS(bs, file = file)
         }
@@ -63,7 +63,7 @@ getRegions <- function(bs, maxGap = 150, n = 3, covMin = 10, methSD = 0.05, save
                               "methSD")]
         if(save){
                 if(verbose){
-                        message("[getRegions] Saving regions as ", file)
+                        message("[getRegions] Saving file as ", file)
                 }
                 write.table(regions, file = file, quote = FALSE, sep = "\t", row.names = FALSE)
         }
@@ -146,7 +146,7 @@ getRegionMeth <- function(regions, bs, type = "raw", save = TRUE, file = "Region
         rownames(meth) <- regions$RegionID
         if(save){
                 if(verbose){
-                        message("[getRegionMeth] Saving region methylation as ", file)
+                        message("[getRegionMeth] Saving file as ", file)
                 }
                 saveRDS(meth, file = file)
         }
@@ -165,7 +165,7 @@ adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
         methAdj <- sva_network(meth, n.pc = n.pc) %>% t()
         if(save){
                 if(verbose){
-                        message("[adjustRegionMeth] Saving adjusted region methylation as ", file)
+                        message("[adjustRegionMeth] Saving file as ", file)
                 }
                 saveRDS(methAdj, file = file)
         }
@@ -234,7 +234,7 @@ plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(2,2), 
         }
         if(save){
                 if(verbose){
-                        message("[plotDendro] Saving dendrogram plot as ", file)
+                        message("[plotDendro] Saving plot as ", file)
                 }
                 ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
         }
@@ -346,7 +346,7 @@ plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pd
         blockNames <- paste("Block ", 1:length(modules$dendrograms), " (", sapply(modules$blockGenes, length), " regions)", sep = "")
         if(save){
                 if(verbose){
-                        message("[plotRegionDendro] Saving region dendrogram plot as ", file)
+                        message("[plotRegionDendro] Saving plot as ", file)
                 }
                 pdf(file = file, width = width, height = height)
         }
@@ -355,6 +355,69 @@ plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pd
                                          cex.lab = 1.2, cex.colorLabels = 1.2, autoColorHeight = FALSE, lwd = 0.8, 
                                          colorHeight = 0.15, cex.axis = 1, frame.plot = TRUE)))
         invisible(dev.off())
+}
+
+.regionFilterTotals <- function(regions, covMin, methSD){
+        regions <- regions[regions$covMin >= covMin & regions$methSD >= methSD,]
+        totals <- c("covMin" = covMin, "methSD" = methSD, "totalRegions_K" = nrow(regions)/10^3, 
+                    "totalWidth_Mb" = sum(regions$width)/10^6, "totalN_M" = sum(regions$n)/10^6)
+        return(totals)
+}
+
+getRegionFilterTotals <- function(regions, covMin = rep(seq(0,20,2), each = 11), methSD = rep(seq(0,0.1,0.01), 11),
+                                  save = TRUE, file = "Region_Filter_Totals.txt", verbose = TRUE){
+        if(verbose){
+                message("[getRegionFilterTotals] Calculating region totals at specified covMin and methSD cutoffs")
+        }
+        regionFilterTotals <- mapply(FUN = .regionFilterTotals, covMin = covMin, methSD = methSD, 
+                                     MoreArgs = list(regions = regions)) %>% t() %>% as.data.frame()
+        if(save){
+                if(verbose){
+                        message("[getRegionFilterTotals] Saving file as ", file)
+                        write.table(regionFilterTotals, file = file, sep = "\t", row.names = FALSE)
+                }
+        }
+        return(regionFilterTotals)
+}
+
+plotRegionFilterTotals <- function(regionFilterTotals, nBreaks = 4, legend.position = c(1.11,0.925), save = TRUE, 
+                                   file = "Region_Filter_Totals.pdf", width = 11, height = 11, verbose = TRUE){
+        if(verbose){
+                message("[plotRegionFilterTotals] Plotting region filter totals")
+        }
+        regionFilterTotals <- reshape2::melt(regionFilterTotals, id.vars = c("covMin", "methSD"))
+        regionFilterTotals$variable <- as.character(regionFilterTotals$variable) %>% 
+                str_replace_all(pattern = c("totalRegions_K" = "Total Regions (Thousands)", "totalWidth_Mb" = "Total Width (Mb)", 
+                                            "totalN_M" = "Total CpGs (Millions)")) %>%
+                factor(levels = c("Total Regions (Thousands)", "Total Width (Mb)", "Total CpGs (Millions)"))
+        gg <- ggplot(data = regionFilterTotals)
+        gg <- gg +
+                geom_line(aes(x = covMin, y = value, group = methSD, color = methSD)) +
+                geom_text(data = subset(regionFilterTotals, covMin == min(covMin)), 
+                          aes(x = covMin, y = value, group = methSD, color = methSD, label = methSD), 
+                          size = 4.5, check_overlap = TRUE, nudge_x = -0.2, hjust = 1) +
+                facet_wrap(vars(variable), nrow = 3, ncol = 1, scales = "free_y", strip.position = "left") +
+                xlab("Minimum Coverage") +
+                scale_x_continuous(breaks = breaks_pretty(n = nBreaks), expand = expand_scale(mult = c(0.07, 0.03))) +
+                scale_y_continuous(breaks = breaks_pretty(n = nBreaks)) +
+                scale_color_gradient("Minimum SD", breaks = breaks_pretty(n = nBreaks - 1)) +
+                theme_bw(base_size = 24) +
+                theme(axis.text = element_text(size = 14, color = "black"),
+                      axis.ticks = element_line(size = 1.25, color = "black"), axis.title.x = element_text(size = 18),
+                      axis.title.y = element_blank(), legend.background = element_blank(), legend.position = legend.position, 
+                      legend.title = element_text(size = 18), legend.text = element_text(size = 14), 
+                      panel.border = element_rect(color = "black", size = 1.25), 
+                      panel.grid = element_blank(), panel.spacing.x = unit(0.3, "lines"),
+                      panel.spacing.y = unit(0.8, "lines"), plot.margin = unit(c(1,9,0.7,0.2), "lines"),
+                      strip.background = element_blank(), strip.placement = "outside", 
+                      strip.switch.pad.wrap = unit(0, "lines"), strip.text = element_text(size = 18))
+        if(save){
+                if(verbose){
+                        message("[plotRegionFilterTotals] Saving plot as ", file)
+                }
+                ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
+        }
+        return(gg)
 }
 
 # Set Global Options ####
@@ -367,9 +430,13 @@ colData <- read.xlsx("sample_info.xlsx", rowNames = TRUE)
 bs <- getCpGs(colData)
 
 # Call Regions without Filtering ####
-regions_unf <- getRegions(bs, covMin = 0, methSD = 0, save = FALSE)
+regions_unf <- getRegions(bs, covMin = 0, methSD = 0, file = "Unfiltered_Regions.txt")
 plotRegionStats(regions_unf, file = "Unfiltered_Region_Plots.pdf")
 plotSDstats(regions_unf, file = "Unfiltered_SD_Plots.pdf")
+
+# Examine Region Totals at Different Cutoffs ####
+regionFilterTotals <- getRegionFilterTotals(regions_unf)
+plotRegionFilterTotals(regionFilterTotals)
 
 # Call Regions with Filtering ####
 regions <- getRegions(bs)
