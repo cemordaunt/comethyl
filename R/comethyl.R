@@ -8,13 +8,92 @@ sapply(c("scales", "openxlsx", "tidyverse", "ggdendro", "bsseq", "dmrseq", "WGCN
 # Functions ####
 getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz", 
                     chroms = c(paste("chr", 1:22, sep = ""), "chrX", "chrY", "chrM"), BPPARAM = MulticoreParam(10), 
-                    cov = 2, perSample = 0.75, save = TRUE, file = "Filtered_BSseq.rds", verbose = TRUE){
+                    save = TRUE, file = "Unfiltered_BSseq.rds", verbose = TRUE){
         if(verbose){
                 message("[getCpGs] Loading CpG-level data")
         }
         files <- list.files(path, pattern = pattern) %>% .[pmatch(rownames(colData), table = .)]
         loci <- bsseq:::.readBismarkAsFWGRanges(files[1]) %>% chrSelectBSseq(seqnames = chroms)
         bs <- read.bismark(files, loci = loci, colData = colData, BPPARAM = BPPARAM, verbose = verbose)
+        if(verbose){
+                message("[getCpGs] Final BSseq Object:")
+                print(bs)
+        }
+        if(save){
+                if(verbose){
+                        message("[getCpGs] Saving file as ", file)
+                }
+                saveRDS(bs, file = file)
+        }
+        return(bs)
+}
+
+.n <- function(covSample, nSample){
+        n <- length(covSample[covSample >= nSample])
+        return(n)
+}
+
+.nCpGs <- function(bsCov, cov, nSample){
+        covSample <- (bsCov >= cov) %>% DelayedMatrixStats::rowSums2()
+        nCpGs <- sapply(nSample, FUN = .n, covSample = covSample)
+        return(nCpGs)
+}
+
+getCpGfilterTotals <- function(bs, cov = seq(0,10,1), perSample = seq(0.5,1,0.05), save = TRUE, file = "CpG_Filter_Totals.txt",
+                               verbose = TRUE){
+        if(verbose){
+                message("[getCpGfilterTotals] Calculating CpG totals at specified cov and perSample cutoffs")
+        }
+        nSample <- (perSample * ncol(bs)) %>% ceiling()
+        bsCov <- getCoverage(bs)
+        nCpGs <- sapply(cov, FUN = .nCpGs, bsCov = bsCov, nSample = nSample)
+        nCpGs <- as.integer(nCpGs)
+        perCpGs <- (nCpGs / length(bs)) %>% round(digits = 5)
+        CpGfilterTotals <- data.frame(cov = rep(cov, each = length(perSample)), perSample = rep(perSample, times = length(cov)), 
+                                      nSample = rep(nSample, times = length(cov)), nCpGs_M = nCpGs / 10^6, perCpGs = perCpGs)
+        if(save){
+                if(verbose){
+                        message("[getCpGfilterTotals] Saving file as ", file)
+                }
+                write.table(CpGfilterTotals, file = file, sep = "\t", row.names = FALSE)
+        }
+        return(CpGfilterTotals)
+}
+
+plotCpGfilterTotals <- function(CpGfilterTotals, nBreaks = 4, legend.position = c(1.08,0.73), save = TRUE, 
+                                file = "CpG_Filter_Totals.pdf", width = 11, height = 4.25, verbose = TRUE){
+        if(verbose){
+                message("[plotCpGfilterTotals] Plotting CpG filter totals")
+        }
+        CpGfilterTotals$perSample <- CpGfilterTotals$perSample * 100
+        gg <- ggplot(data = CpGfilterTotals)
+        gg <- gg +
+                geom_line(aes(x = perSample, y = nCpGs_M, group = cov, color = cov)) +
+                geom_text(data = subset(CpGfilterTotals, perSample == min(perSample)), 
+                          aes(x = perSample, y = nCpGs_M, group = cov, color = cov, label = cov), 
+                          size = 4.5, check_overlap = TRUE, nudge_x = -0.5, hjust = 1) +
+                xlab("Samples (%) Cutoff") +
+                ylab("Total CpGs (Millions)") +
+                scale_x_continuous(breaks = breaks_pretty(n = nBreaks + 1), expand = expand_scale(mult = c(0.05, 0.03))) +
+                scale_y_continuous(breaks = breaks_pretty(n = nBreaks)) +
+                scale_color_gradient("Coverage\nCutoff", breaks = breaks_pretty(n = nBreaks - 1)) +
+                theme_bw(base_size = 24) +
+                theme(axis.text = element_text(size = 14, color = "black"),
+                      axis.ticks = element_line(size = 1.25, color = "black"), axis.title = element_text(size = 18),
+                      legend.background = element_blank(), legend.position = legend.position, 
+                      legend.title = element_text(size = 18), legend.text = element_text(size = 14), 
+                      panel.border = element_rect(color = "black", size = 1.25), 
+                      panel.grid = element_blank(), plot.margin = unit(c(1,7,0.7,0.7), "lines"))
+        if(save){
+                if(verbose){
+                        message("[plotCpGfilterTotals] Saving plot as ", file)
+                }
+                ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
+        }
+        return(gg)
+}
+
+filterCpGs <- function(bs, cov = 2, perSample = 0.75, save = TRUE, file = "Filtered_BSseq.rds", verbose = TRUE){
         if(verbose){
                 message("[getCpGs] Filtering CpG-level data for loci with at least ", cov, " reads in at least ", 
                         perSample * 100, "% of samples")
@@ -132,6 +211,71 @@ plotSDstats <- function(regions, bins = 100, nBreaks = 4, legend.position = c(1.
         if(save){
                 if(verbose){
                         message("[plotSDstats] Saving plots as ", file)
+                }
+                ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
+        }
+        return(gg)
+}
+
+.regionFilterTotals <- function(regions, covMin, methSD){
+        regions <- regions[regions$covMin >= covMin & regions$methSD >= methSD,]
+        totals <- c("covMin" = covMin, "methSD" = methSD, "totalRegions_K" = nrow(regions)/10^3, 
+                    "totalWidth_Mb" = sum(regions$width)/10^6, "totalN_M" = sum(regions$n)/10^6)
+        return(totals)
+}
+
+getRegionFilterTotals <- function(regions, covMin = seq(0,20,2), methSD = seq(0,0.1,0.01),
+                                  save = TRUE, file = "Region_Filter_Totals.txt", verbose = TRUE){
+        if(verbose){
+                message("[getRegionFilterTotals] Calculating region totals at specified covMin and methSD cutoffs")
+        }
+        covMin <- rep(covMin, each = length(methSD))
+        methSD <- rep(methSD, times = length(covMin))
+        regionFilterTotals <- mapply(FUN = .regionFilterTotals, covMin = covMin, methSD = methSD, 
+                                     MoreArgs = list(regions = regions)) %>% t() %>% as.data.frame()
+        if(save){
+                if(verbose){
+                        message("[getRegionFilterTotals] Saving file as ", file)
+                        write.table(regionFilterTotals, file = file, sep = "\t", row.names = FALSE)
+                }
+        }
+        return(regionFilterTotals)
+}
+
+plotRegionFilterTotals <- function(regionFilterTotals, nBreaks = 4, legend.position = c(1.08,0.897), save = TRUE, 
+                                   file = "Region_Filter_Totals.pdf", width = 11, height = 11, verbose = TRUE){
+        if(verbose){
+                message("[plotRegionFilterTotals] Plotting region filter totals")
+        }
+        regionFilterTotals <- reshape2::melt(regionFilterTotals, id.vars = c("covMin", "methSD"))
+        regionFilterTotals$variable <- as.character(regionFilterTotals$variable) %>% 
+                str_replace_all(pattern = c("totalRegions_K" = "Total Regions (Thousands)", "totalWidth_Mb" = "Total Width (Mb)", 
+                                            "totalN_M" = "Total CpGs (Millions)")) %>%
+                factor(levels = c("Total Regions (Thousands)", "Total Width (Mb)", "Total CpGs (Millions)"))
+        gg <- ggplot(data = regionFilterTotals)
+        gg <- gg +
+                geom_line(aes(x = methSD, y = value, group = covMin, color = covMin)) +
+                geom_text(data = subset(regionFilterTotals, methSD == min(methSD)), 
+                          aes(x = methSD, y = value, group = covMin, color = covMin, label = covMin), 
+                          size = 4.5, check_overlap = TRUE, nudge_x = -0.001, hjust = 1) +
+                facet_wrap(vars(variable), nrow = 3, ncol = 1, scales = "free_y", strip.position = "left") +
+                xlab("SD Cutoff") +
+                scale_x_continuous(breaks = breaks_pretty(n = nBreaks), expand = expand_scale(mult = c(0.05, 0.03))) +
+                scale_y_continuous(breaks = breaks_pretty(n = nBreaks)) +
+                scale_color_gradient("Minimum\nCoverage\nCutoff", breaks = breaks_pretty(n = nBreaks - 1)) +
+                theme_bw(base_size = 24) +
+                theme(axis.text = element_text(size = 14, color = "black"),
+                      axis.ticks = element_line(size = 1.25, color = "black"), axis.title.x = element_text(size = 18),
+                      axis.title.y = element_blank(), legend.background = element_blank(), legend.position = legend.position, 
+                      legend.title = element_text(size = 18), legend.text = element_text(size = 14), 
+                      panel.border = element_rect(color = "black", size = 1.25), 
+                      panel.grid = element_blank(), panel.spacing.x = unit(0.3, "lines"),
+                      panel.spacing.y = unit(0.8, "lines"), plot.margin = unit(c(1,7,0.7,0.2), "lines"),
+                      strip.background = element_blank(), strip.placement = "outside", 
+                      strip.switch.pad.wrap = unit(0, "lines"), strip.text = element_text(size = 18))
+        if(save){
+                if(verbose){
+                        message("[plotRegionFilterTotals] Saving plot as ", file)
                 }
                 ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
         }
@@ -357,89 +501,33 @@ plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pd
         invisible(dev.off())
 }
 
-.regionFilterTotals <- function(regions, covMin, methSD){
-        regions <- regions[regions$covMin >= covMin & regions$methSD >= methSD,]
-        totals <- c("covMin" = covMin, "methSD" = methSD, "totalRegions_K" = nrow(regions)/10^3, 
-                    "totalWidth_Mb" = sum(regions$width)/10^6, "totalN_M" = sum(regions$n)/10^6)
-        return(totals)
-}
-
-getRegionFilterTotals <- function(regions, covMin = rep(seq(0,20,2), each = 11), methSD = rep(seq(0,0.1,0.01), 11),
-                                  save = TRUE, file = "Region_Filter_Totals.txt", verbose = TRUE){
-        if(verbose){
-                message("[getRegionFilterTotals] Calculating region totals at specified covMin and methSD cutoffs")
-        }
-        regionFilterTotals <- mapply(FUN = .regionFilterTotals, covMin = covMin, methSD = methSD, 
-                                     MoreArgs = list(regions = regions)) %>% t() %>% as.data.frame()
-        if(save){
-                if(verbose){
-                        message("[getRegionFilterTotals] Saving file as ", file)
-                        write.table(regionFilterTotals, file = file, sep = "\t", row.names = FALSE)
-                }
-        }
-        return(regionFilterTotals)
-}
-
-plotRegionFilterTotals <- function(regionFilterTotals, nBreaks = 4, legend.position = c(1.11,0.925), save = TRUE, 
-                                   file = "Region_Filter_Totals.pdf", width = 11, height = 11, verbose = TRUE){
-        if(verbose){
-                message("[plotRegionFilterTotals] Plotting region filter totals")
-        }
-        regionFilterTotals <- reshape2::melt(regionFilterTotals, id.vars = c("covMin", "methSD"))
-        regionFilterTotals$variable <- as.character(regionFilterTotals$variable) %>% 
-                str_replace_all(pattern = c("totalRegions_K" = "Total Regions (Thousands)", "totalWidth_Mb" = "Total Width (Mb)", 
-                                            "totalN_M" = "Total CpGs (Millions)")) %>%
-                factor(levels = c("Total Regions (Thousands)", "Total Width (Mb)", "Total CpGs (Millions)"))
-        gg <- ggplot(data = regionFilterTotals)
-        gg <- gg +
-                geom_line(aes(x = covMin, y = value, group = methSD, color = methSD)) +
-                geom_text(data = subset(regionFilterTotals, covMin == min(covMin)), 
-                          aes(x = covMin, y = value, group = methSD, color = methSD, label = methSD), 
-                          size = 4.5, check_overlap = TRUE, nudge_x = -0.2, hjust = 1) +
-                facet_wrap(vars(variable), nrow = 3, ncol = 1, scales = "free_y", strip.position = "left") +
-                xlab("Minimum Coverage") +
-                scale_x_continuous(breaks = breaks_pretty(n = nBreaks), expand = expand_scale(mult = c(0.07, 0.03))) +
-                scale_y_continuous(breaks = breaks_pretty(n = nBreaks)) +
-                scale_color_gradient("Minimum SD", breaks = breaks_pretty(n = nBreaks - 1)) +
-                theme_bw(base_size = 24) +
-                theme(axis.text = element_text(size = 14, color = "black"),
-                      axis.ticks = element_line(size = 1.25, color = "black"), axis.title.x = element_text(size = 18),
-                      axis.title.y = element_blank(), legend.background = element_blank(), legend.position = legend.position, 
-                      legend.title = element_text(size = 18), legend.text = element_text(size = 14), 
-                      panel.border = element_rect(color = "black", size = 1.25), 
-                      panel.grid = element_blank(), panel.spacing.x = unit(0.3, "lines"),
-                      panel.spacing.y = unit(0.8, "lines"), plot.margin = unit(c(1,9,0.7,0.2), "lines"),
-                      strip.background = element_blank(), strip.placement = "outside", 
-                      strip.switch.pad.wrap = unit(0, "lines"), strip.text = element_text(size = 18))
-        if(save){
-                if(verbose){
-                        message("[plotRegionFilterTotals] Saving plot as ", file)
-                }
-                ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
-        }
-        return(gg)
-}
-
 # Set Global Options ####
 options(stringsAsFactors = FALSE)
 Sys.setenv(R_THREADS = 1)
 enableWGCNAThreads(nThreads = 6)
 
-# Read and Filter Bismark CpG Reports ####
-colData <- read.xlsx("sample_info.xlsx", rowNames = TRUE)
+# Read Bismark CpG Reports ####
+colData <- read.xlsx("sample_info.xlsx", rowNames = TRUE) %>% subset(Sex == "M")
 bs <- getCpGs(colData)
 
+# Examine CpG Totals at Different Cutoffs ####
+CpGfilterTotals <- getCpGfilterTotals(bs)
+plotCpGfilterTotals(CpGfilterTotals)
+
+# Filter BSobject ####
+bs <- filterCpGs(bs, cov = 2, perSample = 0.75)
+
 # Call Regions without Filtering ####
-regions_unf <- getRegions(bs, covMin = 0, methSD = 0, file = "Unfiltered_Regions.txt")
-plotRegionStats(regions_unf, file = "Unfiltered_Region_Plots.pdf")
-plotSDstats(regions_unf, file = "Unfiltered_SD_Plots.pdf")
+regions <- getRegions(bs, covMin = 0, methSD = 0, file = "Unfiltered_Regions.txt")
+plotRegionStats(regions, file = "Unfiltered_Region_Plots.pdf")
+plotSDstats(regions, file = "Unfiltered_SD_Plots.pdf")
 
 # Examine Region Totals at Different Cutoffs ####
-regionFilterTotals <- getRegionFilterTotals(regions_unf)
+regionFilterTotals <- getRegionFilterTotals(regions)
 plotRegionFilterTotals(regionFilterTotals)
 
 # Call Regions with Filtering ####
-regions <- getRegions(bs)
+regions <- getRegions(bs, covMin = 10, methSD = 0.05)
 plotRegionStats(regions)
 plotSDstats(regions)
 
