@@ -515,6 +515,31 @@ plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pd
         invisible(dev.off())
 }
 
+getModuleBED <- function(regions, modules, grey = TRUE, save = TRUE, file = "Modules.bed", verbose = TRUE){
+        if(verbose){
+                message("[getModuleBED] Creating bed file of regions annotated with identified modules")
+        }
+        regions$module <- modules$colors[match(regions$RegionID, names(modules$colors))]
+        if(!grey){
+                if(verbose){
+                        message("[getModuleBED] Excluding regions in grey (unassigned) module")
+                }
+                regions <- regions[!regions$module == "grey",]
+        }
+        regions$rgb <- col2rgb(regions$module) %>% apply(2, paste, collapse = ",")
+        bed <- cbind(regions[c("chr", "start", "end", "RegionID")], score = 0, strand = ".", thickStart = 0, thickEnd = 0, 
+                     rgb = regions$rgb)
+        if(save){
+                if(verbose){
+                        message("[getModuleBED] Saving file as ", file)
+                }
+                name <- gsub(".bed", replacement = "", file)
+                write(paste("track name='", name, "' description='", name, "' itemRgb='On'", sep = ""), file = file)
+                write.table(bed, file = file, append = TRUE, quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
+        }
+        return(bed)
+}
+
 # Set Global Options ####
 options(stringsAsFactors = FALSE)
 Sys.setenv(R_THREADS = 1)
@@ -559,3 +584,4 @@ plotSoftPower(sft)
 # Get Comethylation Modules ####
 modules <- getModules(methAdj, power = sft$powerEstimate)
 plotRegionDendro(modules)
+BED <- getModuleBED(regions, modules = modules)
