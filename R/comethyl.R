@@ -113,33 +113,47 @@ filterCpGs <- function(bs, cov = 2, perSample = 0.75, save = TRUE, file = "Filte
         return(bs)
 }
 
-getRegions <- function(bs, maxGap = 150, n = 3, covMin = 10, methSD = 0.05, save = TRUE, file = "Filtered_Regions.txt",
-                       verbose = TRUE){
+getRegions <- function(bs, maxGap = 150, n = 3, save = TRUE, file = "Unfiltered_Regions.txt", verbose = TRUE){
         if(verbose){
                 message("[getRegions] Calling regions when at least ", n, " CpGs are no more than ", maxGap, " bases apart")
         }
         regions <- bsseq:::regionFinder3(x = as.integer(rep(1, length(bs))), chr = as.character(seqnames(bs)), 
                                          positions = start(bs), maxGap = maxGap, verbose = FALSE)[["up"]]
         regions <- regions[regions$n >= n,]
+        regions$RegionID <- paste("Region", 1:nrow(regions), sep = "_")
         regions$chr <- as.character(regions$chr)
+        if(verbose){
+                message("[getRegions] Calculating region statistics")
+        }
         regions$width <- regions$end - regions$start
+        cov <- getCoverage(bs, regions = regions[,c("chr", "start", "end")], what = "perRegionTotal")
+        regions$covMin <- DelayedArray::rowMins(cov)
+        regions$covMean <- DelayedMatrixStats::rowMeans2(cov) %>% round(digits = 5)
+        regions$covSD <- DelayedMatrixStats::rowSds(cov) %>% round(digits = 5)
+        meth <- getMeth(bs, regions = regions[,c("chr", "start", "end")], type = "raw", what = "perRegion")
+        regions$methMean <- DelayedMatrixStats::rowMeans2(meth, na.rm = TRUE) %>% round(digits = 5)
+        regions$methSD <- DelayedMatrixStats::rowSds(meth, na.rm = TRUE) %>% round(digits = 5)
+        regions <- regions[,c("RegionID", "chr", "start", "end", "width", "n", "covMin", "covMean", "covSD", "methMean", 
+                              "methSD")]
+        if(save){
+                if(verbose){
+                        message("[getRegions] Saving file as ", file)
+                }
+                write.table(regions, file = file, quote = FALSE, sep = "\t", row.names = FALSE)
+        }
+        return(regions)
+}
+
+filterRegions <- function(regions, covMin = 10, methSD = 0.05, save = TRUE, file = "Filtered_Regions.txt", verbose = TRUE){
         if(verbose){
                 message("[getRegions] Filtering regions for at least ", covMin, 
                         " reads in all samples and methylation SD of at least ", methSD * 100, "%")
         }
-        cov <- getCoverage(bs, regions = regions[,c("chr", "start", "end")], what = "perRegionTotal")
-        regions$covMean <- DelayedMatrixStats::rowMeans2(cov) %>% round(digits = 5)
-        regions$covSD <- DelayedMatrixStats::rowSds(cov) %>% round(digits = 5)
-        regions$covMin <- DelayedArray::rowMins(cov)
-        regions <- regions[regions$covMin >= covMin,]
-        meth <- getMeth(bs, regions = regions[,c("chr", "start", "end")], type = "raw", what = "perRegion")
-        regions$methMean <- DelayedMatrixStats::rowMeans2(meth, na.rm = TRUE) %>% round(digits = 5)
-        regions$methSD <- DelayedMatrixStats::rowSds(meth, na.rm = TRUE) %>% round(digits = 5)
-        regions <- regions[regions$methSD >= methSD,]
+        regions <- regions[regions$covMin >= covMin & regions$methSD >= methSD,]
+        if(verbose){
+                message("[getRegions] Creating new Region IDs")
+        }
         regions$RegionID <- paste("Region", 1:nrow(regions), sep = "_")
-        regions$width <- regions$end - regions$start
-        regions <- regions[,c("RegionID", "chr", "start", "end", "width", "n", "covMin", "covMean", "covSD", "methMean", 
-                              "methSD")]
         if(save){
                 if(verbose){
                         message("[getRegions] Saving file as ", file)
@@ -457,7 +471,7 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
         return(gg)
 }
 
-getModules <- function(methAdj, power = NULL, corType = c("pearson", "bicor"), deepSplit = 4, minModuleSize = 10, 
+getModules <- function(meth, power = NULL, corType = c("pearson", "bicor"), deepSplit = 4, minModuleSize = 10, 
                        mergeCutHeight = 0.1, nThreads = 6, save = TRUE, file = "Modules.rds", verbose = TRUE){
         if(is.null(power)){
                 stop("[getModules] You must select a soft power threshold")
@@ -469,8 +483,8 @@ getModules <- function(methAdj, power = NULL, corType = c("pearson", "bicor"), d
                 verboseNum <- 0
         }
         corType <- match.arg(corType)
-        modules <- blockwiseModules(methAdj, checkMissingData = FALSE, maxBlockSize = 40000, corType = corType, 
-                                    power = power, networkType = "signed", TOMtype = "signed", deepSplit = deepSplit, 
+        modules <- blockwiseModules(meth, checkMissingData = FALSE, maxBlockSize = 40000, corType = corType, power = power, 
+                                    networkType = "signed", TOMtype = "signed", deepSplit = deepSplit, 
                                     minModuleSize = minModuleSize, mergeCutHeight = mergeCutHeight, nThreads = nThreads,
                                     verbose = verboseNum)
         if(save){
@@ -518,7 +532,7 @@ plotCpGtotals(CpGtotals)
 bs <- filterCpGs(bs, cov = 2, perSample = 0.75)
 
 # Call Regions without Filtering ####
-regions <- getRegions(bs, covMin = 0, methSD = 0, file = "Unfiltered_Regions.txt")
+regions <- getRegions(bs)
 plotRegionStats(regions, file = "Unfiltered_Region_Plots.pdf")
 plotSDstats(regions, file = "Unfiltered_SD_Plots.pdf")
 
@@ -527,9 +541,9 @@ regionTotals <- getRegionTotals(regions)
 plotRegionTotals(regionTotals)
 
 # Call Regions with Filtering ####
-regions <- getRegions(bs, covMin = 10, methSD = 0.05)
-plotRegionStats(regions)
-plotSDstats(regions)
+regions <- filterRegions(regions, covMin = 10, methSD = 0.05)
+plotRegionStats(regions, file = "Filtered_Region_Plots.pdf")
+plotSDstats(regions, file = "Filtered_SD_Plots.pdf")
 
 # Adjust Methylation Data for PCs ####
 meth <- getRegionMeth(regions, bs = bs)
