@@ -3,7 +3,8 @@
 
 # Load Packages ####
 .libPaths("/share/lasallelab/Charles/comethylated/R")
-sapply(c("scales", "openxlsx", "tidyverse", "ggdendro", "bsseq", "dmrseq", "WGCNA", "sva"), require, character.only = TRUE)
+sapply(c("scales", "openxlsx", "tidyverse", "ggdendro", "cowplot", "bsseq", "dmrseq", "WGCNA", "sva"), require, 
+       character.only = TRUE)
 
 # Functions ####
 getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz", 
@@ -135,25 +136,6 @@ getRegions <- function(bs, maxGap = 150, n = 3, save = TRUE, file = "Unfiltered_
         regions$methSD <- DelayedMatrixStats::rowSds(meth, na.rm = TRUE) %>% round(digits = 5)
         regions <- regions[,c("RegionID", "chr", "start", "end", "width", "n", "covMin", "covMean", "covSD", "methMean", 
                               "methSD")]
-        if(save){
-                if(verbose){
-                        message("[getRegions] Saving file as ", file)
-                }
-                write.table(regions, file = file, quote = FALSE, sep = "\t", row.names = FALSE)
-        }
-        return(regions)
-}
-
-filterRegions <- function(regions, covMin = 10, methSD = 0.05, save = TRUE, file = "Filtered_Regions.txt", verbose = TRUE){
-        if(verbose){
-                message("[getRegions] Filtering regions for at least ", covMin, 
-                        " reads in all samples and methylation SD of at least ", methSD * 100, "%")
-        }
-        regions <- regions[regions$covMin >= covMin & regions$methSD >= methSD,]
-        if(verbose){
-                message("[getRegions] Creating new Region IDs")
-        }
-        regions$RegionID <- paste("Region", 1:nrow(regions), sep = "_")
         if(save){
                 if(verbose){
                         message("[getRegions] Saving file as ", file)
@@ -296,6 +278,25 @@ plotRegionTotals <- function(regionTotals, nBreaks = 4, legend.position = c(1.08
         return(gg)
 }
 
+filterRegions <- function(regions, covMin = 10, methSD = 0.05, save = TRUE, file = "Filtered_Regions.txt", verbose = TRUE){
+        if(verbose){
+                message("[getRegions] Filtering regions for at least ", covMin, 
+                        " reads in all samples and methylation SD of at least ", methSD * 100, "%")
+        }
+        regions <- regions[regions$covMin >= covMin & regions$methSD >= methSD,]
+        if(verbose){
+                message("[getRegions] Creating new Region IDs")
+        }
+        regions$RegionID <- paste("Region", 1:nrow(regions), sep = "_")
+        if(save){
+                if(verbose){
+                        message("[getRegions] Saving file as ", file)
+                }
+                write.table(regions, file = file, quote = FALSE, sep = "\t", row.names = FALSE)
+        }
+        return(regions)
+}
+
 getRegionMeth <- function(regions, bs, type = "raw", save = TRUE, file = "Region_Methylation.rds", verbose = TRUE){
         if(verbose){
                 message("[getRegionMeth] Calculating region methylation from BSseq object")
@@ -341,32 +342,33 @@ getDendro <- function(x, transpose = FALSE, distance = c("euclidean", "pearson",
         distance <- match.arg(distance)
         if(distance == "euclidean"){
                 if(verbose){
-                        message("[getDendro] Clustering with euclidean distance")
-                        dist <- dist(x)
+                        message("[getDendro] Clustering by euclidean distance")
+                }
+                dist <- dist(x)
+        } else {
+                if(distance == "pearson"){
+                        if(verbose){
+                                message("[getDendro] Clustering with pearson correlation as the distance")
+                        }
+                        dist <- (1 - cor(x)) %>% as.dist()
                 } else {
-                        if(distance == "pearson"){
+                        if(distance == "bicor"){
                                 if(verbose){
-                                        message("[getDendro] Clustering with pearson correlation as the distance")
+                                        message("[getDendro] Clustering with bicor correlation as the distance")
                                 }
-                                dist <- (1 - cor(x)) %>% as.dist()
+                                dist <- (1 - bicor(x, maxPOutliers = maxPOutliers)) %>% as.dist()
                         } else {
-                                if(distance == "bicor"){
-                                        if(verbose){
-                                                message("[getDendro] Clustering with bicor correlation as the distance")
-                                        }
-                                        dist <- (1 - bicor(x, maxPOutliers = maxPOutliers)) %>% as.dist()
-                                } else {
-                                        stop("[getDendro] Error: Distance must be either euclidean, pearson, or bicor")
-                                }
+                                stop("[getDendro] Error: Distance must be either euclidean, pearson, or bicor")
                         }
                 }
         }
         dendro <- hclust(dist, method = "average")
+        dendro$labels <- gsub("ME", replacement = "", x = dendro$labels, fixed = TRUE)
         return(dendro)
 }
 
-plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(2,2), expandY = c(7,2), nBreaks = 4, save = TRUE,
-                       file = "Dendrogram.pdf", width = 11, height = 4.25, verbose = TRUE){
+plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(0.03,0.03), expandY = c(0.3,0.08), 
+                       nBreaks = 4, save = TRUE, file = "Dendrogram.pdf", width = 11, height = 4.25, verbose = TRUE){
         if(verbose){
                 message("[plotDendro] Plotting dendrogram")
         }
@@ -374,11 +376,12 @@ plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(2,2), 
         fix <- dendroPlot$segments$yend == 0
         dendroPlot$segments$yend[fix] <- dendroPlot$segments$y[fix] - max(dendroPlot$segments$y) * 0.05
         dendroPlot$labels$y <- dendroPlot$segments$yend[fix] - max(dendroPlot$segments$y) * 0.01
+        dendroPlot$labels$label <- gsub("ME", replacement = "", x = dendroPlot$labels$label, fixed = TRUE)
         gg <- ggplot()
         gg <- gg +
-                geom_segment(data = dendroPlot$segments, aes(x = x, y = y, xend = xend, yend = yend), lwd = 0.3) +
-                scale_x_continuous(expand = expand_scale(add = expandX)) +
-                scale_y_continuous(expand = expand_scale(add = expandY), breaks = breaks_pretty(n = nBreaks)) +
+                geom_segment(data = dendroPlot$segments, aes(x = x, y = y, xend = xend, yend = yend), lwd = 0.3, lineend = "square") +
+                scale_x_continuous(expand = expand_scale(mult = expandX)) +
+                scale_y_continuous(expand = expand_scale(mult = expandY), breaks = breaks_pretty(n = nBreaks)) +
                 ylab("Height") +
                 theme_dendro() +
                 theme(plot.margin = unit(c(1,1,0,1), "lines"), 
@@ -540,6 +543,55 @@ getModuleBED <- function(regions, modules, grey = TRUE, save = TRUE, file = "Mod
         return(bed)
 }
 
+plotHeatmap <- function(x, rowDendro, colDendro, legend.title = "Module\nEigenvector", 
+                        colors = blueWhiteRed(100, gamma = 0.3), limit = max(abs(x)), save = TRUE, 
+                        file = "Heatmap.pdf", width = 11, height = 11, verbose = TRUE){
+        if(verbose){
+                message("[plotHeatmap] Plotting heatmap with dendrograms")
+        }
+        limits <- c(-limit, limit)
+        rownames(x) <- gsub("ME", replacement = "", x = rownames(x), fixed = TRUE)
+        colnames(x) <- gsub("ME", replacement = "", x = colnames(x), fixed = TRUE)
+        x$rowID <- factor(rownames(x), levels = rowDendro$labels[rev(rowDendro$order)])
+        x <- reshape2::melt(x, id.vars = "rowID")
+        x$variable <- factor(x$variable, levels = colDendro$labels[colDendro$order])
+        colDendroPlot <- ggplot(data = dendro_data(colDendro)$segments) +
+                geom_segment(aes(x = x, y = y, xend = xend, yend = yend), lwd = 0.5, lineend = "square") +
+                theme_dendro() +
+                theme(plot.margin = unit(c(1,-0.4,-1,3.3), "lines"))
+        heatmap <- ggplot(data = x) +
+                geom_tile(aes(x = variable, y = rowID, color = value, fill = value)) +
+                scale_fill_gradientn(legend.title, colors = colors, limits = limits, aesthetics = c("color", "fill")) +
+                theme_bw(base_size = 24) +
+                theme(axis.text.x = element_blank(), axis.text.y = element_text(size = 10, color = "black"), 
+                      axis.ticks.x = element_blank(), axis.ticks.y = element_line(size = 1, color = "black"), 
+                      axis.title = element_blank(), legend.position = "none", 
+                      panel.border = element_rect(color = "black", size = 1.25), panel.grid = element_blank(), 
+                      plot.margin = unit(c(0,1,0,0.7), "lines"))
+        rowDendroPlot <- ggplot(data = dendro_data(rowDendro)$segments) +
+                geom_segment(aes(x = -x, y = y, xend = -xend, yend = yend), lwd = 0.5, lineend = "square") +
+                coord_flip() +
+                theme_dendro() +
+                theme(plot.margin = unit(c(-1.8,1,-2.5,-1.1), "lines"))
+        legend <- get_legend(heatmap + theme(legend.position = c(0.4,0.9), legend.background = element_blank(),
+                                             legend.title = element_text(size = 18), 
+                                             legend.text = element_text(size = 14)))
+        colColors <- ggplot(data = data.frame(x = 1:length(levels(x$variable)), y = 0, color = levels(x$variable))) +
+                geom_tile(aes(x = x, y = y, color = color, fill = color)) +
+                scale_fill_identity(aesthetics = c("color", "fill")) +
+                theme_void() +
+                theme(legend.position = "none", plot.margin = unit(c(0,-0.7,1,3.2), "lines"))
+        gg <- plot_grid(colDendroPlot, NULL, NULL, heatmap, rowDendroPlot, legend, colColors, NULL, NULL,
+                        nrow = 3, ncol = 3, rel_widths = c(1, 0.15, 0.17), rel_heights = c(0.15, 1, 0.045))
+        if(save){
+                if(verbose){
+                        message("[plotHeatmap] Saving plot as ", file)
+                }
+                ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
+        }
+        return(gg)
+}
+
 # Set Global Options ####
 options(stringsAsFactors = FALSE)
 Sys.setenv(R_THREADS = 1)
@@ -556,7 +608,7 @@ plotCpGtotals(CpGtotals)
 # Filter BSobject ####
 bs <- filterCpGs(bs, cov = 2, perSample = 0.75)
 
-# Call Regions without Filtering ####
+# Call Regions ####
 regions <- getRegions(bs)
 plotRegionStats(regions, file = "Unfiltered_Region_Plots.pdf")
 plotSDstats(regions, file = "Unfiltered_SD_Plots.pdf")
@@ -565,7 +617,7 @@ plotSDstats(regions, file = "Unfiltered_SD_Plots.pdf")
 regionTotals <- getRegionTotals(regions)
 plotRegionTotals(regionTotals)
 
-# Call Regions with Filtering ####
+# Filter Regions ####
 regions <- filterRegions(regions, covMin = 10, methSD = 0.05)
 plotRegionStats(regions, file = "Filtered_Region_Plots.pdf")
 plotSDstats(regions, file = "Filtered_SD_Plots.pdf")
@@ -574,8 +626,7 @@ plotSDstats(regions, file = "Filtered_SD_Plots.pdf")
 meth <- getRegionMeth(regions, bs = bs)
 mod <- model.matrix(~1, data = pData(bs))
 methAdj <- adjustRegionMeth(meth, mod = mod)
-dendro <- getDendro(methAdj)
-plotDendro(dendro, file = "Sample_Dendrogram.pdf")
+getDendro(methAdj, distance = "euclidean") %>% plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25,0.08))
 
 # Select Soft Power Threshold ####
 sft <- getSoftPower(methAdj)
@@ -585,3 +636,14 @@ plotSoftPower(sft)
 modules <- getModules(methAdj, power = sft$powerEstimate)
 plotRegionDendro(modules)
 BED <- getModuleBED(regions, modules = modules)
+
+# Examine Correlations between Modules and Samples ####
+MEs <- modules$MEs
+moduleDendro <- getDendro(MEs, distance = "bicor")
+plotDendro(moduleDendro, file = "Module_ME_Dendrogram.pdf", labelSize = 4, nBreaks = 5)
+
+sampleDendro <- getDendro(MEs, transpose = TRUE, distance = "bicor")
+plotDendro(sampleDendro, file = "Sample_ME_Dendrogram.pdf", labelSize = 3, nBreaks = 5)
+
+plotHeatmap(MEs, rowDendro = sampleDendro, colDendro = moduleDendro, file = "Sample_ME_Heatmap.pdf")
+
