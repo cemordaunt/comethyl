@@ -3,7 +3,7 @@
 
 # Load Packages ####
 .libPaths("/share/lasallelab/Charles/comethylated/R")
-sapply(c("scales", "openxlsx", "tidyverse", "ggdendro", "cowplot", "bsseq", "dmrseq", "WGCNA", "sva"), require, 
+sapply(c("scales", "openxlsx", "rlist", "tidyverse", "ggdendro", "cowplot", "bsseq", "dmrseq", "WGCNA", "sva"), require, 
        character.only = TRUE)
 
 # Functions ####
@@ -634,7 +634,8 @@ getCor <- function(x, y = NULL, transpose = FALSE, corType = c("bicor", "pearson
                 message("[getCor] Calculating correlations using ", corType, " correlation")
         }
         if(corType == "bicor"){
-                cor <- bicor(x, y = y, use = "pairwise.complete.obs", maxPOutliers = maxPOutliers)
+                cor <- bicor(x, y = y, use = "pairwise.complete.obs", maxPOutliers = maxPOutliers, 
+                             pearsonFallback = "none")
         } else {
                 if(corType == "pearson"){
                         cor <- WGCNA::cor(x, y = y, use = "pairwise.complete.obs")
@@ -645,13 +646,52 @@ getCor <- function(x, y = NULL, transpose = FALSE, corType = c("bicor", "pearson
         return(cor)
 }
 
+getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"), maxPOutliers = 0.1, robustY = FALSE, 
+                          save = TRUE, file = "Module_Eigennode_Trait_Correlation_Stats.txt", verbose = TRUE){
+        corType <- match.arg(corType)
+        if(verbose){
+                message("[getMEtraitCor] Testing associations between module eigennodes and sample traits using ",
+                        corType, " correlation")
+        }
+        colData <- colData[rownames(MEs),]
+        if(corType == "bicor"){
+                cor <- bicorAndPvalue(x = MEs, y = colData, maxPOutliers = maxPOutliers, robustY = robustY, 
+                                      pearsonFallback = "none")
+        } else {
+                if(corType == "pearson"){
+                        cor <- corAndPvalue(x = MEs, y = colData)
+                } else {
+                        stop("[getMEtraitCor] corType must be either bicor or pearson")
+                }
+        }
+        stats <- list.rbind(cor) %>% as.data.frame()
+        stats$module <- rownames(cor$p) %>% gsub(pattern = "ME", replacement = "", x = .) %>% rep(length(cor)) %>%
+                factor(levels = unique(.))
+        stats$stat <- names(cor) %>% rep(each = nrow(cor$p)) %>% factor(levels = unique(.))
+        stats <- reshape2::melt(stats, id.vars = c("module", "stat")) %>%
+                reshape2::dcast(formula = module + variable ~ stat, value.var = "value")
+        stats$q <- p.adjust(stats$p, method = "fdr")
+        if(corType == "bicor"){
+                stats <- stats[,c("module", "variable", "nObs", "bicor", "Z", "t", "p", "q")]
+        } else {
+                stats <- stats[,c("module", "variable", "nObs", "cor", "Z", "t", "p", "q")]
+        }
+        if(save){
+                if(verbose){
+                        message("[getMEtraitCor] Saving file as ", file)
+                }
+                write.table(stats, file = file, quote = FALSE, sep = "\t", row.names = FALSE)
+        }
+        return(stats)
+}
+
 # Set Global Options ####
 options(stringsAsFactors = FALSE)
 Sys.setenv(R_THREADS = 1)
 enableWGCNAThreads(nThreads = 6)
 
 # Read Bismark CpG Reports ####
-colData <- read.xlsx("sample_info.xlsx", rowNames = TRUE) %>% subset(Sex == "M")
+colData <- read.xlsx("sample_info.xlsx", rowNames = TRUE)
 bs <- getCpGs(colData)
 
 # Examine CpG Totals at Different Cutoffs ####
@@ -693,14 +733,17 @@ BED <- getModuleBED(regions, modules = modules)
 # Examine Correlations between Modules and Samples ####
 MEs <- modules$MEs
 moduleDendro <- getDendro(MEs, distance = "bicor")
-plotDendro(moduleDendro, file = "Figures/Module_ME_Dendrogram.pdf", labelSize = 4, nBreaks = 5)
+plotDendro(moduleDendro, file = "Module_ME_Dendrogram.pdf", labelSize = 4, nBreaks = 5)
 sampleDendro <- getDendro(MEs, transpose = TRUE, distance = "bicor")
-plotDendro(sampleDendro, file = "Figures/Sample_ME_Dendrogram.pdf", labelSize = 3, nBreaks = 5)
-plotHeatmap(MEs, rowDendro = sampleDendro, colDendro = moduleDendro, file = "Figures/Sample_ME_Heatmap.pdf",
+plotDendro(sampleDendro, file = "Sample_ME_Dendrogram.pdf", labelSize = 3, nBreaks = 5)
+plotHeatmap(MEs, rowDendro = sampleDendro, colDendro = moduleDendro, file = "Sample_ME_Heatmap.pdf",
             legend.title = "Module\nEigennode", legend.position = c(0.37,0.89))
-
 sampleCor <- getCor(MEs, transpose = TRUE, corType = "bicor")
-plotHeatmap(sampleCor, rowDendro = sampleDendro, colDendro = sampleDendro, file = "Figures/Sample_Cor_Heatmap.pdf")
-
+plotHeatmap(sampleCor, rowDendro = sampleDendro, colDendro = sampleDendro, file = "Sample_Cor_Heatmap.pdf")
 moduleCor <- getCor(MEs, corType = "bicor")
-plotHeatmap(moduleCor, rowDendro = moduleDendro, colDendro = moduleDendro, file = "Figures/Module_Cor_Heatmap.pdf")
+plotHeatmap(moduleCor, rowDendro = moduleDendro, colDendro = moduleDendro, file = "Module_Cor_Heatmap.pdf")
+
+# Test Correlations between Module Eigennodes and Sample Traits ####
+colData <- read.xlsx("sample_info.xlsx", rowNames = TRUE)
+MEtraitCor <- getMEtraitCor(MEs, colData = colData, corType = "bicor", 
+                            file = "Module_Eigennode_Trait_Correlation_Stats.txt")
