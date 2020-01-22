@@ -350,13 +350,14 @@ getDendro <- function(x, transpose = FALSE, distance = c("euclidean", "pearson",
                         if(verbose){
                                 message("[getDendro] Clustering with pearson correlation as the distance")
                         }
-                        dist <- (1 - cor(x)) %>% as.dist()
+                        dist <- (1 - WGCNA::cor(x, use = "pairwise.complete.obs")) %>% as.dist()
                 } else {
                         if(distance == "bicor"){
                                 if(verbose){
                                         message("[getDendro] Clustering with bicor correlation as the distance")
                                 }
-                                dist <- (1 - bicor(x, maxPOutliers = maxPOutliers)) %>% as.dist()
+                                dist <- (1 - bicor(x, maxPOutliers = maxPOutliers, use = "pairwise.complete.obs")) %>% 
+                                        as.dist()
                         } else {
                                 stop("[getDendro] Error: Distance must be either euclidean, pearson, or bicor")
                         }
@@ -543,46 +544,67 @@ getModuleBED <- function(regions, modules, grey = TRUE, save = TRUE, file = "Mod
         return(bed)
 }
 
-plotHeatmap <- function(x, rowDendro, colDendro, legend.title = "Module\nEigenvector", 
+plotHeatmap <- function(x, rowDendro, colDendro, legend.title = "Value", legend.position = c(0.3,0.905),
                         colors = blueWhiteRed(100, gamma = 0.3), limit = max(abs(x)), save = TRUE, 
-                        file = "Heatmap.pdf", width = 11, height = 11, verbose = TRUE){
+                        file = "Heatmap.pdf", width = 11, height = 9.5, verbose = TRUE){
         if(verbose){
                 message("[plotHeatmap] Plotting heatmap with dendrograms")
         }
         limits <- c(-limit, limit)
+        x <- as.data.frame(x)
         rownames(x) <- gsub("ME", replacement = "", x = rownames(x), fixed = TRUE)
         colnames(x) <- gsub("ME", replacement = "", x = colnames(x), fixed = TRUE)
+        rowModules <- sum(!is.na(col2hcl(rownames(x)))) == length(rownames(x))
+        colModules <- sum(!is.na(col2hcl(colnames(x)))) == length(colnames(x))
         x$rowID <- factor(rownames(x), levels = rowDendro$labels[rev(rowDendro$order)])
         x <- reshape2::melt(x, id.vars = "rowID")
         x$variable <- factor(x$variable, levels = colDendro$labels[colDendro$order])
-        colDendroPlot <- ggplot(data = dendro_data(colDendro)$segments) +
-                geom_segment(aes(x = x, y = y, xend = xend, yend = yend), lwd = 0.5, lineend = "square") +
-                theme_dendro() +
-                theme(plot.margin = unit(c(1,-0.4,-1,3.3), "lines"))
         heatmap <- ggplot(data = x) +
                 geom_tile(aes(x = variable, y = rowID, color = value, fill = value)) +
                 scale_fill_gradientn(legend.title, colors = colors, limits = limits, aesthetics = c("color", "fill")) +
                 theme_bw(base_size = 24) +
-                theme(axis.text.x = element_blank(), axis.text.y = element_text(size = 10, color = "black"), 
-                      axis.ticks.x = element_blank(), axis.ticks.y = element_line(size = 1, color = "black"), 
+                theme(axis.text.x = element_text(size = 8, color = "black", angle = 90, vjust = 0.5), 
+                      axis.text.y = element_text(size = 8, color = "black"), 
+                      axis.ticks = element_line(size = 0.8, color = "black"), 
                       axis.title = element_blank(), legend.position = "none", 
                       panel.border = element_rect(color = "black", size = 1.25), panel.grid = element_blank(), 
-                      plot.margin = unit(c(0,1,0,0.7), "lines"))
+                      plot.margin = unit(c(0,1,-1,-1), "lines"))
         rowDendroPlot <- ggplot(data = dendro_data(rowDendro)$segments) +
                 geom_segment(aes(x = -x, y = y, xend = -xend, yend = yend), lwd = 0.5, lineend = "square") +
                 coord_flip() +
                 theme_dendro() +
-                theme(plot.margin = unit(c(-1.8,1,-2.5,-1.1), "lines"))
-        legend <- get_legend(heatmap + theme(legend.position = c(0.4,0.9), legend.background = element_blank(),
-                                             legend.title = element_text(size = 18), 
-                                             legend.text = element_text(size = 14)))
-        colColors <- ggplot(data = data.frame(x = 1:length(levels(x$variable)), y = 0, color = levels(x$variable))) +
-                geom_tile(aes(x = x, y = y, color = color, fill = color)) +
-                scale_fill_identity(aesthetics = c("color", "fill")) +
-                theme_void() +
-                theme(legend.position = "none", plot.margin = unit(c(0,-0.7,1,3.2), "lines"))
-        gg <- plot_grid(colDendroPlot, NULL, NULL, heatmap, rowDendroPlot, legend, colColors, NULL, NULL,
-                        nrow = 3, ncol = 3, rel_widths = c(1, 0.15, 0.17), rel_heights = c(0.15, 1, 0.045))
+                theme(plot.margin = unit(c(-1.55,1,-0.1,-1.1), "lines"))
+        colDendroPlot <- ggplot(data = dendro_data(colDendro)$segments) +
+                geom_segment(aes(x = x, y = y, xend = xend, yend = yend), lwd = 0.5, lineend = "square") +
+                theme_dendro() +
+                theme(plot.margin = unit(c(1,-0.5,-1,0.8), "lines"))
+        legend <- get_legend(heatmap + theme(legend.position = legend.position, legend.background = element_blank(),
+                                             legend.title = element_text(size = 16), 
+                                             legend.text = element_text(size = 12)))
+        rowColors <- NULL
+        colColors <- NULL
+        if(rowModules){
+                rowColors <- ggplot(data = data.frame(x = 1:length(levels(x$rowID)), y = 0, color = levels(x$rowID))) +
+                        geom_tile(aes(x = x, y = y, color = color, fill = color)) +
+                        coord_flip() +
+                        scale_fill_identity(aesthetics = c("color", "fill")) +
+                        theme_void() +
+                        theme(legend.position = "none", plot.margin = unit(c(0,-0.7,1,3.2), "lines"))
+                heatmap <- heatmap + theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+        }
+        if(colModules){
+                colColors <- ggplot(data = data.frame(x = 1:length(levels(x$variable)), y = 0, color = levels(x$variable))) +
+                        geom_tile(aes(x = x, y = y, color = color, fill = color)) +
+                        scale_fill_identity(aesthetics = c("color", "fill")) +
+                        theme_void() +
+                        theme(legend.position = "none", plot.margin = unit(c(0,-0.7,1,3.2), "lines"))
+                rowDendro <- rowDendro + theme(plot.margin = unit(c(-1.8,1,-2.5,-1.1), "lines"))
+                heatmap <- heatmap + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+        }
+        
+        gg <- plot_grid(NULL, colDendroPlot, NULL, NULL, rowColors, heatmap, rowDendroPlot, legend, NULL, colColors, 
+                        NULL, NULL, nrow = 3, ncol = 4, rel_widths = c(0.045, 1, 0.15, 0.15), 
+                        rel_heights = c(0.15, 1, 0.045))
         if(save){
                 if(verbose){
                         message("[plotHeatmap] Saving plot as ", file)
@@ -590,6 +612,29 @@ plotHeatmap <- function(x, rowDendro, colDendro, legend.title = "Module\nEigenve
                 ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
         }
         return(gg)
+}
+
+getCor <- function(x, y = NULL, transpose = FALSE, corType = c("bicor", "pearson"), maxPOutliers = 0.1, verbose = TRUE){
+        if(transpose){
+                if(verbose){
+                        message("[getCor] Transposing data")
+                }
+                x <- t(x)
+        }
+        corType <- match.arg(corType)
+        if(verbose){
+                message("[getCor] Calculating correlations using ", corType, " correlation")
+        }
+        if(corType == "bicor"){
+                cor <- bicor(x, y = y, use = "pairwise.complete.obs", maxPOutliers = maxPOutliers)
+        } else {
+                if(corType == "pearson"){
+                        cor <- WGCNA::cor(x, y = y, use = "pairwise.complete.obs")
+                } else {
+                        stop("[getCor] corType must be either bicor or pearson")
+                }
+        }
+        return(cor)
 }
 
 # Set Global Options ####
@@ -629,11 +674,11 @@ methAdj <- adjustRegionMeth(meth, mod = mod)
 getDendro(methAdj, distance = "euclidean") %>% plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25,0.08))
 
 # Select Soft Power Threshold ####
-sft <- getSoftPower(methAdj)
+sft <- getSoftPower(methAdj, corType = "pearson")
 plotSoftPower(sft)
 
 # Get Comethylation Modules ####
-modules <- getModules(methAdj, power = sft$powerEstimate)
+modules <- getModules(methAdj, power = sft$powerEstimate, corType = "pearson")
 plotRegionDendro(modules)
 BED <- getModuleBED(regions, modules = modules)
 
@@ -641,9 +686,14 @@ BED <- getModuleBED(regions, modules = modules)
 MEs <- modules$MEs
 moduleDendro <- getDendro(MEs, distance = "bicor")
 plotDendro(moduleDendro, file = "Module_ME_Dendrogram.pdf", labelSize = 4, nBreaks = 5)
-
 sampleDendro <- getDendro(MEs, transpose = TRUE, distance = "bicor")
 plotDendro(sampleDendro, file = "Sample_ME_Dendrogram.pdf", labelSize = 3, nBreaks = 5)
+plotHeatmap(MEs, rowDendro = sampleDendro, colDendro = moduleDendro, file = "Sample_ME_Heatmap.pdf",
+            legend.title = "Module\nEigennode")
 
-plotHeatmap(MEs, rowDendro = sampleDendro, colDendro = moduleDendro, file = "Sample_ME_Heatmap.pdf")
+sampleCor <- getCor(MEs, transpose = TRUE, corType = "bicor")
+plotHeatmap(sampleCor, rowDendro = sampleDendro, colDendro = sampleDendro, legend.title = "Bicor", 
+            file = "Sample_Cor_Heatmap.pdf")
+
+moduleCor <- getCor(MEs, corType = "bicor")
 
