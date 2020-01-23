@@ -647,7 +647,7 @@ getCor <- function(x, y = NULL, transpose = FALSE, corType = c("bicor", "pearson
 }
 
 getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"), maxPOutliers = 0.1, robustY = FALSE, 
-                          save = TRUE, file = "Module_Eigennode_Trait_Correlation_Stats.txt", verbose = TRUE){
+                          save = TRUE, file = "ME_Trait_Correlation_Stats.txt", verbose = TRUE){
         corType <- match.arg(corType)
         if(verbose){
                 message("[getMEtraitCor] Testing associations between module eigennodes and sample traits using ",
@@ -683,6 +683,58 @@ getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"), maxPOut
                 write.table(stats, file = file, quote = FALSE, sep = "\t", row.names = FALSE)
         }
         return(stats)
+}
+
+plotMEtraitCor <- function(MEtraitCor, sigOnly = FALSE, star.size = 8, star.nudge_y = -0.38,
+                           colors = blueWhiteRed(100, gamma = 0.9), limit = max(abs(MEtraitCor$bicor)), 
+                           axis.text.size = 12, legend.position = c(1.08, 0.915), legend.text.size = 12, 
+                           legend.title.size = 16, colColorMargins = c(-0.7,4.21,1.2,11.07), save = TRUE, 
+                           file = "ME_Trait_Correlation_Heatmap.pdf", width = 11, height = 9.5, verbose = TRUE){
+        if(verbose){
+                message("[plotMEtraitCor] Plotting ME trait correlation heatmap")
+        }
+        MEtraitCor$Significant <- (MEtraitCor$q < 0.05) %>% factor(levels = c("TRUE", "FALSE"))
+        if(sigOnly){
+                sigVars <- MEtraitCor$variable[MEtraitCor$Significant == "TRUE"] %>% unique() %>% as.character()
+                sigMods <- MEtraitCor$module[MEtraitCor$Significant == "TRUE"] %>% unique() %>% as.character()
+                MEtraitCor <- subset(MEtraitCor, variable %in% sigVars & module %in% sigMods)
+                MEtraitCor$module <- factor(MEtraitCor$module, 
+                                            levels = levels(MEtraitCor$module)[levels(MEtraitCor$module) %in% sigMods])
+        }
+        heatmap <- ggplot(data = MEtraitCor) +
+                geom_tile(aes(x = module, y = variable, color = bicor, fill = bicor)) +
+                geom_text(aes(x = module, y = variable, alpha = Significant), label = "*", color = "black", 
+                          size = star.size, nudge_y = star.nudge_y) +
+                scale_fill_gradientn("Bicor", colors = colors, limits = c(-limit, limit), 
+                                     aesthetics = c("color", "fill")) +
+                scale_x_discrete(expand = expand_scale(mult = 0.01)) +
+                scale_y_discrete(expand = expand_scale(mult = 0.01)) +
+                scale_alpha_manual(breaks = c("TRUE", "FALSE"), values = c(1, 0), guide = FALSE) +
+                theme_bw(base_size = 24) +
+                theme(axis.text.x = element_blank(), 
+                      axis.text.y = element_text(size = axis.text.size, color = "black"), 
+                      axis.ticks.x = element_blank(), axis.ticks.y = element_line(size = 0.8, color = "black"), 
+                      axis.title = element_blank(), legend.background = element_blank(), 
+                      legend.position = legend.position, 
+                      legend.text = element_text(size = legend.text.size), 
+                      legend.title = element_text(size = legend.title.size), 
+                      panel.background = element_blank(), panel.border = element_rect(color = "black", size = 1.25), 
+                      panel.grid = element_blank(), plot.background = element_blank(), 
+                      plot.margin = unit(c(1,6,1,1), "lines"))
+        colColors <- ggplot(data = data.frame(x = 1:length(levels(MEtraitCor$module)), y = 0, 
+                                              color = levels(MEtraitCor$module))) +
+                geom_tile(aes(x = x, y = y, color = color, fill = color)) +
+                scale_fill_identity(aesthetics = c("color", "fill")) +
+                theme_void() +
+                theme(legend.position = "none", plot.margin = unit(colColorMargins, "lines"))
+        gg <- plot_grid(heatmap, colColors, nrow = 2, rel_heights = c(1, 0.045))
+        if(save){
+                if(verbose){
+                        message("[plotMEtraitCor] Saving plot as ", file)
+                }
+                ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
+        }
+        return(gg)
 }
 
 # Set Global Options ####
@@ -734,16 +786,24 @@ BED <- getModuleBED(regions, modules = modules)
 MEs <- modules$MEs
 moduleDendro <- getDendro(MEs, distance = "bicor")
 plotDendro(moduleDendro, file = "Module_ME_Dendrogram.pdf", labelSize = 4, nBreaks = 5)
+moduleCor <- getCor(MEs, corType = "bicor")
+plotHeatmap(moduleCor, rowDendro = moduleDendro, colDendro = moduleDendro, file = "Module_Correlation_Heatmap.pdf")
+
 sampleDendro <- getDendro(MEs, transpose = TRUE, distance = "bicor")
 plotDendro(sampleDendro, file = "Sample_ME_Dendrogram.pdf", labelSize = 3, nBreaks = 5)
+sampleCor <- getCor(MEs, transpose = TRUE, corType = "bicor")
+plotHeatmap(sampleCor, rowDendro = sampleDendro, colDendro = sampleDendro, file = "Sample_Correlation_Heatmap.pdf")
+
 plotHeatmap(MEs, rowDendro = sampleDendro, colDendro = moduleDendro, file = "Sample_ME_Heatmap.pdf",
             legend.title = "Module\nEigennode", legend.position = c(0.37,0.89))
-sampleCor <- getCor(MEs, transpose = TRUE, corType = "bicor")
-plotHeatmap(sampleCor, rowDendro = sampleDendro, colDendro = sampleDendro, file = "Sample_Cor_Heatmap.pdf")
-moduleCor <- getCor(MEs, corType = "bicor")
-plotHeatmap(moduleCor, rowDendro = moduleDendro, colDendro = moduleDendro, file = "Module_Cor_Heatmap.pdf")
 
 # Test Correlations between Module Eigennodes and Sample Traits ####
-colData <- read.xlsx("sample_info.xlsx", rowNames = TRUE)
-MEtraitCor <- getMEtraitCor(MEs, colData = colData, corType = "bicor", 
-                            file = "Module_Eigennode_Trait_Correlation_Stats.txt")
+MEtraitCor <- getMEtraitCor(MEs, colData = colData, corType = "bicor", file = "ME_Trait_Correlation_Stats.txt")
+traitDendro <- reshape2::acast(data = MEtraitCor, formula = variable ~ module, value.var = "bicor") %>%
+        dist() %>% hclust(method = "average")
+MEtraitCor$module <- factor(MEtraitCor$module, levels = moduleDendro$labels[moduleDendro$order])
+MEtraitCor$variable <- factor(MEtraitCor$variable, levels = rev(traitDendro$labels[traitDendro$order]))
+plotMEtraitCor(MEtraitCor, file = "ME_Trait_Correlation_Heatmap.pdf")
+plotMEtraitCor(MEtraitCor, sigOnly = TRUE, star.size = 11, star.nudge_y = -0.27, legend.position = c(1.14, 0.745),
+               colColorMargins = c(-1,5.1,0.5,10.47), file = "Sig_ME_Trait_Correlation_Heatmap.pdf", 
+               width = 7, height = 3.5)
