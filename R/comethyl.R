@@ -476,7 +476,7 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
 }
 
 getModules <- function(meth, power = NULL, corType = c("pearson", "bicor"), deepSplit = 4, minModuleSize = 10, 
-                       mergeCutHeight = 0.1, nThreads = 6, save = TRUE, file = "Modules.rds", verbose = TRUE){
+                       mergeCutHeight = 0.1, nThreads = 4, save = TRUE, file = "Modules.rds", verbose = TRUE){
         if(is.null(power)){
                 stop("[getModules] You must select a soft power threshold")
         }
@@ -740,7 +740,7 @@ plotMEtraitCor <- function(MEtraitCor, sigOnly = FALSE, star.size = 8, star.nudg
 # Set Global Options ####
 options(stringsAsFactors = FALSE)
 Sys.setenv(R_THREADS = 1)
-enableWGCNAThreads(nThreads = 6)
+enableWGCNAThreads(nThreads = 4)
 
 # Read Bismark CpG Reports ####
 colData <- read.xlsx("sample_info.xlsx", rowNames = TRUE)
