@@ -427,7 +427,8 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
                 }
         }
         if(is.na(sft$powerEstimate)){
-                sft$powerEstimate <- sft$fitIndices$Power[sft$fitIndices$SFT.R.sq == max(sft$fitIndices$SFT.R.sq)]
+                fit <- -sign(sft$fitIndices[,"slope"]) * sft$fitIndices[,"SFT.R.sq"]
+                sft$powerEstimate <- sft$fitIndices$Power[fit == max(fit)]
         }
         if(verbose){
                 message("[getSoftPower] At soft power threshold = ", sft$powerEstimate, 
@@ -450,7 +451,8 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
         gg <- ggplot(data = fitIndices)
         gg <- gg +
                 geom_vline(aes(xintercept = powerEstimate), color = lineCol) +
-                geom_text(aes(x = powerEstimate, y = 0, label = powerEstimate), color = lineCol, nudge_x = -1) +
+                geom_text(aes(x = powerEstimate, y = min(0, min(fitIndices$value)), label = powerEstimate), color = lineCol, 
+                          nudge_x = -1) +
                 geom_point(aes(x = power, y = value), color = pointCol, size = 1.2) +
                 facet_wrap(vars(variable), nrow = 1, ncol = 2, scales = "free_y", strip.position = "left") +
                 xlab("Soft Power Threshold") +
