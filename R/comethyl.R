@@ -145,17 +145,29 @@ getRegions <- function(bs, maxGap = 150, n = 3, save = TRUE, file = "Unfiltered_
         return(regions)
 }
 
-plotRegionStats <- function(regions, bins = 100, histCol = "#132B43", lineCol = "red", nBreaks = 4, save = TRUE, 
-                            file = "Region_Plots.pdf", width = 11, height = 8.5, verbose = TRUE){
+plotRegionStats <- function(regions, maxQuantile = 1, bins = 75, histCol = "#132B43", lineCol = "red", nBreaks = 4, 
+                            save = TRUE, file = "Region_Plots.pdf", width = 11, height = 8.5, verbose = TRUE){
         if(verbose){
                 message("[plotRegionStats] Plotting histograms of region statistics")
         }
+        variables <- c("width", "n", "covMin", "covMean", "methMean", "methSD")
+        medians <- data.frame(variable = factor(variables, levels = variables), 
+                              value = sapply(regions[,variables], FUN = median)) 
+        if(maxQuantile < 1){
+                if(verbose){
+                        message("[plotRegionStats] Limiting x-axis to values in bottom ", maxQuantile * 100, 
+                                "% for width, n, covMin, and covMean")
+                }
+                regions$width[regions$width >= quantile(regions$width, probs = maxQuantile)] <- NA
+                regions$n[regions$n >= quantile(regions$n, probs = maxQuantile)] <- NA
+                regions$covMin[regions$covMin >= quantile(regions$covMin, probs = maxQuantile)] <- NA
+                regions$covMean[regions$covMean >= quantile(regions$covMean, probs = maxQuantile)] <- NA
+        }
         regions <- reshape2::melt(regions[,c("RegionID", "width", "n", "covMin", "covMean", "methMean", "methSD")], 
                                   id.vars = "RegionID")
-        medians <- aggregate(value ~ variable, data = regions, FUN = median)
         gg <- ggplot(data = regions)
         gg <- gg +
-                geom_histogram(aes(x = value), bins = bins, fill = histCol, color = histCol) +
+                geom_histogram(aes(x = value), bins = bins, fill = histCol, color = histCol, na.rm = TRUE) +
                 geom_vline(data = medians, aes(xintercept = value), color = lineCol) +
                 facet_wrap(vars(variable), nrow = 2, ncol = 3, scales = "free", strip.position = "bottom") +
                 scale_x_continuous(breaks = breaks_pretty(n = nBreaks)) +
@@ -178,16 +190,25 @@ plotRegionStats <- function(regions, bins = 100, histCol = "#132B43", lineCol = 
         return(gg)
 }
 
-plotSDstats <- function(regions, bins = 100, nBreaks = 4, legend.position = c(1.09,0.9), save = TRUE, 
+plotSDstats <- function(regions, maxQuantile = 1, bins = 75, nBreaks = 4, legend.position = c(1.09,0.9), save = TRUE, 
                         file = "SD_Plots.pdf", width = 8.5, height = 8.5, verbose = TRUE){
         if(verbose){
                 message("[plotSDstats] Plotting methylation SD vs region statistics")
+        }
+        if(maxQuantile < 1){
+                if(verbose){
+                        message("[plotSDstats] Limiting x-axis to values in bottom ", maxQuantile * 100, 
+                                "% for n, covMin, and covMean")
+                }
+                regions$n[regions$n >= quantile(regions$n, probs = maxQuantile)] <- NA
+                regions$covMin[regions$covMin >= quantile(regions$covMin, probs = maxQuantile)] <- NA
+                regions$covMean[regions$covMean >= quantile(regions$covMean, probs = maxQuantile)] <- NA
         }
         regions <- reshape2::melt(regions[,c("RegionID", "n", "covMin", "covMean", "methMean", "methSD")], 
                                   id.vars = c("RegionID", "methSD"))
         gg <- ggplot(data = regions)
         gg <- gg +
-                geom_bin2d(aes(x = value, y = methSD, color = ..count..), bins = bins) +
+                geom_bin2d(aes(x = value, y = methSD, color = ..count..), bins = bins, na.rm = TRUE) +
                 facet_wrap(vars(variable), nrow = 2, ncol = 2, scales = "free_x", strip.position = "bottom") +
                 scale_fill_continuous(name = "Count", trans = "log10") +
                 scale_color_continuous(guide = FALSE, trans = "log10") +
@@ -757,8 +778,8 @@ bs <- filterCpGs(bs, cov = 2, perSample = 0.75)
 
 # Call Regions ####
 regions <- getRegions(bs)
-plotRegionStats(regions, file = "Unfiltered_Region_Plots.pdf")
-plotSDstats(regions, file = "Unfiltered_SD_Plots.pdf")
+plotRegionStats(regions, maxQuantile = 0.99, file = "Unfiltered_Region_Plots.pdf")
+plotSDstats(regions, maxQuantile = 0.99, file = "Unfiltered_SD_Plots.pdf")
 
 # Examine Region Totals at Different Cutoffs ####
 regionTotals <- getRegionTotals(regions)
@@ -766,8 +787,8 @@ plotRegionTotals(regionTotals)
 
 # Filter Regions ####
 regions <- filterRegions(regions, covMin = 10, methSD = 0.05)
-plotRegionStats(regions, file = "Filtered_Region_Plots.pdf")
-plotSDstats(regions, file = "Filtered_SD_Plots.pdf")
+plotRegionStats(regions, maxQuantile = 0.99, file = "Filtered_Region_Plots.pdf")
+plotSDstats(regions, maxQuantile = 0.99, file = "Filtered_SD_Plots.pdf")
 
 # Adjust Methylation Data for PCs ####
 meth <- getRegionMeth(regions, bs = bs)
