@@ -425,7 +425,7 @@ plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(0.03,0
 }
 
 getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor"), maxPOutliers = 0.1, 
-                         RsquaredCut = 0.8, blockSize = 40000, gcInterval = NULL, verbose = TRUE){
+                         RsquaredCut = 0.8, blockSize = 40000, gcInterval = blockSize - 1, verbose = TRUE){
         corType <- match.arg(corType)
         if(verbose){
                 message("[getSoftPower] Analyzing scale-free topology with ", corType, 
