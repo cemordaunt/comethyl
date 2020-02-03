@@ -425,7 +425,7 @@ plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(0.03,0
 }
 
 getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor"), maxPOutliers = 0.1, 
-                         RsquaredCut = 0.8, verbose = TRUE){
+                         RsquaredCut = 0.8, blockSize = 40000, verbose = TRUE){
         corType <- match.arg(corType)
         if(verbose){
                 message("[getSoftPower] Analyzing scale-free topology with ", corType, 
@@ -436,12 +436,12 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
         }
         if(corType == "pearson"){
                 sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector, 
-                                         networkType = "signed", corFnc = "cor", blockSize = 40000, verbose = verboseNum)
+                                         networkType = "signed", corFnc = "cor", blockSize = blockSize, verbose = verboseNum)
         } else {
                 if(corType == "bicor"){
                         sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector, 
                                                  networkType = "signed", corFnc = "bicor", 
-                                                 corOptions = list(maxPOutliers = maxPOutliers), blockSize = 40000, 
+                                                 corOptions = list(maxPOutliers = maxPOutliers), blockSize = blockSize, 
                                                  verbose = verboseNum)
                 } else {
                         stop("[getSoftPower] Error: corType must be either pearson or bicor")
@@ -498,8 +498,8 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
         return(gg)
 }
 
-getModules <- function(meth, power = NULL, corType = c("pearson", "bicor"), deepSplit = 4, minModuleSize = 10, 
-                       mergeCutHeight = 0.1, nThreads = 4, save = TRUE, file = "Modules.rds", verbose = TRUE){
+getModules <- function(meth, maxBlockSize = 40000, power = NULL, corType = c("pearson", "bicor"), maxPOutliers = 0.1, deepSplit = 4, 
+                       minModuleSize = 10, mergeCutHeight = 0.1, nThreads = 4, save = TRUE, file = "Modules.rds", verbose = TRUE){
         if(is.null(power)){
                 stop("[getModules] You must select a soft power threshold")
         }
@@ -510,10 +510,10 @@ getModules <- function(meth, power = NULL, corType = c("pearson", "bicor"), deep
                 verboseNum <- 0
         }
         corType <- match.arg(corType)
-        modules <- blockwiseModules(meth, checkMissingData = FALSE, maxBlockSize = 40000, corType = corType, power = power, 
-                                    networkType = "signed", TOMtype = "signed", deepSplit = deepSplit, 
-                                    minModuleSize = minModuleSize, mergeCutHeight = mergeCutHeight, nThreads = nThreads,
-                                    verbose = verboseNum)
+        modules <- blockwiseModules(meth, checkMissingData = FALSE, maxBlockSize = maxBlockSize, corType = corType, 
+                                    maxPOutliers = maxPOutliers, power = power, networkType = "signed", TOMtype = "signed", 
+                                    deepSplit = deepSplit, minModuleSize = minModuleSize, mergeCutHeight = mergeCutHeight, 
+                                    nThreads = nThreads, verbose = verboseNum)
         if(save){
                 if(verbose){
                         message("[getModules] Saving modules as ", file)
