@@ -425,7 +425,7 @@ plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(0.03,0
 }
 
 getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor"), maxPOutliers = 0.1, 
-                         RsquaredCut = 0.8, blockSize = 40000, verbose = TRUE){
+                         RsquaredCut = 0.8, blockSize = 40000, gcInterval = NULL, verbose = TRUE){
         corType <- match.arg(corType)
         if(verbose){
                 message("[getSoftPower] Analyzing scale-free topology with ", corType, 
@@ -435,14 +435,14 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
                 verboseNum <- 0
         }
         if(corType == "pearson"){
-                sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector, 
-                                         networkType = "signed", corFnc = "cor", blockSize = blockSize, verbose = verboseNum)
+                sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector, networkType = "signed", 
+                                         corFnc = "cor", blockSize = blockSize, gcInterval = gcInterval, verbose = verboseNum)
         } else {
                 if(corType == "bicor"){
                         sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector, 
                                                  networkType = "signed", corFnc = "bicor", 
                                                  corOptions = list(maxPOutliers = maxPOutliers), blockSize = blockSize, 
-                                                 verbose = verboseNum)
+                                                 gcInterval = gcInterval, verbose = verboseNum)
                 } else {
                         stop("[getSoftPower] Error: corType must be either pearson or bicor")
                 }
