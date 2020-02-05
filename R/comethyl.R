@@ -436,11 +436,12 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
         }
         if(corType == "pearson"){
                 sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector, networkType = "signed", 
-                                         corFnc = "cor", blockSize = blockSize, gcInterval = gcInterval, verbose = verboseNum)
+                                         moreNetworkConcepts = TRUE, corFnc = "cor", blockSize = blockSize, 
+                                         gcInterval = gcInterval, verbose = verboseNum)
         } else {
                 if(corType == "bicor"){
                         sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector, 
-                                                 networkType = "signed", corFnc = "bicor", 
+                                                 networkType = "signed", moreNetworkConcepts = TRUE, corFnc = "bicor", 
                                                  corOptions = list(maxPOutliers = maxPOutliers), blockSize = blockSize, 
                                                  gcInterval = gcInterval, verbose = verboseNum)
                 } else {
