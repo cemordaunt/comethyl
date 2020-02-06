@@ -734,7 +734,7 @@ plotMEtraitCor <- function(MEtraitCor, sigOnly = FALSE, star.size = 8, star.nudg
                                      aesthetics = c("color", "fill")) +
                 scale_x_discrete(expand = expand_scale(mult = 0.01)) +
                 scale_y_discrete(expand = expand_scale(mult = 0.01)) +
-                scale_alpha_manual(breaks = c("TRUE", "FALSE"), values = c(1, 0), guide = FALSE) +
+                scale_alpha_manual(breaks = c("TRUE", "FALSE"), values = c("TRUE" = 1, "FALSE" = 0), guide = FALSE) +
                 theme_bw(base_size = 24) +
                 theme(axis.text.x = element_blank(), 
                       axis.text.y = element_text(size = axis.text.size, color = "black"), 
