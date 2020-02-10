@@ -2,7 +2,7 @@
 # Charles Mordaunt
 
 # Load Packages ####
-.libPaths("/share/lasallelab/Charles/comethylated/R")
+.libPaths("/share/lasallelab/Charles/comethyl/R")
 sapply(c("scales", "openxlsx", "rlist", "tidyverse", "ggdendro", "cowplot", "bsseq", "dmrseq", "WGCNA", "sva"), require, 
        character.only = TRUE)
 
