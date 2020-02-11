@@ -145,7 +145,7 @@ getRegions <- function(bs, maxGap = 150, n = 3, save = TRUE, file = "Unfiltered_
         return(regions)
 }
 
-plotRegionStats <- function(regions, maxQuantile = 1, bins = 75, histCol = "#132B43", lineCol = "red", nBreaks = 4, 
+plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132B43", lineCol = "red", nBreaks = 4, 
                             save = TRUE, file = "Region_Plots.pdf", width = 11, height = 8.5, verbose = TRUE){
         if(verbose){
                 message("[plotRegionStats] Plotting histograms of region statistics")
@@ -190,7 +190,7 @@ plotRegionStats <- function(regions, maxQuantile = 1, bins = 75, histCol = "#132
         return(gg)
 }
 
-plotSDstats <- function(regions, maxQuantile = 1, bins = 75, nBreaks = 4, legend.position = c(1.09,0.9), save = TRUE, 
+plotSDstats <- function(regions, maxQuantile = 1, bins = 30, nBreaks = 4, legend.position = c(1.09,0.9), save = TRUE, 
                         file = "SD_Plots.pdf", width = 8.5, height = 8.5, verbose = TRUE){
         if(verbose){
                 message("[plotSDstats] Plotting methylation SD vs region statistics")
