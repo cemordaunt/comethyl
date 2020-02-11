@@ -49,7 +49,7 @@ getCpGtotals <- function(bs, cov = seq(0,10,1), perSample = seq(0.5,1,0.05), sav
         bsCov <- getCoverage(bs)
         nCpGs <- sapply(cov, FUN = .nCpGsByCov, bsCov = bsCov, nSample = nSample)
         nCpGs <- as.integer(nCpGs)
-        perCpGs <- (nCpGs / length(bs)) %>% round(digits = 5)
+        perCpGs <- (nCpGs / length(bs))
         CpGtotals <- data.frame(cov = rep(cov, each = length(perSample)), perSample = rep(perSample, times = length(cov)), 
                                 nSample = rep(nSample, times = length(cov)), nCpGs_M = nCpGs / 10^6, perCpGs = perCpGs)
         if(save){
@@ -129,11 +129,11 @@ getRegions <- function(bs, maxGap = 150, n = 3, save = TRUE, file = "Unfiltered_
         regions$width <- regions$end - regions$start
         cov <- getCoverage(bs, regions = regions[,c("chr", "start", "end")], what = "perRegionTotal")
         regions$covMin <- DelayedArray::rowMins(cov)
-        regions$covMean <- DelayedMatrixStats::rowMeans2(cov) %>% round(digits = 5)
-        regions$covSD <- DelayedMatrixStats::rowSds(cov) %>% round(digits = 5)
+        regions$covMean <- DelayedMatrixStats::rowMeans2(cov)
+        regions$covSD <- DelayedMatrixStats::rowSds(cov)
         meth <- getMeth(bs, regions = regions[,c("chr", "start", "end")], type = "raw", what = "perRegion")
-        regions$methMean <- DelayedMatrixStats::rowMeans2(meth, na.rm = TRUE) %>% round(digits = 5)
-        regions$methSD <- DelayedMatrixStats::rowSds(meth, na.rm = TRUE) %>% round(digits = 5)
+        regions$methMean <- DelayedMatrixStats::rowMeans2(meth, na.rm = TRUE)
+        regions$methSD <- DelayedMatrixStats::rowSds(meth, na.rm = TRUE)
         regions <- regions[,c("RegionID", "chr", "start", "end", "width", "n", "covMin", "covMean", "covSD", "methMean", 
                               "methSD")]
         if(save){
