@@ -769,43 +769,43 @@ enableWGCNAThreads(nThreads = 4)
 
 # Read Bismark CpG Reports ####
 colData <- read.xlsx("sample_info.xlsx", rowNames = TRUE)
-bs <- getCpGs(colData)
+bs <- getCpGs(colData, file = "Unfiltered_BSseq.rds")
 
 # Examine CpG Totals at Different Cutoffs ####
-CpGtotals <- getCpGtotals(bs)
-plotCpGtotals(CpGtotals)
+CpGtotals <- getCpGtotals(bs, file = "CpG_Totals.txt")
+plotCpGtotals(CpGtotals, file = "CpG_Totals.pdf")
 
 # Filter BSobject ####
-bs <- filterCpGs(bs, cov = 2, perSample = 0.75)
+bs <- filterCpGs(bs, cov = 2, perSample = 0.75, file = "Filtered_BSseq.rds")
 
 # Call Regions ####
-regions <- getRegions(bs)
+regions <- getRegions(bs, file = "Unfiltered_Regions.txt")
 plotRegionStats(regions, maxQuantile = 0.99, file = "Unfiltered_Region_Plots.pdf")
 plotSDstats(regions, maxQuantile = 0.99, file = "Unfiltered_SD_Plots.pdf")
 
 # Examine Region Totals at Different Cutoffs ####
-regionTotals <- getRegionTotals(regions)
-plotRegionTotals(regionTotals)
+regionTotals <- getRegionTotals(regions, file = "Region_Totals.txt")
+plotRegionTotals(regionTotals, file = "Region_Totals.pdf")
 
 # Filter Regions ####
-regions <- filterRegions(regions, covMin = 10, methSD = 0.05)
+regions <- filterRegions(regions, covMin = 10, methSD = 0.05, file = "Filtered_Regions.txt")
 plotRegionStats(regions, maxQuantile = 0.99, file = "Filtered_Region_Plots.pdf")
 plotSDstats(regions, maxQuantile = 0.99, file = "Filtered_SD_Plots.pdf")
 
 # Adjust Methylation Data for PCs ####
-meth <- getRegionMeth(regions, bs = bs)
+meth <- getRegionMeth(regions, bs = bs, file = "Region_Methylation.rds")
 mod <- model.matrix(~1, data = pData(bs))
-methAdj <- adjustRegionMeth(meth, mod = mod)
+methAdj <- adjustRegionMeth(meth, mod = mod, file = "Adjusted_Region_Methylation.rds")
 getDendro(methAdj, distance = "euclidean") %>% plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25,0.08))
 
 # Select Soft Power Threshold ####
 sft <- getSoftPower(methAdj, corType = "pearson")
-plotSoftPower(sft)
+plotSoftPower(sft, file = "Soft_Power_Plots.pdf")
 
 # Get Comethylation Modules ####
-modules <- getModules(methAdj, power = sft$powerEstimate, corType = "pearson")
-plotRegionDendro(modules)
-BED <- getModuleBED(regions, modules = modules)
+modules <- getModules(methAdj, power = sft$powerEstimate, corType = "pearson", file = "Modules.rds")
+plotRegionDendro(modules, file = "Region_Dendrograms.pdf")
+BED <- getModuleBED(regions, modules = modules, file = "Modules.bed")
 
 # Examine Correlations between Modules and Samples ####
 MEs <- modules$MEs
