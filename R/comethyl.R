@@ -543,7 +543,7 @@ plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pd
         invisible(dev.off())
 }
 
-getModuleBED <- function(regions, modules, grey = TRUE, save = TRUE, file = "Modules.bed", verbose = TRUE){
+getModuleBED <- function(regions, modules, grey = FALSE, save = TRUE, file = "Modules.bed", verbose = TRUE){
         if(verbose){
                 message("[getModuleBED] Creating bed file of regions annotated with identified modules")
         }
@@ -554,6 +554,7 @@ getModuleBED <- function(regions, modules, grey = TRUE, save = TRUE, file = "Mod
                 }
                 regions <- regions[!regions$module == "grey",]
         }
+        regions$RegionID <- paste(regions$RegionID, regions$module, sep = "_")
         regions$rgb <- col2rgb(regions$module) %>% apply(2, paste, collapse = ",")
         bed <- cbind(regions[c("chr", "start", "end", "RegionID")], score = 0, strand = ".", thickStart = 0, thickEnd = 0, 
                      rgb = regions$rgb)
@@ -561,7 +562,7 @@ getModuleBED <- function(regions, modules, grey = TRUE, save = TRUE, file = "Mod
                 if(verbose){
                         message("[getModuleBED] Saving file as ", file)
                 }
-                name <- gsub(".bed", replacement = "", file)
+                name <- basename(file) %>% gsub(".bed", replacement = "", x = .)
                 write(paste("track name='", name, "' description='", name, "' itemRgb='On'", sep = ""), file = file)
                 write.table(bed, file = file, append = TRUE, quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
         }
