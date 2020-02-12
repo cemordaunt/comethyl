@@ -575,8 +575,7 @@ getModuleBED <- function(modules, grey = FALSE, save = TRUE, file = "Modules.bed
         return(BED)
 }
 
-plotHeatmap <- function(x, rowDendro, colDendro, rowModules = FALSE, colModules = FALSE, 
-                        colors = blueWhiteRed(100, gamma = 0.3), limit = max(abs(x)), 
+plotHeatmap <- function(x, rowDendro, colDendro, colors = blueWhiteRed(100, gamma = 0.3), limit = max(abs(x)), 
                         axis.text.size = 8, legend.title = "Bicor", legend.title.size = 16, legend.text.size = 12,
                         legend.position = c(0.3,0.905), rowDendroMargins = c(-1.55,1,-0.1,-1.1), 
                         colDendroMargins = c(1,-0.5,-1,0.8), rowColorMargins = c(-1.85,-1.5,0.55,1.7),
@@ -589,8 +588,8 @@ plotHeatmap <- function(x, rowDendro, colDendro, rowModules = FALSE, colModules 
         x <- as.data.frame(x)
         rownames(x) <- gsub("ME", replacement = "", x = rownames(x), fixed = TRUE)
         colnames(x) <- gsub("ME", replacement = "", x = colnames(x), fixed = TRUE)
-        #rowModules <- sum(!is.na(col2hcl(rownames(x)))) == length(rownames(x))
-        #colModules <- sum(!is.na(col2hcl(colnames(x)))) == length(colnames(x))
+        rowModules <- sum(rownames(x) %in% colors()) == length(rownames(x))
+        colModules <- sum(colnames(x) %in% colors()) == length(colnames(x))
         x$rowID <- factor(rownames(x), levels = rowDendro$labels[rev(rowDendro$order)])
         x <- reshape2::melt(x, id.vars = "rowID")
         x$variable <- factor(x$variable, levels = colDendro$labels[colDendro$order])
