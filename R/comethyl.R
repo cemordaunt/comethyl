@@ -678,7 +678,7 @@ getCor <- function(x, y = NULL, transpose = FALSE, corType = c("bicor", "pearson
         return(cor)
 }
 
-getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"), maxPOutliers = 0.1, robustY = FALSE, 
+getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"), maxPOutliers = 0.1, robustY = FALSE, adjMethod = "fdr", 
                           save = TRUE, file = "ME_Trait_Correlation_Stats.txt", verbose = TRUE){
         corType <- match.arg(corType)
         if(verbose){
@@ -702,11 +702,11 @@ getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"), maxPOut
         stats$stat <- names(cor) %>% rep(each = nrow(cor$p)) %>% factor(levels = unique(.))
         stats <- reshape2::melt(stats, id.vars = c("module", "stat"), variable.name = "trait") %>%
                 reshape2::dcast(formula = module + trait ~ stat, value.var = "value")
-        stats$q <- p.adjust(stats$p, method = "fdr")
+        stats$adj_p <- p.adjust(stats$p, method = adjMethod)
         if(corType == "bicor"){
-                stats <- stats[,c("module", "trait", "nObs", "bicor", "Z", "t", "p", "q")]
+                stats <- stats[,c("module", "trait", "nObs", "bicor", "Z", "t", "p", "adj_p")]
         } else {
-                stats <- stats[,c("module", "trait", "nObs", "cor", "Z", "t", "p", "q")]
+                stats <- stats[,c("module", "trait", "nObs", "cor", "Z", "t", "p", "adj_p")]
         }
         if(save){
                 if(verbose){
@@ -718,7 +718,7 @@ getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"), maxPOut
 }
 
 plotMEtraitCor <- function(MEtraitCor, moduleOrder = 1:length(unique(MEtraitCor$module)), 
-                           traitOrder = 1:length(unique(MEtraitCor$trait)), sigOnly = FALSE, star.size = 8, 
+                           traitOrder = 1:length(unique(MEtraitCor$trait)), sigOnly = FALSE, adj_p = 0.05, star.size = 8, 
                            star.nudge_y = -0.38, colors = blueWhiteRed(100, gamma = 0.9), limit = NULL, 
                            axis.text.size = 12, legend.position = c(1.08, 0.915), legend.text.size = 12, 
                            legend.title.size = 16, colColorMargins = c(-0.7,4.21,1.2,11.07), save = TRUE, 
@@ -728,7 +728,7 @@ plotMEtraitCor <- function(MEtraitCor, moduleOrder = 1:length(unique(MEtraitCor$
         }
         MEtraitCor$module <- factor(MEtraitCor$module, levels = levels(MEtraitCor$module)[moduleOrder])
         MEtraitCor$trait <- factor(MEtraitCor$trait, levels = levels(MEtraitCor$trait)[rev(traitOrder)])
-        MEtraitCor$Significant <- (MEtraitCor$q < 0.05 & !is.na(MEtraitCor$q)) %>% factor(levels = c("TRUE", "FALSE"))
+        MEtraitCor$Significant <- (MEtraitCor$adj_p < adj_p & !is.na(MEtraitCor$adj_p)) %>% factor(levels = c("TRUE", "FALSE"))
         if(sigOnly){
                 sigModules <- MEtraitCor$module[MEtraitCor$Significant == "TRUE"] %>% unique() %>% as.character()
                 sigTraits <- MEtraitCor$trait[MEtraitCor$Significant == "TRUE"] %>% unique() %>% as.character()
