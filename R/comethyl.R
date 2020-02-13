@@ -246,8 +246,10 @@ getRegionTotals <- function(regions, covMin = seq(0,20,2), methSD = seq(0,0.1,0.
         if(verbose){
                 message("[getRegionTotals] Calculating region totals at specified covMin and methSD cutoffs")
         }
-        covMin <- rep(covMin, each = length(methSD))
-        methSD <- rep(methSD, times = length(covMin))
+        length_covMin <- length(covMin)
+        length_methSD <- length(methSD)
+        covMin <- rep(covMin, each = length_methSD)
+        methSD <- rep(methSD, times = length_covMin)
         regionTotals <- mapply(FUN = .regionTotals, covMin = covMin, methSD = methSD, 
                                MoreArgs = list(regions = regions)) %>% t() %>% as.data.frame()
         if(save){
@@ -817,13 +819,14 @@ plotMEtraitDot <- function(ME, trait, traitCode = NULL, colors = NULL, fun.data 
         ggsave(file, plot = dotplot, dpi = 600, width = width, height = height, units = "in")
 }
 
-plotMEtraitScatter <- function(ME, trait, color = "#132B43", xlim = NULL, ylim = NULL, nBreaks = 4, point.size = 2, 
+plotMEtraitScatter <- function(ME, trait, color = "#132B43", xlim = NULL, ylim = NULL, nBreaks = 4, point.size = 2.5, 
                                axis.title.size = 20, axis.text.size = 16, xlab = "Trait", ylab = "Module Eigennode", 
                                save = TRUE, file = "ME_Trait_Scatterplot.pdf", width = 6, height = 6, verbose = TRUE){
         if(verbose){
                 message("[plotMEtraitScatter] Plotting module eigennode by continuous trait")
         }
         scatterplot <- ggplot() +
+                geom_smooth(aes(x = trait, y = ME), method = MASS::rlm, color = "#56B1F7", fill = "#336A98") +   
                 geom_point(aes(x = trait, y = ME), color = color, size = point.size) +   
                 coord_cartesian(xlim = xlim, ylim = ylim) +
                 scale_x_continuous(breaks = breaks_pretty(n = nBreaks)) +
