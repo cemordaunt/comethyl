@@ -780,6 +780,68 @@ plotMEtraitCor <- function(MEtraitCor, moduleOrder = 1:length(unique(MEtraitCor$
         return(gg)
 }
 
+plotMEtraitDot <- function(ME, trait, traitCode = NULL, colors = NULL, fun.data = "median_hilow", 
+                           fun.args = list(conf.int = 0.5), binwidth = 0.01, stackratio = 1.4, dotsize = 0.85, ylim = NULL,
+                           nBreaks = 4, axis.title.size = 20, axis.text.size = 16, xlab = "Trait", ylab = "Module Eigennode",
+                           save = TRUE, file = "ME_Trait_Dotplot.pdf", width = 6, height = 6, verbose = TRUE){
+        if(verbose){
+                message("[plotMEtraitDot] Plotting module eigennode by categorical trait")
+        }
+        if(!is.null(traitCode)){
+                trait <- names(traitCode)[match(colData[[traitName]], traitCode)] %>% factor(levels = names(traitCode))
+        } else {
+                trait <- as.factor(trait)
+        }
+        dotplot <- ggplot() +
+                stat_summary(aes(x = trait, y = ME, group = trait), fun.data = fun.data, geom = "crossbar", 
+                             color = "black", size = 0.5, fun.args = fun.args) +
+                geom_dotplot(aes(x = trait, y = ME, fill = trait, color = trait), binwidth = binwidth, binaxis = "y", 
+                             stackdir = "center", position = "dodge", stackratio = stackratio, dotsize = dotsize) +
+                coord_cartesian(ylim = ylim) +
+                scale_y_continuous(breaks = breaks_pretty(n = nBreaks)) +
+                theme_bw(base_size = 25) +
+                theme(legend.position = "none", panel.grid.major = element_blank(),
+                      panel.border = element_rect(color = "black", size = 1.25), axis.ticks = element_line(size = 1.25), 
+                      panel.grid.minor = element_blank(), strip.background = element_blank(),
+                      axis.text = element_text(color = "black", size = axis.text.size), 
+                      axis.title = element_text(size = axis.title.size), plot.margin = unit(c(1,1,1,1), "lines")) +
+                xlab(xlab) +
+                ylab(ylab)
+        if(!is.null(colors)){
+                dotplot <- dotplot +
+                        scale_color_manual(breaks = names(colors), values = colors, aesthetics = c("color", "fill"))
+        }
+        if(verbose){
+                message("[plotMEtraitDot] Saving file as ", file)
+        }
+        ggsave(file, plot = dotplot, dpi = 600, width = width, height = height, units = "in")
+}
+
+plotMEtraitScatter <- function(ME, trait, color = "#132B43", xlim = NULL, ylim = NULL, nBreaks = 4, point.size = 2, 
+                               axis.title.size = 20, axis.text.size = 16, xlab = "Trait", ylab = "Module Eigennode", 
+                               save = TRUE, file = "ME_Trait_Scatterplot.pdf", width = 6, height = 6, verbose = TRUE){
+        if(verbose){
+                message("[plotMEtraitScatter] Plotting module eigennode by continuous trait")
+        }
+        scatterplot <- ggplot() +
+                geom_point(aes(x = trait, y = ME), color = color, size = point.size) +   
+                coord_cartesian(xlim = xlim, ylim = ylim) +
+                scale_x_continuous(breaks = breaks_pretty(n = nBreaks)) +
+                scale_y_continuous(breaks = breaks_pretty(n = nBreaks)) +
+                theme_bw(base_size = 25) +
+                theme(legend.position = "none", panel.grid.major = element_blank(),
+                      panel.border = element_rect(color = "black", size = 1.25), axis.ticks = element_line(size = 1.25), 
+                      panel.grid.minor = element_blank(), strip.background = element_blank(),
+                      axis.text = element_text(color = "black", size = axis.text.size), 
+                      axis.title = element_text(size = axis.title.size), plot.margin = unit(c(1,1,1,1), "lines")) +
+                xlab(xlab) +
+                ylab(ylab)
+        if(verbose){
+                message("[plotMEtraitScatter] Saving file as ", file)
+        }
+        ggsave(file, plot = scatterplot, dpi = 600, width = width, height = height, units = "in")
+}
+
 # Set Global Options ####
 options(stringsAsFactors = FALSE)
 Sys.setenv(R_THREADS = 1)
@@ -849,3 +911,14 @@ plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order, traitOrder = traitD
 plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order, traitOrder = traitDendro$order, sigOnly = TRUE, star.size = 11, 
                star.nudge_y = -0.27, legend.position = c(1.14, 0.745), colColorMargins = c(-1,5.1,0.5,10.47), 
                file = "Sig_ME_Trait_Correlation_Heatmap.pdf", width = 7, height = 3.5)
+
+# Explore Significant ME-Trait Correlations ####
+plotMEtraitDot(MEs$MEbisque4, trait = colData$Diagnosis_ASD, traitCode = c("TD" = 0, "ASD" = 1), 
+               colors = c("TD" = "#3366CC", "ASD" = "#FF3366"), ylim = c(-0.2,0.2), xlab = "Diagnosis", 
+               ylab = "Bisque 4 Module Eigennode", file = "bisque4_ME_Diagnosis_Dotplot.pdf")
+
+plotMEtraitScatter(MEs$MEpaleturquoise, trait = colData$Gran, ylim = c(-0.15,0.15), xlab = "Granulocytes", 
+                   ylab = "Pale Turquoise Module Eigennode", file = "paleturquoise_ME_Granulocytes_Scatterplot.pdf")
+plotMEtraitScatter(MEs$MEpaleturquoise, trait = colData$Bcell, ylim = c(-0.15,0.15), xlab = "B-cells", 
+                   ylab = "Pale Turquoise Module Eigennode", file = "paleturquoise_ME_Bcells_Scatterplot.pdf")
+
