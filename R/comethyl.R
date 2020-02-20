@@ -508,7 +508,7 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
         return(gg)
 }
 
-getModules <- function(meth, power = NULL, regions = NULL, maxBlockSize = 40000, corType = c("pearson", "bicor"), 
+getModules <- function(meth, power, regions, maxBlockSize = 40000, corType = c("pearson", "bicor"), 
                        maxPOutliers = 0.1, deepSplit = 4, minModuleSize = 10, mergeCutHeight = 0.1, nThreads = 4, save = TRUE, 
                        file = "Modules.rds", verbose = TRUE){
         if(is.null(power)){
@@ -517,19 +517,38 @@ getModules <- function(meth, power = NULL, regions = NULL, maxBlockSize = 40000,
         if(is.null(regions)){
                 stop("[getModules] You must include regions")
         }
+        corType <- match.arg(corType)
+        if(!corType %in% c("pearson", "bicor")){
+                stop("[getModules] corType must be either pearson or bicor")
+        }
         if(verbose){
-                message("[getModules] Constructing network and detecting modules in blocks")
+                message("[getModules] Constructing network and detecting modules in blocks using ", corType, " correlation")
                 verboseNum <- 10
         } else {
                 verboseNum <- 0
         }
-        corType <- match.arg(corType)
         modules <- blockwiseModules(meth, checkMissingData = FALSE, maxBlockSize = maxBlockSize, corType = corType, 
                                     maxPOutliers = maxPOutliers, power = power, networkType = "signed", TOMtype = "signed", 
                                     deepSplit = deepSplit, minModuleSize = minModuleSize, mergeCutHeight = mergeCutHeight, 
                                     nThreads = nThreads, verbose = verboseNum)
+        if(verbose){
+                message("[getModules] Assigning modules and calculating module membership using ", corType, " correlation")
+        }
+        colnames(modules$MEs) <- str_remove_all(colnames(modules$MEs), pattern = "ME")
+        if(corType == "pearson"){
+                membership <- WGCNA::cor(x = meth, y = modules$MEs, use = "pairwise.complete.obs", nThreads = nThreads)
+        } else {
+                membership <- bicor(x = meth, y = modules$MEs, use = "pairwise.complete.obs", maxPOutliers = maxPOutliers,
+                                    nThreads = nThreads)
+        }
+        regions$module <- modules$colors[match(regions$RegionID, names(modules$colors))]
+        regions <- lapply(unique(regions$module), function(x){
+                regions <- regions[regions$module == x,]
+                regions$membership <- membership[regions$RegionID,x]
+                return(regions)
+        })
+        regions <- list.rbind(regions) %>% .[order(as.integer(str_remove_all(.$RegionID, pattern = "Region_"))),]
         modules$regions <- regions
-        modules$regions$module <- modules$colors[match(regions$RegionID, names(modules$colors))]
         if(save){
                 if(verbose){
                         message("[getModules] Saving modules as ", file)
@@ -1011,3 +1030,4 @@ plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$G
 plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$Bcell, expandY = 0.04,
               trait.legend.title = "B-cells", trait.legend.position = c(1.004,3.35), 
               file = "paleturquoise_Module_Methylation_Bcells_Heatmap.pdf")
+
