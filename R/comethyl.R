@@ -987,22 +987,22 @@ BED <- getModuleBED(modules$regions, file = "Modules.bed")
 # Examine Correlations between Modules and Samples ####
 MEs <- modules$MEs
 moduleDendro <- getDendro(MEs, distance = "bicor")
-plotDendro(moduleDendro, file = "Module_ME_Dendrogram.pdf", labelSize = 4, nBreaks = 5)
+plotDendro(moduleDendro, labelSize = 4, nBreaks = 5, file = "Module_ME_Dendrogram.pdf")
 moduleCor <- getCor(MEs, corType = "bicor")
 plotHeatmap(moduleCor, rowDendro = moduleDendro, colDendro = moduleDendro, file = "Module_Correlation_Heatmap.pdf")
 
 sampleDendro <- getDendro(MEs, transpose = TRUE, distance = "bicor")
-plotDendro(sampleDendro, file = "Sample_ME_Dendrogram.pdf", labelSize = 3, nBreaks = 5)
+plotDendro(sampleDendro, labelSize = 3, nBreaks = 5, file = "Sample_ME_Dendrogram.pdf")
 sampleCor <- getCor(MEs, transpose = TRUE, corType = "bicor")
 plotHeatmap(sampleCor, rowDendro = sampleDendro, colDendro = sampleDendro, file = "Sample_Correlation_Heatmap.pdf")
 
-plotHeatmap(MEs, rowDendro = sampleDendro, colDendro = moduleDendro, file = "Sample_ME_Heatmap.pdf",
-            legend.title = "Module\nEigennode", legend.position = c(0.37,0.89))
+plotHeatmap(MEs, rowDendro = sampleDendro, colDendro = moduleDendro, legend.title = "Module\nEigennode", 
+            legend.position = c(0.37,0.89), file = "Sample_ME_Heatmap.pdf")
 
 # Test Correlations between Module Eigennodes and Sample Traits ####
 MEtraitCor <- getMEtraitCor(MEs, colData = colData, corType = "bicor", file = "ME_Trait_Correlation_Stats.txt")
 traitDendro <- getCor(MEs, y = colData, corType = "bicor", robustY = FALSE) %>% getDendro(transpose = TRUE)
-plotDendro(traitDendro, file = "Trait_Dendrogram.pdf", labelSize = 3.5, expandY = c(0.65,0.08))
+plotDendro(traitDendro, labelSize = 3.5, expandY = c(0.65,0.08), file = "Trait_Dendrogram.pdf")
 plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order, traitOrder = traitDendro$order,
                file = "ME_Trait_Correlation_Heatmap.pdf")
 plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order, traitOrder = traitDendro$order, sigOnly = TRUE, star.size = 11, 
@@ -1011,12 +1011,12 @@ plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order, traitOrder = traitD
 
 # Explore Significant ME-Trait Correlations ####
 # Plot Module Eigennodes vs Traits
-plotMEtraitDot(MEs$MEbisque4, trait = colData$Diagnosis_ASD, traitCode = c("TD" = 0, "ASD" = 1), 
+plotMEtraitDot(MEs$bisque4, trait = colData$Diagnosis_ASD, traitCode = c("TD" = 0, "ASD" = 1), 
                colors = c("TD" = "#3366CC", "ASD" = "#FF3366"), ylim = c(-0.2,0.2), xlab = "Diagnosis", 
                ylab = "Bisque 4 Module Eigennode", file = "bisque4_ME_Diagnosis_Dotplot.pdf")
-plotMEtraitScatter(MEs$MEpaleturquoise, trait = colData$Gran, ylim = c(-0.15,0.15), xlab = "Granulocytes", 
+plotMEtraitScatter(MEs$paleturquoise, trait = colData$Gran, ylim = c(-0.15,0.15), xlab = "Granulocytes", 
                    ylab = "Pale Turquoise Module Eigennode", file = "paleturquoise_ME_Granulocytes_Scatterplot.pdf")
-plotMEtraitScatter(MEs$MEpaleturquoise, trait = colData$Bcell, ylim = c(-0.15,0.15), xlab = "B-cells", 
+plotMEtraitScatter(MEs$paleturquoise, trait = colData$Bcell, ylim = c(-0.15,0.15), xlab = "B-cells", 
                    ylab = "Pale Turquoise Module Eigennode", file = "paleturquoise_ME_Bcells_Scatterplot.pdf")
 
 # Plot Region Methylation vs Traits
@@ -1030,4 +1030,3 @@ plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$G
 plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$Bcell, expandY = 0.04,
               trait.legend.title = "B-cells", trait.legend.position = c(1.004,3.35), 
               file = "paleturquoise_Module_Methylation_Bcells_Heatmap.pdf")
-
