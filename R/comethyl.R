@@ -427,7 +427,8 @@ plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(0.03,0
 }
 
 getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor"), maxPOutliers = 0.1, 
-                         RsquaredCut = 0.8, blockSize = 40000, gcInterval = blockSize - 1, verbose = TRUE){
+                         RsquaredCut = 0.8, blockSize = 40000, gcInterval = blockSize - 1, save = TRUE,
+                         file = "Soft_Power.rds", verbose = TRUE){
         corType <- match.arg(corType)
         if(verbose){
                 message("[getSoftPower] Analyzing scale-free topology with ", corType, 
@@ -458,6 +459,12 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
                 message("[getSoftPower] At soft power threshold = ", sft$powerEstimate, 
                         ", fit = ", round(sft$fitIndices$SFT.R.sq[sft$fitIndices$Power == sft$powerEstimate], 3), 
                         " and mean connectivity = ", round(sft$fitIndices$mean.k.[sft$fitIndices$Power == sft$powerEstimate], 1))
+        }
+        if(save){
+                if(verbose){
+                        message("[getSoftPower] Saving file as ", file)
+                }
+                saveRDS(sft, file = file)
         }
         return(sft)
 }
@@ -950,7 +957,7 @@ methAdj <- adjustRegionMeth(meth, mod = mod, file = "Adjusted_Region_Methylation
 getDendro(methAdj, distance = "euclidean") %>% plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25,0.08))
 
 # Select Soft Power Threshold ####
-sft <- getSoftPower(methAdj, corType = "pearson")
+sft <- getSoftPower(methAdj, corType = "pearson", file = "Soft_Power.rds")
 plotSoftPower(sft, file = "Soft_Power_Plots.pdf")
 
 # Get Comethylation Modules ####
