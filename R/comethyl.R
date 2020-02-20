@@ -387,7 +387,7 @@ getDendro <- function(x, transpose = FALSE, distance = c("euclidean", "pearson",
                 }
         }
         dendro <- hclust(dist, method = "average")
-        dendro$labels <- gsub("ME", replacement = "", x = dendro$labels, fixed = TRUE)
+        dendro$labels <- str_remove_all(dendro$labels, pattern = "ME")
         return(dendro)
 }
 
@@ -400,7 +400,7 @@ plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(0.03,0
         fix <- dendroPlot$segments$yend == 0
         dendroPlot$segments$yend[fix] <- dendroPlot$segments$y[fix] - max(dendroPlot$segments$y) * 0.05
         dendroPlot$labels$y <- dendroPlot$segments$yend[fix] - max(dendroPlot$segments$y) * 0.01
-        dendroPlot$labels$label <- gsub("ME", replacement = "", x = dendroPlot$labels$label, fixed = TRUE)
+        dendroPlot$labels$label <- str_remove_all(dendroPlot$labels$label, pattern = "ME")
         gg <- ggplot()
         gg <- gg +
                 geom_segment(data = dendroPlot$segments, aes(x = x, y = y, xend = xend, yend = yend), lwd = 0.3, lineend = "square") +
@@ -598,7 +598,7 @@ getModuleBED <- function(regions, grey = FALSE, save = TRUE, file = "Modules.bed
                 if(verbose){
                         message("[getModuleBED] Saving file as ", file)
                 }
-                name <- basename(file) %>% gsub(".bed", replacement = "", x = .)
+                name <- basename(file) %>% str_remove_all(pattern = ".bed")
                 write(paste("track name='", name, "' description='", name, "' itemRgb='On'", sep = ""), file = file)
                 write.table(BED, file = file, append = TRUE, quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
         }
@@ -616,8 +616,8 @@ plotHeatmap <- function(x, rowDendro, colDendro, colors = blueWhiteRed(100, gamm
         }
         limits <- c(-limit, limit)
         x <- as.data.frame(x)
-        rownames(x) <- gsub("ME", replacement = "", x = rownames(x), fixed = TRUE)
-        colnames(x) <- gsub("ME", replacement = "", x = colnames(x), fixed = TRUE)
+        rownames(x) <- str_remove_all(rownames(x), pattern = "ME")
+        colnames(x) <- str_remove_all(colnames(x), pattern = "ME")
         rowModules <- sum(rownames(x) %in% colors()) == length(rownames(x))
         colModules <- sum(colnames(x) %in% colors()) == length(colnames(x))
         x$rowID <- factor(rownames(x), levels = rowDendro$labels[rev(rowDendro$order)])
@@ -727,7 +727,7 @@ getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"), maxPOut
                 }
         }
         stats <- list.rbind(cor) %>% as.data.frame()
-        stats$module <- rownames(cor$p) %>% gsub(pattern = "ME", replacement = "", x = .) %>% rep(length(cor)) %>%
+        stats$module <- rownames(cor$p) %>% str_remove_all(pattern = "ME") %>% rep(length(cor)) %>%
                 factor(levels = unique(.))
         stats$stat <- names(cor) %>% rep(each = nrow(cor$p)) %>% factor(levels = unique(.))
         stats <- reshape2::melt(stats, id.vars = c("module", "stat"), variable.name = "trait") %>%
