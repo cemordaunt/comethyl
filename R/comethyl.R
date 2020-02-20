@@ -551,11 +551,13 @@ plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pd
         invisible(dev.off())
 }
 
-getModuleBED <- function(modules, grey = FALSE, save = TRUE, file = "Modules.bed", verbose = TRUE){
+getModuleBED <- function(regions, grey = FALSE, save = TRUE, file = "Modules.bed", verbose = TRUE){
+        if(!"module" %in% colnames(regions)){
+                stop("[getModuleBED] Regions must have module annotation")
+        }
         if(verbose){
                 message("[getModuleBED] Creating bed file of regions annotated with identified modules")
         }
-        regions <- modules$regions
         if(!grey){
                 if(verbose){
                         message("[getModuleBED] Excluding regions in grey (unassigned) module")
@@ -954,7 +956,7 @@ plotSoftPower(sft, file = "Soft_Power_Plots.pdf")
 # Get Comethylation Modules ####
 modules <- getModules(methAdj, power = sft$powerEstimate, regions = regions, corType = "pearson", file = "Modules.rds")
 plotRegionDendro(modules, file = "Region_Dendrograms.pdf")
-BED <- getModuleBED(modules, file = "Modules.bed")
+BED <- getModuleBED(modules$regions, file = "Modules.bed")
 
 # Examine Correlations between Modules and Samples ####
 MEs <- modules$MEs
