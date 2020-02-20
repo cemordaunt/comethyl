@@ -790,7 +790,7 @@ plotMEtraitDot <- function(ME, trait, traitCode = NULL, colors = NULL, fun.data 
                 message("[plotMEtraitDot] Plotting module eigennode by categorical trait")
         }
         if(!is.null(traitCode)){
-                trait <- names(traitCode)[match(colData[[traitName]], traitCode)] %>% factor(levels = names(traitCode))
+                trait <- names(traitCode)[match(trait, traitCode)] %>% factor(levels = names(traitCode))
         } else {
                 trait <- as.factor(trait)
         }
@@ -843,6 +843,72 @@ plotMEtraitScatter <- function(ME, trait, color = "#132B43", xlim = NULL, ylim =
                 message("[plotMEtraitScatter] Saving file as ", file)
         }
         ggsave(file, plot = scatterplot, dpi = 600, width = width, height = height, units = "in")
+}
+
+plotMethTrait <- function(module, regions, meth, trait, discrete = NULL, traitCode = NULL, traitColors = NULL, 
+                          heatmapColors = blueWhiteRed(100, gamma = 0.3), limit = NULL, expandY = 0.05, axis.text.size = 11,
+                          heatmap.legend.position = c(1.1,0.743), trait.legend.position = c(1.017,4.39),
+                          heatmap.legend.title = "Relative\nMethylation (%)", trait.legend.title = "Trait",
+                          legend.text.size = 11, legend.title.size = 14, heatmapMargins = c(1,8,0,1),
+                          traitMargins = c(0,6,1,5.15), save = TRUE, file = "Module_Methylation_Trait_Heatmap.pdf",
+                          width = 11, height = 4, verbose = TRUE){
+        if(verbose){
+                message("[plotMethTrait] Plotting ", module, " module region methylation by ", trait.legend.title)
+        }
+        RegionIDs <- rev(regions$RegionID[regions$module == module])
+        if(is.null(discrete)){
+                discrete <- length(unique(trait)) <= 5
+        }
+        if(discrete){
+                if(!is.null(traitCode)){
+                        trait <- names(traitCode)[match(trait, traitCode)] %>% factor(levels = names(traitCode))
+                } else {
+                        trait <- as.factor(trait)
+                }
+        }
+        meth <- meth[RegionIDs,order(trait)]
+        meth <- (meth - DelayedMatrixStats::rowMeans2(meth)) %>% reshape2::melt()
+        if(is.null(limit)){
+                limit <- max(abs(meth$value))
+        }
+        heatmap <- ggplot(data = meth) +
+                geom_tile(aes(x = Var2, y = Var1, color = value, fill = value)) +
+                scale_fill_gradientn(heatmap.legend.title, colors = heatmapColors, limits = c(-limit,limit), 
+                                     aesthetics = c("color", "fill")) +
+                scale_y_discrete(expand = expand_scale(mult = expandY)) +
+                theme_bw(base_size = 24) +
+                theme(axis.text.x = element_blank(), axis.text.y = element_text(size = axis.text.size, color = "black"),
+                      axis.ticks.x = element_blank(), axis.ticks.y = element_line(size = 0.8, color = "black"),
+                      axis.title = element_blank(), legend.background = element_blank(), 
+                      legend.position = heatmap.legend.position, legend.text = element_text(size = legend.text.size), 
+                      legend.title = element_text(size = legend.title.size), panel.background = element_blank(), 
+                      panel.border = element_rect(color = "black", size = 1.25), panel.grid = element_blank(), 
+                      plot.background = element_blank(), plot.margin = unit(heatmapMargins, "lines"))
+        colColors <- ggplot(data = data.frame(x = 1:length(trait), y = 0, color = sort(trait))) +
+                geom_tile(aes(x = x, y = y, color = color, fill = color)) +
+                theme_void() +
+                theme(legend.position = trait.legend.position, legend.text = element_text(size = legend.text.size), 
+                      legend.title = element_text(size = legend.title.size), plot.margin = unit(traitMargins, "lines"))
+        if(discrete){
+                if(!is.null(traitColors)){
+                        colColors <- colColors +
+                                scale_color_manual(trait.legend.title, breaks = names(traitColors), values = traitColors, 
+                                                   aesthetics = c("color", "fill"))
+                } else {
+                        colColors <- colColors +
+                                scale_color_discrete(trait.legend.title, aesthetics = c("color", "fill"))
+                }
+        } else {
+                colColors <- colColors +
+                        scale_color_continuous(trait.legend.title, aesthetics = c("color", "fill"))
+        }
+        gg <- plot_grid(heatmap, colColors, nrow = 2, rel_heights = c(1,0.15))
+        if(save){
+                if(verbose){
+                        message("[plotMethTrait] Saving file as ", file)
+                }
+                ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
+        }
 }
 
 # Set Global Options ####
@@ -916,12 +982,23 @@ plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order, traitOrder = traitD
                file = "Sig_ME_Trait_Correlation_Heatmap.pdf", width = 7, height = 3.5)
 
 # Explore Significant ME-Trait Correlations ####
+# Plot Module Eigennodes vs Traits
 plotMEtraitDot(MEs$MEbisque4, trait = colData$Diagnosis_ASD, traitCode = c("TD" = 0, "ASD" = 1), 
                colors = c("TD" = "#3366CC", "ASD" = "#FF3366"), ylim = c(-0.2,0.2), xlab = "Diagnosis", 
                ylab = "Bisque 4 Module Eigennode", file = "bisque4_ME_Diagnosis_Dotplot.pdf")
-
 plotMEtraitScatter(MEs$MEpaleturquoise, trait = colData$Gran, ylim = c(-0.15,0.15), xlab = "Granulocytes", 
                    ylab = "Pale Turquoise Module Eigennode", file = "paleturquoise_ME_Granulocytes_Scatterplot.pdf")
 plotMEtraitScatter(MEs$MEpaleturquoise, trait = colData$Bcell, ylim = c(-0.15,0.15), xlab = "B-cells", 
                    ylab = "Pale Turquoise Module Eigennode", file = "paleturquoise_ME_Bcells_Scatterplot.pdf")
 
+# Plot Region Methylation vs Traits
+regions <- modules$regions
+plotMethTrait("bisque4", regions = regions, meth = meth, trait = colData$Diagnosis_ASD, traitCode = c("TD" = 0, "ASD" = 1),
+              traitColors = c("TD" = "#3366CC", "ASD" = "#FF3366"), trait.legend.title = "Diagnosis",
+              file = "bisque4_Module_Methylation_Diagnosis_Heatmap.pdf")
+plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$Gran, expandY = 0.04,
+              trait.legend.title = "Granulocytes", trait.legend.position = c(1.034,3.35), 
+              file = "paleturquoise_Module_Methylation_Granulocytes_Heatmap.pdf")
+plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$Bcell, expandY = 0.04,
+              trait.legend.title = "B-cells", trait.legend.position = c(1.004,3.35), 
+              file = "paleturquoise_Module_Methylation_Bcells_Heatmap.pdf")
