@@ -3,8 +3,8 @@
 
 # Load Packages ####
 .libPaths("/share/lasallelab/Charles/comethyl/R")
-sapply(c("scales", "openxlsx", "rlist", "tidyverse", "ggdendro", "cowplot", "bsseq", "dmrseq", "WGCNA", "sva"), require, 
-       character.only = TRUE)
+sapply(c("scales", "openxlsx", "rlist", "tidyverse", "ggdendro", "cowplot", "annotatr", "rtracklayer", 
+         "TxDb.Hsapiens.UCSC.hg38.knownGene", "org.Hs.eg.db", "bsseq", "dmrseq", "WGCNA", "sva"), require, character.only = TRUE)
 
 # Functions ####
 getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz", 
@@ -545,6 +545,7 @@ getModules <- function(meth, power, regions, maxBlockSize = 40000, corType = c("
         regions <- lapply(unique(regions$module), function(x){
                 regions <- regions[regions$module == x,]
                 regions$membership <- membership[regions$RegionID,x]
+                regions$hubRegion <- regions$membership == max(regions$membership)
                 return(regions)
         })
         regions <- list.rbind(regions) %>% .[order(as.integer(str_remove_all(.$RegionID, pattern = "Region_"))),]
@@ -939,6 +940,102 @@ plotMethTrait <- function(module, regions, meth, trait, discrete = NULL, traitCo
         }
 }
 
+annotateModule <- function(regions, module = NULL, grey = FALSE, regDomains, save = TRUE, file = "Annotated_Module_Regions.txt", 
+                           verbose =  TRUE){
+        if(verbose){
+                message("[annotateModule] Adding genes to regions by regulatory domains")
+        }
+        if(!is.null(module)){
+                regions <- regions[regions$module %in% module,]
+        }
+        if(!grey){
+                if(verbose){
+                        message("[annotateModule] Excluding regions in grey (unassigned) module")
+                }
+                regions <- regions[!regions$module == "grey",]
+        }
+        GR_regDomains <- GRanges(seqnames = regDomains$gene_chr, ranges = IRanges(start = regDomains$distal_start, 
+                                                                                  end = regDomains$distal_end))
+        GR_regions <- GRanges(seqnames = regions$chr, ranges = IRanges(start = regions$start, end = regions$end),
+                              RegionID = regions$RegionID)
+        overlaps <- as.data.frame(findOverlaps(GR_regions, GR_regDomains))
+        regions_genes <- cbind("RegionID" = regions$RegionID[overlaps$queryHits], regDomains[overlaps$subjectHits,], 
+                               row.names = NULL)
+        regions_genes <- merge(regions, regions_genes, by = "RegionID", all = TRUE, sort = FALSE)
+        if(verbose){
+                message("[annotateModule] Getting region positions relative to genes")
+        }
+        regions_annotated <- NULL
+        for(i in 1:nrow(regions_genes)){
+                temp <- regions_genes[i,]
+                if(!temp$gene_strand %in% c("+", "-")){temp$distanceToTSS <- NA; temp$positionInGene <- NA} 
+                else {
+                        if(temp$gene_strand == "+"){ # + strand
+                                if(temp$start < temp$gene_start & temp$end < temp$gene_start){temp$distanceToTSS <- temp$end - temp$gene_start} # upstream of TSS (-)
+                                if(temp$start <= temp$gene_start & temp$end >= temp$gene_start){temp$distanceToTSS <- 0} # overlapping TSS
+                                if(temp$start > temp$gene_start & temp$end > temp$gene_start){temp$distanceToTSS <- temp$start - temp$gene_start} # downstream of TSS (+)
+                                if(temp$end < temp$gene_start){temp$positionInGene <- "upstream"}
+                                if(temp$end > temp$gene_start & temp$start < temp$gene_end){temp$positionInGene <- "gene_body"}
+                                if(temp$start >= temp$gene_end){temp$positionInGene <- "downstream"}
+                                if(temp$distanceToTSS == 0){temp$positionInGene <- "TSS"}
+                        }
+                        else { # - strand
+                                if(temp$start > temp$gene_end & temp$end > temp$gene_end){temp$distanceToTSS <- temp$gene_end - temp$start} # upstream of TSS (-)
+                                if(temp$start <= temp$gene_end & temp$end >= temp$gene_end){temp$distanceToTSS <- 0} # overlapping TSS
+                                if(temp$start < temp$gene_end & temp$end < temp$gene_end){temp$distanceToTSS <- temp$gene_end - temp$end} # downstream of TSS (+)
+                                if(temp$start > temp$gene_end){temp$positionInGene <- "upstream"}
+                                if(temp$start < temp$gene_end & temp$end > temp$gene_start){temp$positionInGene <- "gene_body"}
+                                if(temp$end <= temp$gene_start){temp$positionInGene <- "downstream"}
+                                if(temp$distanceToTSS == 0){temp$positionInGene <- "TSS"}
+                        }
+                }
+                regions_annotated <- rbind(regions_annotated, temp)
+        }
+        regions_annotated$RegionID <- factor(regions_annotated$RegionID, levels = unique(regions_annotated$RegionID))
+        regions_annotated <- aggregate(formula = cbind(gene_name, gene_entrezID, gene_strand, distanceToTSS, positionInGene) ~ RegionID, 
+                                       data = regions_annotated, FUN = function(x) paste(x, collapse = ", "), simplify = TRUE)
+        regions_annotated <- merge(x = regions, y = regions_annotated, by = "RegionID", all.x = TRUE, all.y = FALSE, 
+                                   sort = FALSE)
+        if(verbose){
+                message("[annotateModule] Getting CpG annotations")
+        }
+        regions_CpGs <- build_annotations(genome = "hg38", annotations = "hg38_cpgs") %>%
+                GenomeInfoDb::keepStandardChromosomes(pruning.mode = "coarse") %>%
+                annotate_regions(regions = GR_regions, annotations = ., ignore.strand = TRUE, quiet = TRUE) %>% 
+                as.data.frame()
+        colnames(regions_CpGs)[colnames(regions_CpGs) == "annot.type"] <- "CpG_Anno"
+        pattern <- c("hg38_cpg_islands" = "CpG_Island", "hg38_cpg_shores" = "CpG_Shore", "hg38_cpg_shelves" = "CpG_Shelf",
+                     "hg38_cpg_inter" = "CpG_Open_Sea")
+        regions_CpGs$CpG_Anno <- str_replace_all(regions_CpGs$CpG_Anno, pattern = pattern)
+        regions_CpGs <- aggregate(formula = CpG_Anno ~ RegionID, data = regions_CpGs, 
+                                  FUN = function(x) paste(unique(x), collapse = ", "), simplify = TRUE)
+        regions_annotated <- merge(x = regions_annotated, y = regions_CpGs, by = "RegionID", all.x = TRUE, all.y = FALSE, 
+                                   sort = FALSE)
+        if(verbose){
+                message("[annotateModule] Getting gene regulatory annotations")
+        }
+        regions_GeneReg <- build_annotations(genome = "hg38", annotations = c("hg38_basicgenes", "hg38_genes_intergenic", 
+                                                                              "hg38_genes_intronexonboundaries", 
+                                                                              "hg38_enhancers_fantom")) %>%
+                GenomeInfoDb::keepStandardChromosomes(pruning.mode = "coarse") %>%
+                annotate_regions(regions = GR_regions, annotations = ., ignore.strand = TRUE, quiet = TRUE) %>% 
+                as.data.frame()
+        colnames(regions_GeneReg)[colnames(regions_GeneReg) == "annot.type"] <- "GeneReg_Anno"
+        regions_GeneReg$GeneReg_Anno <- str_remove_all(regions_GeneReg$GeneReg_Anno, pattern = "hg38_")
+        regions_GeneReg <- aggregate(formula = GeneReg_Anno ~ RegionID, data = regions_GeneReg, 
+                                     FUN = function(x) paste(unique(x), collapse = ", "), simplify = TRUE)
+        regions_annotated <- merge(x = regions_annotated, y = regions_GeneReg, by = "RegionID", all.x = TRUE, all.y = FALSE, 
+                                   sort = FALSE) %>%
+                .[order(as.integer(str_remove_all(.$RegionID, pattern = "Region_"))),]
+        if(save){
+                if(verbose){
+                        message("[annotateModule] Saving file as ", file)
+                }
+                write.table(regions_annotated, file = file, sep = "\t", quote = FALSE, row.names = FALSE)
+        }
+        return(regions_annotated)
+}
+
 # Set Global Options ####
 options(stringsAsFactors = FALSE)
 Sys.setenv(R_THREADS = 1)
@@ -1030,3 +1127,10 @@ plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$G
 plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$Bcell, expandY = 0.04,
               trait.legend.title = "B-cells", trait.legend.position = c(1.004,3.35), 
               file = "paleturquoise_Module_Methylation_Bcells_Heatmap.pdf")
+
+# Annotate Modules ####
+regDomains <- read.delim("~/Documents/Programming/Autism Cord Blood Methylation/Tables/Regulatory domains hg38.txt", 
+                         stringsAsFactors = FALSE)
+regionsAnno <- annotateModule(regions, module = c("bisque4", "paleturquoise"), regDomains = regDomains, 
+                              file = "Tables/Annotated_bisque4_paleturquoise_Module_Regions")
+regionsAnnoAll <- annotateModuleTest(regions, regDomains = regDomains, file = "Tables/Annotated_Module_Regions")
