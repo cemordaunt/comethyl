@@ -1042,7 +1042,7 @@ Sys.setenv(R_THREADS = 1)
 enableWGCNAThreads(nThreads = 4)
 
 # Read Bismark CpG Reports ####
-colData <- read.xlsx("sample_info.xlsx", rowNames = TRUE)
+colData <- read.xlsx("Tables/sample_info.xlsx", rowNames = TRUE)
 bs <- getCpGs(colData, file = "Unfiltered_BSseq.rds")
 
 # Examine CpG Totals at Different Cutoffs ####
@@ -1129,8 +1129,7 @@ plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$B
               file = "paleturquoise_Module_Methylation_Bcells_Heatmap.pdf")
 
 # Annotate Modules ####
-regDomains <- read.delim("~/Documents/Programming/Autism Cord Blood Methylation/Tables/Regulatory domains hg38.txt", 
-                         stringsAsFactors = FALSE)
+regDomains <- read.delim("Regulatory domains hg38.txt", stringsAsFactors = FALSE)
 regionsAnno <- annotateModule(regions, module = c("bisque4", "paleturquoise"), regDomains = regDomains, 
-                              file = "Tables/Annotated_bisque4_paleturquoise_Module_Regions")
-regionsAnnoAll <- annotateModuleTest(regions, regDomains = regDomains, file = "Tables/Annotated_Module_Regions")
+                              file = "Annotated_bisque4_paleturquoise_Module_Regions.txt")
+
