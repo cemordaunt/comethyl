@@ -190,7 +190,8 @@ getRegions <- function(bs, annotation = NULL, genome = c("hg38", "hg19", "mm10",
         regions$methMean <- DelayedMatrixStats::rowMeans2(meth, na.rm = TRUE)
         regions$methSD <- DelayedMatrixStats::rowSds(meth, na.rm = TRUE)
         colnames <- c("RegionID", "chr", "start", "end", "width", "n", "covMin", "covMean", "covSD", "methMean", "methSD")
-        regions <- regions[,c(colnames, colnames(regions)[!colnames(regions) %in% colnames])]
+        regions <- regions[,c(colnames, colnames(regions)[!colnames(regions) %in% colnames & 
+                                                                  !colnames(regions) %in% c("idxStart", "idxEnd", "cluster")])]
         if(save){
                 if(verbose){
                         message("[getRegions] Saving file as ", file)
