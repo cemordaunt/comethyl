@@ -2,9 +2,10 @@
 # Charles Mordaunt
 
 # Load Packages ####
-.libPaths("/share/lasallelab/Charles/comethyl/R")
-sapply(c("scales", "openxlsx", "rlist", "tidyverse", "ggdendro", "cowplot", "annotatr", "rtracklayer", 
-         "TxDb.Hsapiens.UCSC.hg38.knownGene", "org.Hs.eg.db", "bsseq", "dmrseq", "WGCNA", "sva"), require, character.only = TRUE)
+.libPaths("/share/lasallelab/programs/comethyl/R_3.6")
+AnnotationHub::setAnnotationHubOption("CACHE", value = "/share/lasallelab/programs/comethyl/R_3.6")
+sapply(c("scales", "openxlsx", "rlist", "tidyverse", "ggdendro", "cowplot", "annotatr", "rtracklayer", "bsseq", "dmrseq", 
+         "WGCNA", "sva"), require, character.only = TRUE)
 
 # Functions ####
 getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz", 
@@ -114,13 +115,67 @@ filterCpGs <- function(bs, cov = 2, perSample = 0.75, save = TRUE, file = "Filte
         return(bs)
 }
 
-getRegions <- function(bs, maxGap = 150, n = 3, save = TRUE, file = "Unfiltered_Regions.txt", verbose = TRUE){
-        if(verbose){
-                message("[getRegions] Calling regions when at least ", n, " CpGs are no more than ", maxGap, " bases apart")
+getRegions <- function(bs, annotation = NULL, genome = c("hg38", "hg19", "mm10", "mm9", "rn6", "rn5", "rn4", "dm6", "dm3", "galGal5"), 
+                       upstream = 5000, downstream = 1000, custom = NULL, maxGap = 150, n = 3, save = TRUE, 
+                       file = "Unfiltered_Regions.txt", verbose = TRUE){
+        if(!is.null(annotation) & !is.null(custom)){
+                stop("[getRegions] annotation and custom cannot both have values")
         }
-        regions <- bsseq:::regionFinder3(x = as.integer(rep(1, length(bs))), chr = as.character(seqnames(bs)), 
-                                         positions = start(bs), maxGap = maxGap, verbose = FALSE)[["up"]]
-        regions <- regions[regions$n >= n,]
+        if(!is.null(annotation)){
+                genome <- match.arg(genome)
+                if(verbose){
+                        message("[getRegions] Using ", annotation, " annotation for the ", genome, 
+                                " genome as regions")
+                }
+                if(annotation %in% c("genes", "promoters", "transcripts")){
+                        txdb <- annotatr:::get_txdb_name(genome)
+                        if(requireNamespace(txdb, quietly = TRUE)){
+                                library(txdb, character.only = TRUE)
+                        }
+                        txdb <- get(txdb)
+                        orgdb <- annotatr:::get_orgdb_name(genome)
+                        if (requireNamespace(sprintf("org.%s.eg.db", orgdb), quietly = TRUE)) {
+                                library(sprintf("org.%s.eg.db", orgdb), character.only = TRUE)
+                        }
+                        regions <- suppressWarnings(switch(annotation, 
+                                                           genes = genes(txdb),
+                                                           promoters = promoters(txdb, upstream = upstream, 
+                                                                                 downstream = downstream, 
+                                                                                 use.names = FALSE),
+                                                           transcripts = transcripts(txdb)))
+                } else {
+                        if(annotation %in% builtin_annotations()){
+                                if(!grepl(genome, x = annotation, fixed = TRUE)){
+                                        stop("[getRegions] Annotation must match genome")
+                                }
+                                regions <- build_annotations(genome, annotations = annotation)
+                        } else {
+                                stop("[getRegions] Annotation not supported")
+                        }
+                }
+                regions <- keepStandardChromosomes(regions, pruning.mode = "coarse") %>% trim()
+                regions$n <- countOverlaps(regions, subject = bs)
+                regions <- as.data.frame(regions)
+                colnames(regions)[colnames(regions) == "seqnames"] <- "chr"
+        } else {
+                if(!is.null(custom)){
+                        if(verbose){
+                                message("[getRegions] Using custom regions")
+                        }
+                        regions <- custom
+                        regions$n <- countOverlaps(regions, subject = bs)
+                        regions <- as.data.frame(regions)
+                        colnames(regions)[colnames(regions) == "seqnames"] <- "chr"
+                } else {
+                        if(verbose){
+                                message("[getRegions] Calling regions when at least ", n, " CpGs are no more than ", 
+                                        maxGap, " bases apart")
+                        }
+                        regions <- bsseq:::regionFinder3(x = as.integer(rep(1, length(bs))), chr = as.character(seqnames(bs)), 
+                                                         positions = start(bs), maxGap = maxGap, verbose = FALSE)[["up"]]
+                }
+        }
+        regions <- regions[regions$n >= n,] %>% .[with(., order(chr, start, end)),]
         regions$RegionID <- paste("Region", 1:nrow(regions), sep = "_")
         regions$chr <- as.character(regions$chr)
         if(verbose){
@@ -134,8 +189,8 @@ getRegions <- function(bs, maxGap = 150, n = 3, save = TRUE, file = "Unfiltered_
         meth <- getMeth(bs, regions = regions[,c("chr", "start", "end")], type = "raw", what = "perRegion")
         regions$methMean <- DelayedMatrixStats::rowMeans2(meth, na.rm = TRUE)
         regions$methSD <- DelayedMatrixStats::rowSds(meth, na.rm = TRUE)
-        regions <- regions[,c("RegionID", "chr", "start", "end", "width", "n", "covMin", "covMean", "covSD", "methMean", 
-                              "methSD")]
+        colnames <- c("RegionID", "chr", "start", "end", "width", "n", "covMin", "covMean", "covSD", "methMean", "methSD")
+        regions <- regions[,c(colnames, colnames(regions)[!colnames(regions) %in% colnames])]
         if(save){
                 if(verbose){
                         message("[getRegions] Saving file as ", file)
