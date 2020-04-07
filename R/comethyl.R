@@ -5,7 +5,7 @@
 .libPaths("/share/lasallelab/programs/comethyl/R_3.6")
 AnnotationHub::setAnnotationHubOption("CACHE", value = "/share/lasallelab/programs/comethyl/R_3.6")
 sapply(c("scales", "openxlsx", "rlist", "tidyverse", "ggdendro", "cowplot", "annotatr", "rtracklayer", "bsseq", "dmrseq", 
-         "WGCNA", "sva"), require, character.only = TRUE)
+         "WGCNA", "sva", "rGREAT", "R.devices", "biomaRt"), require, character.only = TRUE)
 
 # Functions ####
 getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz", 
@@ -996,12 +996,14 @@ plotMethTrait <- function(module, regions, meth, trait, discrete = NULL, traitCo
         }
 }
 
-annotateModule <- function(regions, module = NULL, grey = FALSE, regDomains, save = TRUE, file = "Annotated_Module_Regions.txt", 
-                           verbose =  TRUE){
-        if(verbose){
-                message("[annotateModule] Adding genes to regions by regulatory domains")
-        }
+annotateModule <- function(regions, module = NULL, grey = FALSE, genome = c("hg38", "hg19", "mm10", "mm9"), 
+                           includeCuratedRegDoms = FALSE, rule = c("basalPlusExt", "twoClosest", "oneClosest"), 
+                           adv_upstream = 5, adv_downstream = 1, adv_span = 1000, adv_twoDistance = 1000, 
+                           adv_oneDistance = 1000, save = TRUE, file = "Annotated_Module_Regions.txt", verbose =  TRUE){
         if(!is.null(module)){
+                if(verbose){
+                        message("[annotateModule] Filtering for regions in ", paste(module, collapse = ", "), " module(s)")
+                }
                 regions <- regions[regions$module %in% module,]
         }
         if(!grey){
@@ -1010,79 +1012,73 @@ annotateModule <- function(regions, module = NULL, grey = FALSE, regDomains, sav
                 }
                 regions <- regions[!regions$module == "grey",]
         }
-        GR_regDomains <- GRanges(seqnames = regDomains$gene_chr, ranges = IRanges(start = regDomains$distal_start, 
-                                                                                  end = regDomains$distal_end))
-        GR_regions <- GRanges(seqnames = regions$chr, ranges = IRanges(start = regions$start, end = regions$end),
-                              RegionID = regions$RegionID)
-        overlaps <- as.data.frame(findOverlaps(GR_regions, GR_regDomains))
-        regions_genes <- cbind("RegionID" = regions$RegionID[overlaps$queryHits], regDomains[overlaps$subjectHits,], 
-                               row.names = NULL)
-        regions_genes <- merge(regions, regions_genes, by = "RegionID", all = TRUE, sort = FALSE)
+        genome <- match.arg(genome)
+        rule <- match.arg(rule)
         if(verbose){
-                message("[annotateModule] Getting region positions relative to genes")
+                message("[annotateModule] Using the ", genome, " genome assembly for annotations")
+                message("[annotateModule] Adding genes to regions using GREAT with the ", rule, " rule")
         }
-        regions_annotated <- NULL
-        for(i in 1:nrow(regions_genes)){
-                temp <- regions_genes[i,]
-                if(!temp$gene_strand %in% c("+", "-")){temp$distanceToTSS <- NA; temp$positionInGene <- NA} 
-                else {
-                        if(temp$gene_strand == "+"){ # + strand
-                                if(temp$start < temp$gene_start & temp$end < temp$gene_start){temp$distanceToTSS <- temp$end - temp$gene_start} # upstream of TSS (-)
-                                if(temp$start <= temp$gene_start & temp$end >= temp$gene_start){temp$distanceToTSS <- 0} # overlapping TSS
-                                if(temp$start > temp$gene_start & temp$end > temp$gene_start){temp$distanceToTSS <- temp$start - temp$gene_start} # downstream of TSS (+)
-                                if(temp$end < temp$gene_start){temp$positionInGene <- "upstream"}
-                                if(temp$end > temp$gene_start & temp$start < temp$gene_end){temp$positionInGene <- "gene_body"}
-                                if(temp$start >= temp$gene_end){temp$positionInGene <- "downstream"}
-                                if(temp$distanceToTSS == 0){temp$positionInGene <- "TSS"}
-                        }
-                        else { # - strand
-                                if(temp$start > temp$gene_end & temp$end > temp$gene_end){temp$distanceToTSS <- temp$gene_end - temp$start} # upstream of TSS (-)
-                                if(temp$start <= temp$gene_end & temp$end >= temp$gene_end){temp$distanceToTSS <- 0} # overlapping TSS
-                                if(temp$start < temp$gene_end & temp$end < temp$gene_end){temp$distanceToTSS <- temp$gene_end - temp$end} # downstream of TSS (+)
-                                if(temp$start > temp$gene_end){temp$positionInGene <- "upstream"}
-                                if(temp$start < temp$gene_end & temp$end > temp$gene_start){temp$positionInGene <- "gene_body"}
-                                if(temp$end <= temp$gene_start){temp$positionInGene <- "downstream"}
-                                if(temp$distanceToTSS == 0){temp$positionInGene <- "TSS"}
-                        }
-                }
-                regions_annotated <- rbind(regions_annotated, temp)
-        }
-        regions_annotated$RegionID <- factor(regions_annotated$RegionID, levels = unique(regions_annotated$RegionID))
-        regions_annotated <- aggregate(formula = cbind(gene_name, gene_entrezID, gene_strand, distanceToTSS, positionInGene) ~ RegionID, 
-                                       data = regions_annotated, FUN = function(x) paste(x, collapse = ", "), simplify = TRUE)
-        regions_annotated <- merge(x = regions, y = regions_annotated, by = "RegionID", all.x = TRUE, all.y = FALSE, 
-                                   sort = FALSE)
+        GR_regions <- with(regions, GRanges(seqnames = chr, ranges = IRanges(start = start, end = end), RegionID = RegionID))
+        job <- submitGreatJob(GR_regions, species = genome, includeCuratedRegDoms = includeCuratedRegDoms, rule = rule,
+                              adv_upstream = adv_upstream, adv_downstream = adv_downstream, adv_span = adv_span,
+                              adv_twoDistance = adv_twoDistance, adv_oneDistance = adv_oneDistance, request_interval = 1)
+        regions_genes <- suppressGraphics(plotRegionGeneAssociationGraphs(job, type = 1)) %>% 
+                as.data.frame() %>%
+                merge(x = regions[,c("RegionID", "chr", "start", "end")], 
+                      y = .[,c("seqnames", "start", "end", "gene", "distTSS")], by.x = c("chr", "start", "end"), 
+                      by.y = c("seqnames", "start", "end"), all = TRUE, sort = FALSE)
+        regions_genes$RegionID <- factor(regions_genes$RegionID, levels = unique(regions_genes$RegionID))
+        colnames(regions_genes) <- str_replace_all(colnames(regions_genes), pattern = c("gene" = "gene_symbol", 
+                                                                                        "distTSS" = "distance_to_TSS"))
         if(verbose){
-                message("[annotateModule] Getting CpG annotations")
+                message("[annotateModule] Adding gene info from BioMart")
         }
-        regions_CpGs <- build_annotations(genome = "hg38", annotations = "hg38_cpgs") %>%
+        dataset <- str_detect(genome, pattern = "hg") %>% ifelse(yes = "hsapiens_gene_ensembl", no = "mmusculus_gene_ensembl")
+        ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset = dataset)
+        genes_annotated <- suppressMessages(getBM(attributes = c("external_gene_name", "description", "ensembl_gene_id", "entrezgene_id"), 
+                                                  filters = c("external_gene_name"), values = regions_genes$gene, mart = ensembl))
+        colnames(genes_annotated) <- colnames(genes_annotated) %>%
+                str_replace_all(pattern = c("external_gene_name" = "gene_symbol", "description" = "gene_description",
+                                            "ensembl_gene_id" = "gene_ensemblID", "entrezgene_id" = "gene_entrezID"))
+        genes_annotated$gene_description <- str_split_fixed(genes_annotated$gene_description, 
+                                                            pattern = fixed(" ["), n = 2)[,1] %>%
+                str_remove_all(",")
+        regions_annotated <- merge(x = regions_genes, y = genes_annotated, by = "gene_symbol", all.x = TRUE, all.y = FALSE, 
+                                   sort = FALSE) %>% 
+                unique() %>%
+                aggregate(formula = cbind(gene_symbol, distance_to_TSS, gene_description, gene_ensemblID, gene_entrezID) ~ RegionID, 
+                          data = ., FUN = function(x) paste(x, collapse = " | "), simplify = TRUE, drop = FALSE) %>%
+                merge(x = regions, y = ., by = "RegionID", all.x = TRUE, all.y = FALSE, sort = FALSE)
+        if(verbose){
+                message("[annotateModule] Getting gene context from annotatr")
+        }
+        annotations <- paste(genome, c("basicgenes", "genes_intergenic", "enhancers_fantom"), sep = "_")
+        regions_GeneReg <- suppressWarnings(suppressMessages(build_annotations(genome = genome, annotations = annotations))) %>%
                 GenomeInfoDb::keepStandardChromosomes(pruning.mode = "coarse") %>%
                 annotate_regions(regions = GR_regions, annotations = ., ignore.strand = TRUE, quiet = TRUE) %>% 
                 as.data.frame()
-        colnames(regions_CpGs)[colnames(regions_CpGs) == "annot.type"] <- "CpG_Anno"
-        pattern <- c("hg38_cpg_islands" = "CpG_Island", "hg38_cpg_shores" = "CpG_Shore", "hg38_cpg_shelves" = "CpG_Shelf",
-                     "hg38_cpg_inter" = "CpG_Open_Sea")
-        regions_CpGs$CpG_Anno <- str_replace_all(regions_CpGs$CpG_Anno, pattern = pattern)
-        regions_CpGs <- aggregate(formula = CpG_Anno ~ RegionID, data = regions_CpGs, 
-                                  FUN = function(x) paste(unique(x), collapse = ", "), simplify = TRUE)
-        regions_annotated <- merge(x = regions_annotated, y = regions_CpGs, by = "RegionID", all.x = TRUE, all.y = FALSE, 
-                                   sort = FALSE)
+        colnames(regions_GeneReg)[colnames(regions_GeneReg) == "annot.type"] <- "gene_context"
+        pattern <- rep("", times = 5)
+        names(pattern) <- c(genome, "genes", "s", "fantom", "_")
+        regions_GeneReg$gene_context <- str_replace_all(regions_GeneReg$gene_context, pattern = pattern)
+        regions_annotated <- aggregate(formula = gene_context ~ RegionID, data = regions_GeneReg, 
+                                       FUN = function(x) paste(unique(x), collapse = ", "), simplify = TRUE) %>%
+                merge(x = regions_annotated, y = ., by = "RegionID", all.x = TRUE, all.y = FALSE, sort = FALSE) 
         if(verbose){
-                message("[annotateModule] Getting gene regulatory annotations")
+                message("[annotateModule] Getting CpG context from annotatr")
         }
-        regions_GeneReg <- build_annotations(genome = "hg38", annotations = c("hg38_basicgenes", "hg38_genes_intergenic", 
-                                                                              "hg38_genes_intronexonboundaries", 
-                                                                              "hg38_enhancers_fantom")) %>%
+        regions_CpGs <- suppressMessages(build_annotations(genome = genome, annotations = paste(genome, "cpgs", sep = "_"))) %>%
                 GenomeInfoDb::keepStandardChromosomes(pruning.mode = "coarse") %>%
                 annotate_regions(regions = GR_regions, annotations = ., ignore.strand = TRUE, quiet = TRUE) %>% 
                 as.data.frame()
-        colnames(regions_GeneReg)[colnames(regions_GeneReg) == "annot.type"] <- "GeneReg_Anno"
-        regions_GeneReg$GeneReg_Anno <- str_remove_all(regions_GeneReg$GeneReg_Anno, pattern = "hg38_")
-        regions_GeneReg <- aggregate(formula = GeneReg_Anno ~ RegionID, data = regions_GeneReg, 
-                                     FUN = function(x) paste(unique(x), collapse = ", "), simplify = TRUE)
-        regions_annotated <- merge(x = regions_annotated, y = regions_GeneReg, by = "RegionID", all.x = TRUE, all.y = FALSE, 
-                                   sort = FALSE) %>%
-                .[order(as.integer(str_remove_all(.$RegionID, pattern = "Region_"))),]
+        colnames(regions_CpGs)[colnames(regions_CpGs) == "annot.type"] <- "CpG_context"
+        pattern <- c("island", "shore", "shelf", "open sea")
+        names(pattern) <- paste(genome, "cpg", c("islands", "shores", "shelves", "inter"), sep = "_")
+        regions_CpGs$CpG_context <- str_replace_all(regions_CpGs$CpG_context, pattern = pattern)
+        regions_annotated <- aggregate(formula = CpG_context ~ RegionID, data = regions_CpGs, 
+                                       FUN = function(x) paste(unique(x), collapse = ", "), simplify = TRUE) %>%
+                merge(x = regions_annotated, y = ., by = "RegionID", all.x = TRUE, all.y = FALSE, sort = FALSE) %>%
+                .[order(.$module, as.integer(str_remove_all(.$RegionID, pattern = "Region_"))),]
         if(save){
                 if(verbose){
                         message("[annotateModule] Saving file as ", file)
@@ -1090,6 +1086,16 @@ annotateModule <- function(regions, module = NULL, grey = FALSE, regDomains, sav
                 write.table(regions_annotated, file = file, sep = "\t", quote = FALSE, row.names = FALSE)
         }
         return(regions_annotated)
+}
+
+getGeneList <- function(regions_annotated, type = c("symbol", "description", "ensemblID", "entrezID"), verbose = TRUE){
+        type <- match.arg(type)
+        if(verbose){
+                message("[getGeneList] Getting gene ", type, "s")
+        }
+        geneList <- str_split(regions_annotated[,paste("gene", type, sep = "_")], pattern = fixed(" | ")) %>%
+                as_vector() %>% unique() %>% sort()
+        return(geneList)
 }
 
 # Set Global Options ####
@@ -1185,7 +1191,7 @@ plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$B
               file = "paleturquoise_Module_Methylation_Bcells_Heatmap.pdf")
 
 # Annotate Modules ####
-regDomains <- read.delim("Regulatory domains hg38.txt", stringsAsFactors = FALSE)
-regionsAnno <- annotateModule(regions, module = c("bisque4", "paleturquoise"), regDomains = regDomains, 
+regionsAnno <- annotateModule(regions, module = c("bisque4", "paleturquoise"), genome = "hg38",
                               file = "Annotated_bisque4_paleturquoise_Module_Regions.txt")
+geneList <- getGeneList(regionsAnno)
 
