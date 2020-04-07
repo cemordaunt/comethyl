@@ -1098,7 +1098,7 @@ Sys.setenv(R_THREADS = 1)
 enableWGCNAThreads(nThreads = 4)
 
 # Read Bismark CpG Reports ####
-colData <- read.xlsx("Tables/sample_info.xlsx", rowNames = TRUE)
+colData <- read.xlsx("sample_info.xlsx", rowNames = TRUE)
 bs <- getCpGs(colData, file = "Unfiltered_BSseq.rds")
 
 # Examine CpG Totals at Different Cutoffs ####
