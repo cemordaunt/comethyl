@@ -1131,11 +1131,14 @@ enrichModule <- function(regions, module = NULL, genome = c("hg38", "hg19", "hg1
                 message("[enrichModule] Using GREAT v", version, " with the ", genome, " genome assembly and the ", rule, 
                         " rule")
         }
+        if(genome == "danRer7"){
+                ontologies <- ontologies[!ontologies %in% c("Mouse Phenotype", "Human Phenotype")]
+        }
         gr <- with(moduleRegions, GRanges(chr, ranges = IRanges(start, end = end)))
         bg <- with(regions, GRanges(chr, ranges = IRanges(start, end = end)))
         job <- submitGreatJob(gr, bg = bg, species = genome, includeCuratedRegDoms = includeCuratedRegDoms, rule = rule,
                               adv_upstream = adv_upstream, adv_downstream = adv_downstream, adv_span = adv_span,
-                              adv_twoDistance = adv_twoDistance, adv_oneDistance = adv_oneDistance, request_interval = 1,
+                              adv_twoDistance = adv_twoDistance, adv_oneDistance = adv_oneDistance, request_interval = 0,
                               version = version)
         if(verbose){
                 message("[enrichModule] Getting results and adjusting p-values using the ", adjMethod, 
@@ -1159,7 +1162,7 @@ enrichModule <- function(regions, module = NULL, genome = c("hg38", "hg19", "hg1
                 message("[enrichModule] Extracting genes for enriched terms")
         }
         results$genes <- mapply(function(x,y){
-                suppressGraphics(plotRegionGeneAssociationGraphs(job, type = 1, ontology = x, termID = y, request_interval = 1,
+                suppressGraphics(plotRegionGeneAssociationGraphs(job, type = 1, ontology = x, termID = y, request_interval = 0,
                                                                  max_tries = 10000, verbose = FALSE)) %>% .$gene %>% 
                         unique() %>% sort() %>% paste(collapse = ", ")
         }, x = results$ontology, y = results$ID, USE.NAMES = FALSE)
