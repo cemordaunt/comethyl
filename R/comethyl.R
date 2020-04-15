@@ -1179,6 +1179,24 @@ enrichModule <- function(regions, module = NULL, genome = c("hg38", "hg19", "hg1
         return(results)
 }
 
+listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "danRer7"), 
+                           version = c("4.0.4", "3.0.0", "2.0.2"), verbose =  TRUE){
+        genome <- match.arg(genome)
+        version <- match.arg(version)
+        if((version == "4.0.4" & genome %in% c("hg18", "danRer7")) | (version == "3.0.0" & genome %in% c("hg38", "hg18")) |
+           (version == "2.0.2" & genome %in% c("hg38", "mm10"))){
+                stop("[listOntologies] The ", genome, " genome assembly is not supported for GREAT v", version)
+        }
+        if(verbose){
+                message("[listOntologies] Getting available ontologies for GREAT v", version, " with the ", genome, 
+                        " genome assembly")
+        }
+        ontologies <- GRanges("chr1", ranges = IRanges(1, end = 2)) %>%
+                submitGreatJob(species = genome, request_interval = 0, version = version) %>% 
+                availableOntologies()
+        return(ontologies)
+}
+
 # Set Global Options ####
 options(stringsAsFactors = FALSE)
 Sys.setenv(R_THREADS = 1)
@@ -1277,8 +1295,8 @@ regionsAnno <- annotateModule(regions, module = c("bisque4", "paleturquoise"), g
 geneList <- getGeneList(regionsAnno)
 
 # Analyze Functional Enrichment ####
+ontologies <- listOntologies("hg38", version = "4.0.4")
 enrich_bisque4 <- enrichModule(regions, module = "bisque4", genome = "hg38", file = "bisque4_Module_Enrichment.txt")
 enrich_paleturquoise <- enrichModule(regions, module = "paleturquoise", genome = "hg38", 
                                      file = "paleturquoise_Module_Enrichment.txt")
-
 
