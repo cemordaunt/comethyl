@@ -1088,7 +1088,14 @@ annotateModule <- function(regions, module = NULL, grey = FALSE, genome = c("hg3
         return(regions_annotated)
 }
 
-getGeneList <- function(regions_annotated, type = c("symbol", "description", "ensemblID", "entrezID"), verbose = TRUE){
+getGeneList <- function(regions_annotated, module = NULL,type = c("symbol", "description", "ensemblID", "entrezID"), 
+                        verbose = TRUE){
+        if(!is.null(module)){
+                if(verbose){
+                        message("[getGeneList] Filtering for regions in ", paste(module, collapse = ", "), " module(s)")
+                }
+                regions_annotated <- regions_annotated[regions_annotated$module %in% module,]
+        }
         type <- match.arg(type)
         if(verbose){
                 message("[getGeneList] Getting gene ", type, "s")
@@ -1292,7 +1299,8 @@ plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$B
 # Annotate Modules ####
 regionsAnno <- annotateModule(regions, module = c("bisque4", "paleturquoise"), genome = "hg38",
                               file = "Annotated_bisque4_paleturquoise_Module_Regions.txt")
-geneList <- getGeneList(regionsAnno)
+geneList_bisque4 <- getGeneList(regionsAnno, module = "bisque4")
+geneList_paleturquoise <- getGeneList(regionsAnno, module = "paleturquoise")
 
 # Analyze Functional Enrichment ####
 ontologies <- listOntologies("hg38", version = "4.0.4")
