@@ -76,7 +76,7 @@ plotCpGtotals <- function(CpGtotals, nBreaks = 4, legend.position = c(1.08,0.73)
                           size = 4.5, check_overlap = TRUE, nudge_x = -0.5, hjust = 1) +
                 xlab("Samples (%) Cutoff") +
                 ylab("Total CpGs (Millions)") +
-                scale_x_continuous(breaks = breaks_pretty(n = nBreaks + 1), expand = expand_scale(mult = c(0.05, 0.03))) +
+                scale_x_continuous(breaks = breaks_pretty(n = nBreaks + 1), expand = expansion(mult = c(0.05, 0.03))) +
                 scale_y_continuous(breaks = breaks_pretty(n = nBreaks)) +
                 scale_color_gradient("Coverage\nCutoff", breaks = breaks_pretty(n = nBreaks - 1)) +
                 theme_bw(base_size = 24) +
@@ -227,7 +227,7 @@ plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132
                 geom_vline(data = medians, aes(xintercept = value), color = lineCol) +
                 facet_wrap(vars(variable), nrow = 2, ncol = 3, scales = "free", strip.position = "bottom") +
                 scale_x_continuous(breaks = breaks_pretty(n = nBreaks)) +
-                scale_y_continuous(expand = expand_scale(mult = c(0.008, 0.05))) +
+                scale_y_continuous(expand = expansion(mult = c(0.008, 0.05))) +
                 theme_bw(base_size = 24) +
                 theme(axis.text.x = element_text(size = 12, color = "black"), axis.text.y = element_blank(),
                       axis.ticks.x = element_line(size = 1.25, color = "black"), axis.ticks.y = element_blank(), 
@@ -268,8 +268,8 @@ plotSDstats <- function(regions, maxQuantile = 1, bins = 30, nBreaks = 4, legend
                 facet_wrap(vars(variable), nrow = 2, ncol = 2, scales = "free_x", strip.position = "bottom") +
                 scale_fill_continuous(name = "Count", trans = "log10") +
                 scale_color_continuous(guide = FALSE, trans = "log10") +
-                scale_x_continuous(breaks = breaks_pretty(n = nBreaks), expand = expand_scale(mult = c(0.0062, 0.05))) +
-                scale_y_continuous(breaks = breaks_pretty(n = nBreaks), expand = expand_scale(mult = c(0.006, 0.05))) +
+                scale_x_continuous(breaks = breaks_pretty(n = nBreaks), expand = expansion(mult = c(0.0062, 0.05))) +
+                scale_y_continuous(breaks = breaks_pretty(n = nBreaks), expand = expansion(mult = c(0.006, 0.05))) +
                 theme_bw(base_size = 24) +
                 theme(axis.text = element_text(size = 12, color = "black"), 
                       axis.ticks = element_line(size = 1.25, color = "black"),
@@ -335,7 +335,7 @@ plotRegionTotals <- function(regionTotals, nBreaks = 4, legend.position = c(1.08
                           size = 4.5, check_overlap = TRUE, nudge_x = -0.001, hjust = 1) +
                 facet_wrap(vars(variable), nrow = 3, ncol = 1, scales = "free_y", strip.position = "left") +
                 xlab("SD Cutoff") +
-                scale_x_continuous(breaks = breaks_pretty(n = nBreaks), expand = expand_scale(mult = c(0.05, 0.03))) +
+                scale_x_continuous(breaks = breaks_pretty(n = nBreaks), expand = expansion(mult = c(0.05, 0.03))) +
                 scale_y_continuous(breaks = breaks_pretty(n = nBreaks)) +
                 scale_color_gradient("Minimum\nCoverage\nCutoff", breaks = breaks_pretty(n = nBreaks - 1)) +
                 theme_bw(base_size = 24) +
@@ -460,8 +460,8 @@ plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(0.03,0
         gg <- ggplot()
         gg <- gg +
                 geom_segment(data = dendroPlot$segments, aes(x = x, y = y, xend = xend, yend = yend), lwd = 0.3, lineend = "square") +
-                scale_x_continuous(expand = expand_scale(mult = expandX)) +
-                scale_y_continuous(expand = expand_scale(mult = expandY), breaks = breaks_pretty(n = nBreaks)) +
+                scale_x_continuous(expand = expansion(mult = expandX)) +
+                scale_y_continuous(expand = expansion(mult = expandY), breaks = breaks_pretty(n = nBreaks)) +
                 ylab("Height") +
                 theme_dendro() +
                 theme(plot.margin = unit(c(1,1,0,1), "lines"), 
@@ -841,8 +841,8 @@ plotMEtraitCor <- function(MEtraitCor, moduleOrder = 1:length(unique(MEtraitCor$
                           size = star.size, nudge_y = star.nudge_y) +
                 scale_fill_gradientn(str_to_title(corType), colors = colors, limits = c(-limit, limit), 
                                      aesthetics = c("color", "fill")) +
-                scale_x_discrete(expand = expand_scale(mult = 0.01)) +
-                scale_y_discrete(expand = expand_scale(mult = 0.01)) +
+                scale_x_discrete(expand = expansion(mult = 0.01)) +
+                scale_y_discrete(expand = expansion(mult = 0.01)) +
                 scale_alpha_manual(breaks = c("TRUE", "FALSE"), values = c("TRUE" = 1, "FALSE" = 0), guide = FALSE) +
                 theme_bw(base_size = 24) +
                 theme(axis.text.x = element_blank(), axis.text.y = element_text(size = axis.text.size, color = "black"), 
@@ -960,7 +960,7 @@ plotMethTrait <- function(module, regions, meth, trait, discrete = NULL, traitCo
                 geom_tile(aes(x = Var2, y = Var1, color = value, fill = value)) +
                 scale_fill_gradientn(heatmap.legend.title, colors = heatmapColors, limits = c(-limit,limit), 
                                      aesthetics = c("color", "fill")) +
-                scale_y_discrete(expand = expand_scale(mult = expandY)) +
+                scale_y_discrete(expand = expansion(mult = expandY)) +
                 theme_bw(base_size = 24) +
                 theme(axis.text.x = element_blank(), axis.text.y = element_text(size = axis.text.size, color = "black"),
                       axis.ticks.x = element_blank(), axis.ticks.y = element_line(size = 0.8, color = "black"),
