@@ -834,11 +834,12 @@ plotMEtraitCor <- function(MEtraitCor, moduleOrder = 1:length(unique(MEtraitCor$
                         stop("[plotMEtraitCor] corType unknown, must be either bicor or cor")
                 }
         }
+        corData <- MEtraitCor[[corType]]
         if(is.null(limit)){
-                limit <- max(abs(MEtraitCor[[corType]]))
+                limit <- max(abs(corData))
         }
         heatmap <- ggplot(data = MEtraitCor) +
-                geom_tile(aes(x = module, y = trait, color = MEtraitCor[[corType]], fill = MEtraitCor[[corType]])) +
+                geom_tile(aes(x = module, y = trait, color = corData, fill = corData)) +
                 geom_text(aes(x = module, y = trait, alpha = Significant), label = "*", color = "black", 
                           size = star.size, nudge_y = star.nudge_y) +
                 scale_fill_gradientn(str_to_title(corType), colors = colors, limits = c(-limit, limit), 
