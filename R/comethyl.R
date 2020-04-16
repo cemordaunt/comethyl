@@ -175,6 +175,7 @@ getRegions <- function(bs, annotation = NULL, genome = c("hg38", "hg19", "mm10",
                                                          positions = start(bs), maxGap = maxGap, verbose = FALSE)[["up"]]
                 }
         }
+        regions$chr <- factor(regions$chr, levels = seqlevels(bs))
         regions <- regions[regions$n >= n,] %>% .[with(., order(chr, start, end)),]
         regions$RegionID <- paste("Region", 1:nrow(regions), sep = "_")
         regions$chr <- as.character(regions$chr)
