@@ -996,10 +996,11 @@ plotMethTrait <- function(module, regions, meth, trait, discrete = NULL, traitCo
         }
 }
 
-annotateModule <- function(regions, module = NULL, grey = FALSE, genome = c("hg38", "hg19", "mm10", "mm9"), 
+annotateModule <- function(regions, module = NULL, grey = FALSE, genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "danRer7"), 
                            includeCuratedRegDoms = FALSE, rule = c("basalPlusExt", "twoClosest", "oneClosest"), 
                            adv_upstream = 5, adv_downstream = 1, adv_span = 1000, adv_twoDistance = 1000, 
-                           adv_oneDistance = 1000, save = TRUE, file = "Annotated_Module_Regions.txt", verbose =  TRUE){
+                           adv_oneDistance = 1000, version = c("4.0.4", "3.0.0", "2.0.2"), save = TRUE, 
+                           file = "Annotated_Module_Regions.txt", verbose =  TRUE){
         if(!is.null(module)){
                 if(verbose){
                         message("[annotateModule] Filtering for regions in ", paste(module, collapse = ", "), " module(s)")
@@ -1014,15 +1015,21 @@ annotateModule <- function(regions, module = NULL, grey = FALSE, genome = c("hg3
         }
         genome <- match.arg(genome)
         rule <- match.arg(rule)
+        version <- match.arg(version)
+        if((version == "4.0.4" & genome %in% c("hg18", "danRer7")) | (version == "3.0.0" & genome %in% c("hg38", "hg18")) |
+           (version == "2.0.2" & genome %in% c("hg38", "mm10"))){
+                stop("[annotateModule] The ", genome, " genome assembly is not supported for GREAT v", version)
+        }
         if(verbose){
                 message("[annotateModule] Using the ", genome, " genome assembly for annotations")
-                message("[annotateModule] Adding genes to regions using GREAT with the ", rule, " rule")
+                message("[annotateModule] Adding genes to regions using GREAT v", version, " with the ", rule, " rule")
         }
-        GR_regions <- with(regions, GRanges(seqnames = chr, ranges = IRanges(start = start, end = end), RegionID = RegionID))
+        GR_regions <- with(regions, GRanges(chr, ranges = IRanges(start, end = end), RegionID = RegionID))
         job <- submitGreatJob(GR_regions, species = genome, includeCuratedRegDoms = includeCuratedRegDoms, rule = rule,
                               adv_upstream = adv_upstream, adv_downstream = adv_downstream, adv_span = adv_span,
-                              adv_twoDistance = adv_twoDistance, adv_oneDistance = adv_oneDistance, request_interval = 1)
-        regions_genes <- suppressGraphics(plotRegionGeneAssociationGraphs(job, type = 1)) %>% 
+                              adv_twoDistance = adv_twoDistance, adv_oneDistance = adv_oneDistance, request_interval = 0,
+                              version = version)
+        regions_genes <- suppressGraphics(plotRegionGeneAssociationGraphs(job, type = 1, request_interval = 0)) %>% 
                 as.data.frame() %>%
                 merge(x = regions[,c("RegionID", "chr", "start", "end")], 
                       y = .[,c("seqnames", "start", "end", "gene", "distTSS")], by.x = c("chr", "start", "end"), 
@@ -1033,7 +1040,8 @@ annotateModule <- function(regions, module = NULL, grey = FALSE, genome = c("hg3
         if(verbose){
                 message("[annotateModule] Adding gene info from BioMart")
         }
-        dataset <- str_detect(genome, pattern = "hg") %>% ifelse(yes = "hsapiens_gene_ensembl", no = "mmusculus_gene_ensembl")
+        dataset <- str_sub(genome, start = 1, end = 2) %>% switch(hg = "hsapiens_gene_ensembl", mm = "mmusculus_gene_ensembl",
+                                                                  da = "drerio_gene_ensembl")
         ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset = dataset)
         genes_annotated <- suppressMessages(getBM(attributes = c("external_gene_name", "description", "ensembl_gene_id", "entrezgene_id"), 
                                                   filters = c("external_gene_name"), values = regions_genes$gene, mart = ensembl))
