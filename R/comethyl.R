@@ -914,7 +914,7 @@ plotMEtraitScatter <- function(ME, trait, color = "#132B43", xlim = NULL, ylim =
                 message("[plotMEtraitScatter] Plotting module eigennode by continuous trait")
         }
         scatterplot <- ggplot() +
-                geom_smooth(aes(x = trait, y = ME), method = MASS::rlm, color = "#56B1F7", fill = "#336A98") +   
+                geom_smooth(aes(x = trait, y = ME), method = MASS::rlm, formula = y ~ x, color = "#56B1F7", fill = "#336A98") +   
                 geom_point(aes(x = trait, y = ME), color = color, size = point.size) +   
                 coord_cartesian(xlim = xlim, ylim = ylim) +
                 scale_x_continuous(breaks = breaks_pretty(n = nBreaks)) +
