@@ -535,10 +535,11 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
                                  log10_meanConnectivity = log10(sft$fitIndices$mean.k.),
                                  powerEstimate = sft$powerEstimate) %>% 
                 reshape2::melt(id.vars = c("power", "powerEstimate"))
+        powerEstimateY <- min(0, fitIndices$value)
         gg <- ggplot(data = fitIndices)
         gg <- gg +
                 geom_vline(aes(xintercept = powerEstimate), color = lineCol) +
-                geom_text(aes(x = powerEstimate, y = min(0, min(fitIndices$value)), label = powerEstimate), color = lineCol, 
+                geom_text(aes(x = powerEstimate, y = powerEstimateY, label = powerEstimate), color = lineCol, 
                           nudge_x = -1) +
                 geom_point(aes(x = power, y = value), color = pointCol, size = 1.2) +
                 facet_wrap(vars(variable), nrow = 1, ncol = 2, scales = "free_y", strip.position = "left") +
