@@ -490,7 +490,7 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
         if(verbose){
                 message("[getSoftPower] Analyzing scale-free topology with ", corType, 
                         " correlation to determine best soft-thresholding power")
-                verboseNum <- 10
+                verboseNum <- 1
         } else {
                 verboseNum <- 0
         }
@@ -581,7 +581,7 @@ getModules <- function(meth, power, regions, maxBlockSize = 40000, corType = c("
         }
         if(verbose){
                 message("[getModules] Constructing network and detecting modules in blocks using ", corType, " correlation")
-                verboseNum <- 10
+                verboseNum <- 3
         } else {
                 verboseNum <- 0
         }
