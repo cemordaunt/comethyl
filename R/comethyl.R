@@ -1047,7 +1047,8 @@ annotateModule <- function(regions, module = NULL, grey = FALSE, genome = c("hg3
                                                                   da = "drerio_gene_ensembl")
         ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset = dataset)
         genes_annotated <- suppressMessages(getBM(attributes = c("external_gene_name", "description", "ensembl_gene_id", "entrezgene_id"), 
-                                                  filters = c("external_gene_name"), values = regions_genes$gene, mart = ensembl))
+                                                  filters = c("external_gene_name"), values = regions_genes$gene, mart = ensembl,
+                                                  useCache = FALSE))
         colnames(genes_annotated) <- colnames(genes_annotated) %>%
                 str_replace_all(pattern = c("external_gene_name" = "gene_symbol", "description" = "gene_description",
                                             "ensembl_gene_id" = "gene_ensemblID", "entrezgene_id" = "gene_entrezID"))
