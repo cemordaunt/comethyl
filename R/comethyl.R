@@ -466,7 +466,7 @@ plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(0.03,0
                 ylab("Height") +
                 theme_dendro() +
                 theme(plot.margin = unit(c(1,1,0,1), "lines"), 
-                      panel.background = element_rect(color = "black", size = 1.1),
+                      panel.background = element_rect(color = "black", fill = "white", size = 1.1),
                       axis.ticks.y = element_line(), axis.text.y = element_text(size = 12, color = "black"), 
                       axis.title.y = element_text(size = 16, angle = 90, vjust = 2))
         if(label){
