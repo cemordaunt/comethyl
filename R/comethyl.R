@@ -1066,36 +1066,43 @@ annotateModule <- function(regions, module = NULL, grey = FALSE, genome = c("hg3
                 aggregate(formula = cbind(gene_symbol, distance_to_TSS, gene_description, gene_ensemblID, gene_entrezID) ~ RegionID, 
                           data = ., FUN = function(x) paste(x, collapse = " | "), simplify = TRUE, drop = FALSE) %>%
                 merge(x = regions, y = ., by = "RegionID", all.x = TRUE, all.y = FALSE, sort = FALSE)
-        if(verbose){
-                message("[annotateModule] Getting gene context from annotatr")
+        if(!genome %in% c("hg18", "danRer7")){
+                if(verbose){
+                        message("[annotateModule] Getting gene context from annotatr")
+                }
+                annotations <- paste(genome, c("basicgenes", "genes_intergenic", "enhancers_fantom"), sep = "_")
+                regions_GeneReg <- suppressWarnings(suppressMessages(build_annotations(genome = genome, annotations = annotations))) %>%
+                        GenomeInfoDb::keepStandardChromosomes(pruning.mode = "coarse") %>%
+                        annotate_regions(regions = GR_regions, annotations = ., ignore.strand = TRUE, quiet = TRUE) %>% 
+                        as.data.frame()
+                colnames(regions_GeneReg)[colnames(regions_GeneReg) == "annot.type"] <- "gene_context"
+                pattern <- rep("", times = 5)
+                names(pattern) <- c(genome, "genes", "s", "fantom", "_")
+                regions_GeneReg$gene_context <- str_replace_all(regions_GeneReg$gene_context, pattern = pattern)
+                regions_annotated <- aggregate(formula = gene_context ~ RegionID, data = regions_GeneReg, 
+                                               FUN = function(x) paste(unique(x), collapse = ", "), simplify = TRUE) %>%
+                        merge(x = regions_annotated, y = ., by = "RegionID", all.x = TRUE, all.y = FALSE, sort = FALSE) 
+                if(verbose){
+                        message("[annotateModule] Getting CpG context from annotatr")
+                }
+                regions_CpGs <- suppressMessages(build_annotations(genome = genome, annotations = paste(genome, "cpgs", sep = "_"))) %>%
+                        GenomeInfoDb::keepStandardChromosomes(pruning.mode = "coarse") %>%
+                        annotate_regions(regions = GR_regions, annotations = ., ignore.strand = TRUE, quiet = TRUE) %>% 
+                        as.data.frame()
+                colnames(regions_CpGs)[colnames(regions_CpGs) == "annot.type"] <- "CpG_context"
+                pattern <- c("island", "shore", "shelf", "open sea")
+                names(pattern) <- paste(genome, "cpg", c("islands", "shores", "shelves", "inter"), sep = "_")
+                regions_CpGs$CpG_context <- str_replace_all(regions_CpGs$CpG_context, pattern = pattern)
+                regions_annotated <- aggregate(formula = CpG_context ~ RegionID, data = regions_CpGs, 
+                                               FUN = function(x) paste(unique(x), collapse = ", "), simplify = TRUE) %>%
+                        merge(x = regions_annotated, y = ., by = "RegionID", all.x = TRUE, all.y = FALSE, sort = FALSE)
+        } else {
+                if(verbose){
+                        message("[annotateModule] Gene and CpG context not supported by annotatr for hg18 and danRer7")
+                }
         }
-        annotations <- paste(genome, c("basicgenes", "genes_intergenic", "enhancers_fantom"), sep = "_")
-        regions_GeneReg <- suppressWarnings(suppressMessages(build_annotations(genome = genome, annotations = annotations))) %>%
-                GenomeInfoDb::keepStandardChromosomes(pruning.mode = "coarse") %>%
-                annotate_regions(regions = GR_regions, annotations = ., ignore.strand = TRUE, quiet = TRUE) %>% 
-                as.data.frame()
-        colnames(regions_GeneReg)[colnames(regions_GeneReg) == "annot.type"] <- "gene_context"
-        pattern <- rep("", times = 5)
-        names(pattern) <- c(genome, "genes", "s", "fantom", "_")
-        regions_GeneReg$gene_context <- str_replace_all(regions_GeneReg$gene_context, pattern = pattern)
-        regions_annotated <- aggregate(formula = gene_context ~ RegionID, data = regions_GeneReg, 
-                                       FUN = function(x) paste(unique(x), collapse = ", "), simplify = TRUE) %>%
-                merge(x = regions_annotated, y = ., by = "RegionID", all.x = TRUE, all.y = FALSE, sort = FALSE) 
-        if(verbose){
-                message("[annotateModule] Getting CpG context from annotatr")
-        }
-        regions_CpGs <- suppressMessages(build_annotations(genome = genome, annotations = paste(genome, "cpgs", sep = "_"))) %>%
-                GenomeInfoDb::keepStandardChromosomes(pruning.mode = "coarse") %>%
-                annotate_regions(regions = GR_regions, annotations = ., ignore.strand = TRUE, quiet = TRUE) %>% 
-                as.data.frame()
-        colnames(regions_CpGs)[colnames(regions_CpGs) == "annot.type"] <- "CpG_context"
-        pattern <- c("island", "shore", "shelf", "open sea")
-        names(pattern) <- paste(genome, "cpg", c("islands", "shores", "shelves", "inter"), sep = "_")
-        regions_CpGs$CpG_context <- str_replace_all(regions_CpGs$CpG_context, pattern = pattern)
-        regions_annotated <- aggregate(formula = CpG_context ~ RegionID, data = regions_CpGs, 
-                                       FUN = function(x) paste(unique(x), collapse = ", "), simplify = TRUE) %>%
-                merge(x = regions_annotated, y = ., by = "RegionID", all.x = TRUE, all.y = FALSE, sort = FALSE) %>%
-                .[order(.$module, as.integer(str_remove_all(.$RegionID, pattern = "Region_"))),]
+        regions_annotated <- regions_annotated[order(regions_annotated$module, as.integer(str_remove_all(regions_annotated$RegionID, 
+                                                                                                         pattern = "Region_"))),]
         if(save){
                 if(verbose){
                         message("[annotateModule] Saving file as ", file)
