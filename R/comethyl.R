@@ -767,9 +767,11 @@ getCor <- function(x, y = NULL, transpose = FALSE, corType = c("bicor", "pearson
         return(cor)
 }
 
-getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"), maxPOutliers = 0.1, robustY = FALSE, adjMethod = "fdr", 
+getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"), maxPOutliers = 0.1, robustY = FALSE, 
+                          adjMethod = c("fdr", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "none"), 
                           save = TRUE, file = "ME_Trait_Correlation_Stats.txt", verbose = TRUE){
         corType <- match.arg(corType)
+        adjMethod <- match.arg(adjMethod)
         if(verbose){
                 message("[getMEtraitCor] Testing associations between module eigennodes and sample traits using ",
                         corType, " correlation")
@@ -791,6 +793,9 @@ getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"), maxPOut
         stats$stat <- names(cor) %>% rep(each = nrow(cor$p)) %>% factor(levels = unique(.))
         stats <- reshape2::melt(stats, id.vars = c("module", "stat"), variable.name = "trait") %>%
                 reshape2::dcast(formula = module + trait ~ stat, value.var = "value")
+        if(verbose){
+                message("[getMEtraitCor] Adjusting p-values using the ", adjMethod, " method")
+        }
         stats$adj_p <- p.adjust(stats$p, method = adjMethod)
         if(corType == "bicor"){
                 stats <- stats[,c("module", "trait", "nObs", "bicor", "Z", "t", "p", "adj_p")]
@@ -1160,8 +1165,7 @@ enrichModule <- function(regions, module = NULL, genome = c("hg38", "hg19", "hg1
                               adv_twoDistance = adv_twoDistance, adv_oneDistance = adv_oneDistance, request_interval = 0,
                               version = version)
         if(verbose){
-                message("[enrichModule] Getting results and adjusting p-values using the ", adjMethod, 
-                        " method")
+                message("[enrichModule] Getting results and adjusting p-values using the ", adjMethod, " method")
         }
         enrichTables <- getEnrichmentTables(job, ontology = ontologies)
         results <- list.rbind(enrichTables)
