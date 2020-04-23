@@ -1129,6 +1129,24 @@ getGeneList <- function(regions_annotated, module = NULL,type = c("symbol", "des
         return(geneList)
 }
 
+listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "danRer7"), 
+                           version = c("4.0.4", "3.0.0", "2.0.2"), verbose =  TRUE){
+        genome <- match.arg(genome)
+        version <- match.arg(version)
+        if((version == "4.0.4" & genome %in% c("hg18", "danRer7")) | (version == "3.0.0" & genome %in% c("hg38", "hg18")) |
+           (version == "2.0.2" & genome %in% c("hg38", "mm10"))){
+                stop("[listOntologies] The ", genome, " genome assembly is not supported for GREAT v", version)
+        }
+        if(verbose){
+                message("[listOntologies] Getting available ontologies for GREAT v", version, " with the ", genome, 
+                        " genome assembly")
+        }
+        ontologies <- GRanges("chr1", ranges = IRanges(1, end = 2)) %>%
+                submitGreatJob(species = genome, request_interval = 0, version = version) %>% 
+                availableOntologies()
+        return(ontologies)
+}
+
 enrichModule <- function(regions, module = NULL, genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "danRer7"), 
                          includeCuratedRegDoms = FALSE, rule = c("basalPlusExt", "twoClosest", "oneClosest"), 
                          adv_upstream = 5, adv_downstream = 1, adv_span = 1000, adv_twoDistance = 1000, 
@@ -1209,22 +1227,34 @@ enrichModule <- function(regions, module = NULL, genome = c("hg38", "hg19", "hg1
         return(results)
 }
 
-listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "danRer7"), 
-                           version = c("4.0.4", "3.0.0", "2.0.2"), verbose =  TRUE){
-        genome <- match.arg(genome)
-        version <- match.arg(version)
-        if((version == "4.0.4" & genome %in% c("hg18", "danRer7")) | (version == "3.0.0" & genome %in% c("hg38", "hg18")) |
-           (version == "2.0.2" & genome %in% c("hg38", "mm10"))){
-                stop("[listOntologies] The ", genome, " genome assembly is not supported for GREAT v", version)
-        }
+plotEnrichment <- function(enrichment, nTerms = 15, fill = "#132B43", xlim = NULL, nBreaks = 4, axis.title.x.size = 20, 
+                           axis.text.x.size = 16, axis.text.y.size = 16, save = TRUE, file = "Module_Enrichment_Plot.pdf", 
+                           width = 8, height = 6, verbose = TRUE){
         if(verbose){
-                message("[listOntologies] Getting available ontologies for GREAT v", version, " with the ", genome, 
-                        " genome assembly")
+                message("[plotEnrichment] Plotting module enrichments from GREAT")
         }
-        ontologies <- GRanges("chr1", ranges = IRanges(1, end = 2)) %>%
-                submitGreatJob(species = genome, request_interval = 0, version = version) %>% 
-                availableOntologies()
-        return(ontologies)
+        enrichment <- enrichment[order(enrichment$log_p, decreasing = TRUE),]
+        if(nrow(enrichment) > nTerms){
+                enrichment <- enrichment[1:nTerms,]
+        }
+        enrichment$term <- factor(enrichment$term, levels = rev(unique(enrichment$term)))
+        scatterplot <- ggplot() +
+                geom_col(aes(x = term, y = log_p), data = enrichment, fill = fill) +   
+                coord_flip(ylim = xlim) +
+                scale_y_continuous(breaks = breaks_pretty(n = nBreaks), expand = expansion(c(0.004, 0.03))) +
+                theme_bw(base_size = 25) +
+                theme(legend.position = "none", panel.grid.major = element_blank(),
+                      panel.border = element_rect(color = "black", size = 1.25), axis.ticks = element_line(size = 1.25), 
+                      panel.grid.minor = element_blank(), strip.background = element_blank(),
+                      axis.text.x = element_text(color = "black", size = axis.text.x.size), 
+                      axis.text.y = element_text(color = "black", size = axis.text.y.size), 
+                      axis.title.x = element_text(size = axis.title.x.size), axis.title.y = element_blank(),
+                      plot.margin = unit(c(1,1,0.5,1), "lines")) +
+                ylab(expression(-log[10]*(italic(p)-value)))
+        if(verbose){
+                message("[plotEnrichment] Saving file as ", file)
+        }
+        ggsave(file, plot = scatterplot, dpi = 600, width = width, height = height, units = "in")
 }
 
 # Set Global Options ####
@@ -1328,6 +1358,8 @@ geneList_paleturquoise <- getGeneList(regionsAnno, module = "paleturquoise")
 # Analyze Functional Enrichment ####
 ontologies <- listOntologies("hg38", version = "4.0.4")
 enrich_bisque4 <- enrichModule(regions, module = "bisque4", genome = "hg38", file = "bisque4_Module_Enrichment.txt")
+plotEnrichment(enrich_bisque4, file = "bisque4_Module_Enrichment_Plot.pdf")
 enrich_paleturquoise <- enrichModule(regions, module = "paleturquoise", genome = "hg38", 
                                      file = "paleturquoise_Module_Enrichment.txt")
+plotEnrichment(enrich_paleturquoise, axis.text.y.size = 14, width = 10, file = "paleturquoise_Module_Enrichment_Plot.pdf")
 
