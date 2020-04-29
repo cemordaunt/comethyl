@@ -9,6 +9,7 @@ methylation values are used to identify comethylation modules.
 Interesting modules are identified and explored by comparing with sample traits and 
 examining functional enrichments. Results are then visualized with high-quality,
 editable plots from ggplot2.
+
 <br>
 <p align="center">
         <img src="https://github.com/cemordaunt/comethyl/blob/master/Images/comethyl.png" width="600">
