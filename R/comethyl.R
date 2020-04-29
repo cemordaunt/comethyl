@@ -4,12 +4,12 @@
 # Load Packages ####
 .libPaths("/share/lasallelab/programs/comethyl/R_3.6")
 AnnotationHub::setAnnotationHubOption("CACHE", value = "/share/lasallelab/programs/comethyl/R_3.6")
-sapply(c("scales", "openxlsx", "rlist", "tidyverse", "ggdendro", "cowplot", "annotatr", "rtracklayer", "bsseq", "dmrseq", 
+sapply(c("scales", "openxlsx", "rlist", "tidyverse", "ggdendro", "cowplot", "annotatr", "rtracklayer", "bsseq", "dmrseq",
          "WGCNA", "sva", "rGREAT", "R.devices", "biomaRt"), require, character.only = TRUE)
 
 # Functions ####
-getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz", 
-                    chroms = c(paste("chr", 1:22, sep = ""), "chrX", "chrY", "chrM"), BPPARAM = MulticoreParam(10), 
+getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz",
+                    chroms = c(paste("chr", 1:22, sep = ""), "chrX", "chrY", "chrM"), BPPARAM = MulticoreParam(10),
                     save = TRUE, file = "Unfiltered_BSseq.rds", verbose = TRUE){
         if(verbose){
                 message("[getCpGs] Loading CpG-level data")
@@ -51,7 +51,7 @@ getCpGtotals <- function(bs, cov = seq(0,10,1), perSample = seq(0.5,1,0.05), sav
         nCpGs <- sapply(cov, FUN = .nCpGsByCov, bsCov = bsCov, nSample = nSample)
         nCpGs <- as.integer(nCpGs)
         perCpGs <- (nCpGs / length(bs))
-        CpGtotals <- data.frame(cov = rep(cov, each = length(perSample)), perSample = rep(perSample, times = length(cov)), 
+        CpGtotals <- data.frame(cov = rep(cov, each = length(perSample)), perSample = rep(perSample, times = length(cov)),
                                 nSample = rep(nSample, times = length(cov)), nCpGs_M = nCpGs / 10^6, perCpGs = perCpGs)
         if(save){
                 if(verbose){
@@ -62,7 +62,7 @@ getCpGtotals <- function(bs, cov = seq(0,10,1), perSample = seq(0.5,1,0.05), sav
         return(CpGtotals)
 }
 
-plotCpGtotals <- function(CpGtotals, nBreaks = 4, legend.position = c(1.08,0.73), save = TRUE, 
+plotCpGtotals <- function(CpGtotals, nBreaks = 4, legend.position = c(1.08,0.73), save = TRUE,
                           file = "CpG_Totals.pdf", width = 11, height = 4.25, verbose = TRUE){
         if(verbose){
                 message("[plotCpGtotals] Plotting CpG totals")
@@ -71,8 +71,8 @@ plotCpGtotals <- function(CpGtotals, nBreaks = 4, legend.position = c(1.08,0.73)
         gg <- ggplot(data = CpGtotals)
         gg <- gg +
                 geom_line(aes(x = perSample, y = nCpGs_M, group = cov, color = cov)) +
-                geom_text(data = subset(CpGtotals, perSample == min(perSample)), 
-                          aes(x = perSample, y = nCpGs_M, group = cov, color = cov, label = cov), 
+                geom_text(data = subset(CpGtotals, perSample == min(perSample)),
+                          aes(x = perSample, y = nCpGs_M, group = cov, color = cov, label = cov),
                           size = 4.5, check_overlap = TRUE, nudge_x = -0.5, hjust = 1) +
                 xlab("Samples (%) Cutoff") +
                 ylab("Total CpGs (Millions)") +
@@ -82,9 +82,9 @@ plotCpGtotals <- function(CpGtotals, nBreaks = 4, legend.position = c(1.08,0.73)
                 theme_bw(base_size = 24) +
                 theme(axis.text = element_text(size = 14, color = "black"),
                       axis.ticks = element_line(size = 1.25, color = "black"), axis.title = element_text(size = 18),
-                      legend.background = element_blank(), legend.position = legend.position, 
-                      legend.title = element_text(size = 18), legend.text = element_text(size = 14), 
-                      panel.border = element_rect(color = "black", size = 1.25), 
+                      legend.background = element_blank(), legend.position = legend.position,
+                      legend.title = element_text(size = 18), legend.text = element_text(size = 14),
+                      panel.border = element_rect(color = "black", size = 1.25),
                       panel.grid = element_blank(), plot.margin = unit(c(1,7,0.7,0.7), "lines"))
         if(save){
                 if(verbose){
@@ -97,7 +97,7 @@ plotCpGtotals <- function(CpGtotals, nBreaks = 4, legend.position = c(1.08,0.73)
 
 filterCpGs <- function(bs, cov = 2, perSample = 0.75, save = TRUE, file = "Filtered_BSseq.rds", verbose = TRUE){
         if(verbose){
-                message("[getCpGs] Filtering CpG-level data for loci with at least ", cov, " reads in at least ", 
+                message("[getCpGs] Filtering CpG-level data for loci with at least ", cov, " reads in at least ",
                         perSample * 100, "% of samples")
         }
         covSample <- (getCoverage(bs) >= cov) %>% DelayedMatrixStats::rowSums2()
@@ -115,8 +115,8 @@ filterCpGs <- function(bs, cov = 2, perSample = 0.75, save = TRUE, file = "Filte
         return(bs)
 }
 
-getRegions <- function(bs, annotation = NULL, genome = c("hg38", "hg19", "mm10", "mm9", "rn6", "rn5", "rn4", "dm6", "dm3", "galGal5"), 
-                       upstream = 5000, downstream = 1000, custom = NULL, maxGap = 150, n = 3, save = TRUE, 
+getRegions <- function(bs, annotation = NULL, genome = c("hg38", "hg19", "mm10", "mm9", "rn6", "rn5", "rn4", "dm6", "dm3", "galGal5"),
+                       upstream = 5000, downstream = 1000, custom = NULL, maxGap = 150, n = 3, save = TRUE,
                        file = "Unfiltered_Regions.txt", verbose = TRUE){
         if(!is.null(annotation) & !is.null(custom)){
                 stop("[getRegions] annotation and custom cannot both have values")
@@ -124,7 +124,7 @@ getRegions <- function(bs, annotation = NULL, genome = c("hg38", "hg19", "mm10",
         if(!is.null(annotation)){
                 genome <- match.arg(genome)
                 if(verbose){
-                        message("[getRegions] Using ", annotation, " annotation for the ", genome, 
+                        message("[getRegions] Using ", annotation, " annotation for the ", genome,
                                 " genome as regions")
                 }
                 if(annotation %in% c("genes", "promoters", "transcripts")){
@@ -137,10 +137,10 @@ getRegions <- function(bs, annotation = NULL, genome = c("hg38", "hg19", "mm10",
                         if (requireNamespace(sprintf("org.%s.eg.db", orgdb), quietly = TRUE)) {
                                 library(sprintf("org.%s.eg.db", orgdb), character.only = TRUE)
                         }
-                        regions <- suppressWarnings(switch(annotation, 
+                        regions <- suppressWarnings(switch(annotation,
                                                            genes = genes(txdb),
-                                                           promoters = promoters(txdb, upstream = upstream, 
-                                                                                 downstream = downstream, 
+                                                           promoters = promoters(txdb, upstream = upstream,
+                                                                                 downstream = downstream,
                                                                                  use.names = FALSE),
                                                            transcripts = transcripts(txdb)))
                 } else {
@@ -168,10 +168,10 @@ getRegions <- function(bs, annotation = NULL, genome = c("hg38", "hg19", "mm10",
                         colnames(regions)[colnames(regions) == "seqnames"] <- "chr"
                 } else {
                         if(verbose){
-                                message("[getRegions] Calling regions when at least ", n, " CpGs are no more than ", 
+                                message("[getRegions] Calling regions when at least ", n, " CpGs are no more than ",
                                         maxGap, " bases apart")
                         }
-                        regions <- bsseq:::regionFinder3(x = as.integer(rep(1, length(bs))), chr = as.character(seqnames(bs)), 
+                        regions <- bsseq:::regionFinder3(x = as.integer(rep(1, length(bs))), chr = as.character(seqnames(bs)),
                                                          positions = start(bs), maxGap = maxGap, verbose = FALSE)[["up"]]
                 }
         }
@@ -191,7 +191,7 @@ getRegions <- function(bs, annotation = NULL, genome = c("hg38", "hg19", "mm10",
         regions$methMean <- DelayedMatrixStats::rowMeans2(meth, na.rm = TRUE)
         regions$methSD <- DelayedMatrixStats::rowSds(meth, na.rm = TRUE)
         colnames <- c("RegionID", "chr", "start", "end", "width", "n", "covMin", "covMean", "covSD", "methMean", "methSD")
-        regions <- regions[,c(colnames, colnames(regions)[!colnames(regions) %in% colnames & 
+        regions <- regions[,c(colnames, colnames(regions)[!colnames(regions) %in% colnames &
                                                                   !colnames(regions) %in% c("idxStart", "idxEnd", "cluster")])]
         if(save){
                 if(verbose){
@@ -202,17 +202,17 @@ getRegions <- function(bs, annotation = NULL, genome = c("hg38", "hg19", "mm10",
         return(regions)
 }
 
-plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132B43", lineCol = "red", nBreaks = 4, 
+plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132B43", lineCol = "red", nBreaks = 4,
                             save = TRUE, file = "Region_Plots.pdf", width = 11, height = 8.5, verbose = TRUE){
         if(verbose){
                 message("[plotRegionStats] Plotting histograms of region statistics")
         }
         variables <- c("width", "n", "covMin", "covMean", "methMean", "methSD")
-        medians <- data.frame(variable = factor(variables, levels = variables), 
-                              value = sapply(regions[,variables], FUN = median)) 
+        medians <- data.frame(variable = factor(variables, levels = variables),
+                              value = sapply(regions[,variables], FUN = median))
         if(maxQuantile < 1){
                 if(verbose){
-                        message("[plotRegionStats] Limiting x-axis to values in bottom ", maxQuantile * 100, 
+                        message("[plotRegionStats] Limiting x-axis to values in bottom ", maxQuantile * 100,
                                 "% for width, n, covMin, and covMean")
                 }
                 regions$width[regions$width >= quantile(regions$width, probs = maxQuantile)] <- NA
@@ -220,7 +220,7 @@ plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132
                 regions$covMin[regions$covMin >= quantile(regions$covMin, probs = maxQuantile)] <- NA
                 regions$covMean[regions$covMean >= quantile(regions$covMean, probs = maxQuantile)] <- NA
         }
-        regions <- reshape2::melt(regions[,c("RegionID", "width", "n", "covMin", "covMean", "methMean", "methSD")], 
+        regions <- reshape2::melt(regions[,c("RegionID", "width", "n", "covMin", "covMean", "methMean", "methSD")],
                                   id.vars = "RegionID")
         gg <- ggplot(data = regions)
         gg <- gg +
@@ -231,12 +231,12 @@ plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132
                 scale_y_continuous(expand = expansion(mult = c(0.008, 0.05))) +
                 theme_bw(base_size = 24) +
                 theme(axis.text.x = element_text(size = 12, color = "black"), axis.text.y = element_blank(),
-                      axis.ticks.x = element_line(size = 1.25, color = "black"), axis.ticks.y = element_blank(), 
-                      axis.title = element_blank(), legend.position = "none", 
-                      panel.border = element_rect(color = "black", size = 1.25), 
+                      axis.ticks.x = element_line(size = 1.25, color = "black"), axis.ticks.y = element_blank(),
+                      axis.title = element_blank(), legend.position = "none",
+                      panel.border = element_rect(color = "black", size = 1.25),
                       panel.grid = element_blank(), panel.spacing.x = unit(0.6, "lines"),
                       panel.spacing.y = unit(0.8, "lines"), plot.margin = unit(c(1,1,0.3,0.6), "lines"),
-                      strip.background = element_blank(), strip.placement = "outside", 
+                      strip.background = element_blank(), strip.placement = "outside",
                       strip.switch.pad.wrap = unit(0, "lines"), strip.text.x = element_text(size = 16))
         if(save){
                 if(verbose){
@@ -247,21 +247,21 @@ plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132
         return(gg)
 }
 
-plotSDstats <- function(regions, maxQuantile = 1, bins = 30, nBreaks = 4, legend.position = c(1.09,0.9), save = TRUE, 
+plotSDstats <- function(regions, maxQuantile = 1, bins = 30, nBreaks = 4, legend.position = c(1.09,0.9), save = TRUE,
                         file = "SD_Plots.pdf", width = 8.5, height = 8.5, verbose = TRUE){
         if(verbose){
                 message("[plotSDstats] Plotting methylation SD vs region statistics")
         }
         if(maxQuantile < 1){
                 if(verbose){
-                        message("[plotSDstats] Limiting x-axis to values in bottom ", maxQuantile * 100, 
+                        message("[plotSDstats] Limiting x-axis to values in bottom ", maxQuantile * 100,
                                 "% for n, covMin, and covMean")
                 }
                 regions$n[regions$n >= quantile(regions$n, probs = maxQuantile)] <- NA
                 regions$covMin[regions$covMin >= quantile(regions$covMin, probs = maxQuantile)] <- NA
                 regions$covMean[regions$covMean >= quantile(regions$covMean, probs = maxQuantile)] <- NA
         }
-        regions <- reshape2::melt(regions[,c("RegionID", "n", "covMin", "covMean", "methMean", "methSD")], 
+        regions <- reshape2::melt(regions[,c("RegionID", "n", "covMin", "covMean", "methMean", "methSD")],
                                   id.vars = c("RegionID", "methSD"))
         gg <- ggplot(data = regions)
         gg <- gg +
@@ -272,15 +272,15 @@ plotSDstats <- function(regions, maxQuantile = 1, bins = 30, nBreaks = 4, legend
                 scale_x_continuous(breaks = breaks_pretty(n = nBreaks), expand = expansion(mult = c(0.0062, 0.05))) +
                 scale_y_continuous(breaks = breaks_pretty(n = nBreaks), expand = expansion(mult = c(0.006, 0.05))) +
                 theme_bw(base_size = 24) +
-                theme(axis.text = element_text(size = 12, color = "black"), 
+                theme(axis.text = element_text(size = 12, color = "black"),
                       axis.ticks = element_line(size = 1.25, color = "black"),
                       axis.title.x = element_blank(), axis.title.y = element_text(size = 16, color = "black"),
-                      legend.background = element_blank(), legend.position = legend.position, 
-                      legend.text = element_text(size = 12), legend.title = element_text(size = 16), 
-                      panel.border = element_rect(color = "black", size = 1.25), panel.grid = element_blank(), 
-                      panel.spacing.x = unit(1, "lines"), panel.spacing.y = unit(0.8, "lines"), 
-                      plot.margin = unit(c(1,6,0.3,1), "lines"), strip.background = element_blank(), 
-                      strip.placement = "outside", strip.switch.pad.wrap = unit(0, "lines"), 
+                      legend.background = element_blank(), legend.position = legend.position,
+                      legend.text = element_text(size = 12), legend.title = element_text(size = 16),
+                      panel.border = element_rect(color = "black", size = 1.25), panel.grid = element_blank(),
+                      panel.spacing.x = unit(1, "lines"), panel.spacing.y = unit(0.8, "lines"),
+                      plot.margin = unit(c(1,6,0.3,1), "lines"), strip.background = element_blank(),
+                      strip.placement = "outside", strip.switch.pad.wrap = unit(0, "lines"),
                       strip.text.x = element_text(size = 16))
         if(save){
                 if(verbose){
@@ -293,7 +293,7 @@ plotSDstats <- function(regions, maxQuantile = 1, bins = 30, nBreaks = 4, legend
 
 .regionTotals <- function(regions, covMin, methSD){
         regions <- regions[regions$covMin >= covMin & regions$methSD >= methSD,]
-        totals <- c("covMin" = covMin, "methSD" = methSD, "totalRegions_K" = nrow(regions)/10^3, 
+        totals <- c("covMin" = covMin, "methSD" = methSD, "totalRegions_K" = nrow(regions)/10^3,
                     "totalWidth_Mb" = sum(regions$width)/10^6, "totalN_M" = sum(regions$n)/10^6)
         return(totals)
 }
@@ -307,7 +307,7 @@ getRegionTotals <- function(regions, covMin = seq(0,20,2), methSD = seq(0,0.1,0.
         length_methSD <- length(methSD)
         covMin <- rep(covMin, each = length_methSD)
         methSD <- rep(methSD, times = length_covMin)
-        regionTotals <- mapply(FUN = .regionTotals, covMin = covMin, methSD = methSD, 
+        regionTotals <- mapply(FUN = .regionTotals, covMin = covMin, methSD = methSD,
                                MoreArgs = list(regions = regions)) %>% t() %>% as.data.frame()
         if(save){
                 if(verbose){
@@ -318,21 +318,21 @@ getRegionTotals <- function(regions, covMin = seq(0,20,2), methSD = seq(0,0.1,0.
         return(regionTotals)
 }
 
-plotRegionTotals <- function(regionTotals, nBreaks = 4, legend.position = c(1.08,0.897), save = TRUE, 
+plotRegionTotals <- function(regionTotals, nBreaks = 4, legend.position = c(1.08,0.897), save = TRUE,
                              file = "Region_Totals.pdf", width = 11, height = 11, verbose = TRUE){
         if(verbose){
                 message("[plotRegionTotals] Plotting region totals")
         }
         regionTotals <- reshape2::melt(regionTotals, id.vars = c("covMin", "methSD"))
-        regionTotals$variable <- as.character(regionTotals$variable) %>% 
-                str_replace_all(pattern = c("totalRegions_K" = "Total Regions (Thousands)", "totalWidth_Mb" = "Total Width (Mb)", 
+        regionTotals$variable <- as.character(regionTotals$variable) %>%
+                str_replace_all(pattern = c("totalRegions_K" = "Total Regions (Thousands)", "totalWidth_Mb" = "Total Width (Mb)",
                                             "totalN_M" = "Total CpGs (Millions)")) %>%
                 factor(levels = c("Total Regions (Thousands)", "Total Width (Mb)", "Total CpGs (Millions)"))
         gg <- ggplot(data = regionTotals)
         gg <- gg +
                 geom_line(aes(x = methSD, y = value, group = covMin, color = covMin)) +
-                geom_text(data = subset(regionTotals, methSD == min(methSD)), 
-                          aes(x = methSD, y = value, group = covMin, color = covMin, label = covMin), 
+                geom_text(data = subset(regionTotals, methSD == min(methSD)),
+                          aes(x = methSD, y = value, group = covMin, color = covMin, label = covMin),
                           size = 4.5, check_overlap = TRUE, nudge_x = -0.001, hjust = 1) +
                 facet_wrap(vars(variable), nrow = 3, ncol = 1, scales = "free_y", strip.position = "left") +
                 xlab("SD Cutoff") +
@@ -342,12 +342,12 @@ plotRegionTotals <- function(regionTotals, nBreaks = 4, legend.position = c(1.08
                 theme_bw(base_size = 24) +
                 theme(axis.text = element_text(size = 14, color = "black"),
                       axis.ticks = element_line(size = 1.25, color = "black"), axis.title.x = element_text(size = 18),
-                      axis.title.y = element_blank(), legend.background = element_blank(), legend.position = legend.position, 
-                      legend.title = element_text(size = 18), legend.text = element_text(size = 14), 
-                      panel.border = element_rect(color = "black", size = 1.25), 
+                      axis.title.y = element_blank(), legend.background = element_blank(), legend.position = legend.position,
+                      legend.title = element_text(size = 18), legend.text = element_text(size = 14),
+                      panel.border = element_rect(color = "black", size = 1.25),
                       panel.grid = element_blank(), panel.spacing.x = unit(0.3, "lines"),
                       panel.spacing.y = unit(0.8, "lines"), plot.margin = unit(c(1,7,0.7,0.2), "lines"),
-                      strip.background = element_blank(), strip.placement = "outside", 
+                      strip.background = element_blank(), strip.placement = "outside",
                       strip.switch.pad.wrap = unit(0, "lines"), strip.text = element_text(size = 18))
         if(save){
                 if(verbose){
@@ -360,7 +360,7 @@ plotRegionTotals <- function(regionTotals, nBreaks = 4, legend.position = c(1.08
 
 filterRegions <- function(regions, covMin = 10, methSD = 0.05, save = TRUE, file = "Filtered_Regions.txt", verbose = TRUE){
         if(verbose){
-                message("[getRegions] Filtering regions for at least ", covMin, 
+                message("[getRegions] Filtering regions for at least ", covMin,
                         " reads in all samples and methylation SD of at least ", methSD * 100, "%")
         }
         regions <- regions[regions$covMin >= covMin & regions$methSD >= methSD,]
@@ -392,7 +392,7 @@ getRegionMeth <- function(regions, bs, type = "raw", save = TRUE, file = "Region
         return(meth)
 }
 
-adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1), save = TRUE, 
+adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1), save = TRUE,
                              file = "Adjusted_Region_Methylation.rds", verbose = TRUE){
         if(verbose){
                 message("[adjustRegionMeth] Determining number of principal components to adjust for")
@@ -411,7 +411,7 @@ adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
         return(methAdj)
 }
 
-getDendro <- function(x, transpose = FALSE, distance = c("euclidean", "pearson", "bicor"), maxPOutliers = 0.1, 
+getDendro <- function(x, transpose = FALSE, distance = c("euclidean", "pearson", "bicor"), maxPOutliers = 0.1,
                       verbose = TRUE){
         if(transpose){
                 if(verbose){
@@ -436,7 +436,7 @@ getDendro <- function(x, transpose = FALSE, distance = c("euclidean", "pearson",
                                 if(verbose){
                                         message("[getDendro] Clustering with bicor correlation as the distance")
                                 }
-                                dist <- (1 - bicor(x, maxPOutliers = maxPOutliers, use = "pairwise.complete.obs")) %>% 
+                                dist <- (1 - bicor(x, maxPOutliers = maxPOutliers, use = "pairwise.complete.obs")) %>%
                                         as.dist()
                         } else {
                                 stop("[getDendro] Error: Distance must be either euclidean, pearson, or bicor")
@@ -448,7 +448,7 @@ getDendro <- function(x, transpose = FALSE, distance = c("euclidean", "pearson",
         return(dendro)
 }
 
-plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(0.03,0.03), expandY = c(0.3,0.08), 
+plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(0.03,0.03), expandY = c(0.3,0.08),
                        nBreaks = 4, save = TRUE, file = "Dendrogram.pdf", width = 11, height = 4.25, verbose = TRUE){
         if(verbose){
                 message("[plotDendro] Plotting dendrogram")
@@ -465,13 +465,13 @@ plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(0.03,0
                 scale_y_continuous(expand = expansion(mult = expandY), breaks = breaks_pretty(n = nBreaks)) +
                 ylab("Height") +
                 theme_dendro() +
-                theme(plot.margin = unit(c(1,1,0,1), "lines"), 
+                theme(plot.margin = unit(c(1,1,0,1), "lines"),
                       panel.background = element_rect(color = "black", fill = "white", size = 1.1),
-                      axis.ticks.y = element_line(), axis.text.y = element_text(size = 12, color = "black"), 
+                      axis.ticks.y = element_line(), axis.text.y = element_text(size = 12, color = "black"),
                       axis.title.y = element_text(size = 16, angle = 90, vjust = 2))
         if(label){
                 gg <- gg +
-                        geom_text(data = dendroPlot$labels, aes(x = x, y = y, label = label), angle = 90, hjust = 1, 
+                        geom_text(data = dendroPlot$labels, aes(x = x, y = y, label = label), angle = 90, hjust = 1,
                                   size = labelSize)
         }
         if(save){
@@ -483,26 +483,26 @@ plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(0.03,0
         return(gg)
 }
 
-getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor"), maxPOutliers = 0.1, 
+getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor"), maxPOutliers = 0.1,
                          RsquaredCut = 0.8, blockSize = 40000, gcInterval = blockSize - 1, save = TRUE,
                          file = "Soft_Power.rds", verbose = TRUE){
         corType <- match.arg(corType)
         if(verbose){
-                message("[getSoftPower] Analyzing scale-free topology with ", corType, 
+                message("[getSoftPower] Analyzing scale-free topology with ", corType,
                         " correlation to determine best soft-thresholding power")
                 verboseNum <- 1
         } else {
                 verboseNum <- 0
         }
         if(corType == "pearson"){
-                sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector, networkType = "signed", 
-                                         moreNetworkConcepts = TRUE, corFnc = "cor", blockSize = blockSize, 
+                sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector, networkType = "signed",
+                                         moreNetworkConcepts = TRUE, corFnc = "cor", blockSize = blockSize,
                                          gcInterval = gcInterval, verbose = verboseNum)
         } else {
                 if(corType == "bicor"){
-                        sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector, 
-                                                 networkType = "signed", moreNetworkConcepts = TRUE, corFnc = "bicor", 
-                                                 corOptions = list(maxPOutliers = maxPOutliers), blockSize = blockSize, 
+                        sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector,
+                                                 networkType = "signed", moreNetworkConcepts = TRUE, corFnc = "bicor",
+                                                 corOptions = list(maxPOutliers = maxPOutliers), blockSize = blockSize,
                                                  gcInterval = gcInterval, verbose = verboseNum)
                 } else {
                         stop("[getSoftPower] Error: corType must be either pearson or bicor")
@@ -513,8 +513,8 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
                 sft$powerEstimate <- sft$fitIndices$Power[fit == max(fit)]
         }
         if(verbose){
-                message("[getSoftPower] At soft power threshold = ", sft$powerEstimate, 
-                        ", fit = ", round(sft$fitIndices$SFT.R.sq[sft$fitIndices$Power == sft$powerEstimate], 3), 
+                message("[getSoftPower] At soft power threshold = ", sft$powerEstimate,
+                        ", fit = ", round(sft$fitIndices$SFT.R.sq[sft$fitIndices$Power == sft$powerEstimate], 3),
                         " and mean connectivity = ", round(sft$fitIndices$mean.k.[sft$fitIndices$Power == sft$powerEstimate], 1))
         }
         if(save){
@@ -526,21 +526,21 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
         return(sft)
 }
 
-plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 4, save = TRUE, 
+plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 4, save = TRUE,
                           file = "Soft_Power_Plots.pdf", width = 8.5, height = 4.25, verbose = TRUE){
         if(verbose){
                 message("[plotSoftPower] Plotting scale-free topology fit and mean connectivity by soft power threshold")
         }
-        fitIndices <- data.frame(power = sft$fitIndices$Power, 
+        fitIndices <- data.frame(power = sft$fitIndices$Power,
                                  fit = -sign(sft$fitIndices[,"slope"]) * sft$fitIndices[,"SFT.R.sq"],
                                  log10_meanConnectivity = log10(sft$fitIndices$mean.k.),
-                                 powerEstimate = sft$powerEstimate) %>% 
+                                 powerEstimate = sft$powerEstimate) %>%
                 reshape2::melt(id.vars = c("power", "powerEstimate"))
         powerEstimateY <- min(0, fitIndices$value)
         gg <- ggplot(data = fitIndices)
         gg <- gg +
                 geom_vline(aes(xintercept = powerEstimate), color = lineCol) +
-                geom_text(aes(x = powerEstimate, y = powerEstimateY, label = powerEstimate), color = lineCol, 
+                geom_text(aes(x = powerEstimate, y = powerEstimateY, label = powerEstimate), color = lineCol,
                           nudge_x = -1) +
                 geom_point(aes(x = power, y = value), color = pointCol, size = 1.2) +
                 facet_wrap(vars(variable), nrow = 1, ncol = 2, scales = "free_y", strip.position = "left") +
@@ -551,11 +551,11 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
                 theme_bw(base_size = 24) +
                 theme(axis.text = element_text(size = 12, color = "black"),
                       axis.ticks = element_line(size = 1.25, color = "black"), axis.title.x = element_text(size = 16),
-                      axis.title.y = element_blank(), legend.position = "none", 
-                      panel.border = element_rect(color = "black", size = 1.25), 
+                      axis.title.y = element_blank(), legend.position = "none",
+                      panel.border = element_rect(color = "black", size = 1.25),
                       panel.grid = element_blank(), panel.spacing.x = unit(0.3, "lines"),
                       panel.spacing.y = unit(0.8, "lines"), plot.margin = unit(c(1,1,0.7,0.2), "lines"),
-                      strip.background = element_blank(), strip.placement = "outside", 
+                      strip.background = element_blank(), strip.placement = "outside",
                       strip.switch.pad.wrap = unit(0, "lines"), strip.text.x = element_text(size = 16))
         if(save){
                 if(verbose){
@@ -566,8 +566,8 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
         return(gg)
 }
 
-getModules <- function(meth, power, regions, maxBlockSize = 40000, corType = c("pearson", "bicor"), 
-                       maxPOutliers = 0.1, deepSplit = 4, minModuleSize = 10, mergeCutHeight = 0.1, nThreads = 4, save = TRUE, 
+getModules <- function(meth, power, regions, maxBlockSize = 40000, corType = c("pearson", "bicor"),
+                       maxPOutliers = 0.1, deepSplit = 4, minModuleSize = 10, mergeCutHeight = 0.1, nThreads = 4, save = TRUE,
                        file = "Modules.rds", verbose = TRUE){
         if(is.null(power)){
                 stop("[getModules] You must select a soft power threshold")
@@ -585,9 +585,9 @@ getModules <- function(meth, power, regions, maxBlockSize = 40000, corType = c("
         } else {
                 verboseNum <- 0
         }
-        modules <- blockwiseModules(meth, checkMissingData = FALSE, maxBlockSize = maxBlockSize, corType = corType, 
-                                    maxPOutliers = maxPOutliers, power = power, networkType = "signed", TOMtype = "signed", 
-                                    deepSplit = deepSplit, minModuleSize = minModuleSize, mergeCutHeight = mergeCutHeight, 
+        modules <- blockwiseModules(meth, checkMissingData = FALSE, maxBlockSize = maxBlockSize, corType = corType,
+                                    maxPOutliers = maxPOutliers, power = power, networkType = "signed", TOMtype = "signed",
+                                    deepSplit = deepSplit, minModuleSize = minModuleSize, mergeCutHeight = mergeCutHeight,
                                     nThreads = nThreads, verbose = verboseNum)
         if(verbose){
                 message("[getModules] Assigning modules and calculating module membership using ", corType, " correlation")
@@ -629,9 +629,9 @@ plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pd
                 }
                 pdf(file = file, width = width, height = height)
         }
-        invisible(mapply(FUN = plotDendroAndColors, dendro = modules$dendrograms, colors = blockColors, main = blockNames, 
-                         MoreArgs = list(groupLabels = "Modules", dendroLabels = FALSE, marAll = c(1.5,5,3,1.5), saveMar = FALSE, 
-                                         cex.lab = 1.2, cex.colorLabels = 1.2, autoColorHeight = FALSE, lwd = 0.8, 
+        invisible(mapply(FUN = plotDendroAndColors, dendro = modules$dendrograms, colors = blockColors, main = blockNames,
+                         MoreArgs = list(groupLabels = "Modules", dendroLabels = FALSE, marAll = c(1.5,5,3,1.5), saveMar = FALSE,
+                                         cex.lab = 1.2, cex.colorLabels = 1.2, autoColorHeight = FALSE, lwd = 0.8,
                                          colorHeight = 0.15, cex.axis = 1, frame.plot = TRUE)))
         invisible(dev.off())
 }
@@ -651,7 +651,7 @@ getModuleBED <- function(regions, grey = FALSE, save = TRUE, file = "Modules.bed
         }
         regions$RegionID <- paste(regions$RegionID, regions$module, sep = "_")
         regions$rgb <- col2rgb(regions$module) %>% apply(2, paste, collapse = ",")
-        BED <- cbind(regions[c("chr", "start", "end", "RegionID")], score = 0, strand = ".", thickStart = 0, thickEnd = 0, 
+        BED <- cbind(regions[c("chr", "start", "end", "RegionID")], score = 0, strand = ".", thickStart = 0, thickEnd = 0,
                      rgb = regions$rgb)
         if(save){
                 if(verbose){
@@ -664,11 +664,11 @@ getModuleBED <- function(regions, grey = FALSE, save = TRUE, file = "Modules.bed
         return(BED)
 }
 
-plotHeatmap <- function(x, rowDendro, colDendro, colors = blueWhiteRed(100, gamma = 0.3), limit = max(abs(x)), 
+plotHeatmap <- function(x, rowDendro, colDendro, colors = blueWhiteRed(100, gamma = 0.3), limit = max(abs(x)),
                         axis.text.size = 8, legend.title = "Bicor", legend.title.size = 16, legend.text.size = 12,
-                        legend.position = c(0.3,0.905), rowDendroMargins = c(-1.55,1,-0.1,-1.1), 
+                        legend.position = c(0.3,0.905), rowDendroMargins = c(-1.55,1,-0.1,-1.1),
                         colDendroMargins = c(1,-0.5,-1,0.8), rowColorMargins = c(-1.85,-1.5,0.55,1.7),
-                        colColorMargins = c(-1.6,-0.85,1.8,0.55), save = TRUE, file = "Heatmap.pdf", width = 11, 
+                        colColorMargins = c(-1.6,-0.85,1.8,0.55), save = TRUE, file = "Heatmap.pdf", width = 11,
                         height = 9.5, verbose = TRUE){
         if(verbose){
                 message("[plotHeatmap] Plotting heatmap with dendrograms")
@@ -688,14 +688,14 @@ plotHeatmap <- function(x, rowDendro, colDendro, colors = blueWhiteRed(100, gamm
                 geom_tile(aes(x = variable, y = rowID, color = value, fill = value)) +
                 scale_fill_gradientn(legend.title, colors = colors, limits = limits, aesthetics = c("color", "fill")) +
                 theme_bw(base_size = 24) +
-                theme(axis.text.x = element_text(size = axis.text.size, color = "black", angle = 90, vjust = 0.5), 
-                      axis.text.y = element_text(size = axis.text.size, color = "black"), 
-                      axis.ticks = element_line(size = 0.8, color = "black"), 
+                theme(axis.text.x = element_text(size = axis.text.size, color = "black", angle = 90, vjust = 0.5),
+                      axis.text.y = element_text(size = axis.text.size, color = "black"),
+                      axis.ticks = element_line(size = 0.8, color = "black"),
                       axis.title = element_blank(), legend.position = "none", panel.background = element_blank(),
-                      panel.border = element_rect(color = "black", size = 1.25), panel.grid = element_blank(), 
+                      panel.border = element_rect(color = "black", size = 1.25), panel.grid = element_blank(),
                       plot.background = element_blank(), plot.margin = unit(c(0,1,hmMarginB,hmMarginL), "lines"))
         legend <- get_legend(heatmap + theme(legend.position = legend.position, legend.background = element_blank(),
-                                             legend.title = element_text(size = legend.title.size), 
+                                             legend.title = element_text(size = legend.title.size),
                                              legend.text = element_text(size = legend.text.size)))
         rowDendroPlot <- ggplot(data = dendro_data(rowDendro)$segments) +
                 geom_segment(aes(x = -x, y = y, xend = -xend, yend = yend), lwd = 0.5, lineend = "square") +
@@ -730,8 +730,8 @@ plotHeatmap <- function(x, rowDendro, colDendro, colors = blueWhiteRed(100, gamm
                         theme(legend.position = "none", plot.margin = unit(colColorMargins, "lines"))
                 heatmap <- heatmap + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
         }
-        gg <- plot_grid(NULL, colDendroPlot, NULL, NULL, rowColors, heatmap, rowDendroPlot, legend, NULL, colColors, 
-                        NULL, NULL, nrow = 3, ncol = 4, rel_widths = c(0.045, 1, 0.15, 0.15), 
+        gg <- plot_grid(NULL, colDendroPlot, NULL, NULL, rowColors, heatmap, rowDendroPlot, legend, NULL, colColors,
+                        NULL, NULL, nrow = 3, ncol = 4, rel_widths = c(0.045, 1, 0.15, 0.15),
                         rel_heights = c(0.15, 1, 0.045))
         if(save){
                 if(verbose){
@@ -755,7 +755,7 @@ getCor <- function(x, y = NULL, transpose = FALSE, corType = c("bicor", "pearson
                 message("[getCor] Calculating correlations using ", corType, " correlation")
         }
         if(corType == "bicor"){
-                cor <- bicor(x, y = y, use = "pairwise.complete.obs", maxPOutliers = maxPOutliers, 
+                cor <- bicor(x, y = y, use = "pairwise.complete.obs", maxPOutliers = maxPOutliers,
                              robustY = robustY, pearsonFallback = "none")
         } else {
                 if(corType == "pearson"){
@@ -767,8 +767,8 @@ getCor <- function(x, y = NULL, transpose = FALSE, corType = c("bicor", "pearson
         return(cor)
 }
 
-getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"), maxPOutliers = 0.1, robustY = FALSE, 
-                          adjMethod = c("fdr", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "none"), 
+getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"), maxPOutliers = 0.1, robustY = FALSE,
+                          adjMethod = c("fdr", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "none"),
                           save = TRUE, file = "ME_Trait_Correlation_Stats.txt", verbose = TRUE){
         corType <- match.arg(corType)
         adjMethod <- match.arg(adjMethod)
@@ -778,7 +778,7 @@ getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"), maxPOut
         }
         colData <- colData[rownames(MEs),]
         if(corType == "bicor"){
-                cor <- bicorAndPvalue(x = MEs, y = colData, maxPOutliers = maxPOutliers, robustY = robustY, 
+                cor <- bicorAndPvalue(x = MEs, y = colData, maxPOutliers = maxPOutliers, robustY = robustY,
                                       pearsonFallback = "none")
         } else {
                 if(corType == "pearson"){
@@ -811,11 +811,11 @@ getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"), maxPOut
         return(stats)
 }
 
-plotMEtraitCor <- function(MEtraitCor, moduleOrder = 1:length(unique(MEtraitCor$module)), 
-                           traitOrder = 1:length(unique(MEtraitCor$trait)), sigOnly = FALSE, adj_p = 0.05, star.size = 8, 
-                           star.nudge_y = -0.38, colors = blueWhiteRed(100, gamma = 0.9), limit = NULL, 
-                           axis.text.size = 12, legend.position = c(1.08, 0.915), legend.text.size = 12, 
-                           legend.title.size = 16, colColorMargins = c(-0.7,4.21,1.2,11.07), save = TRUE, 
+plotMEtraitCor <- function(MEtraitCor, moduleOrder = 1:length(unique(MEtraitCor$module)),
+                           traitOrder = 1:length(unique(MEtraitCor$trait)), sigOnly = FALSE, adj_p = 0.05, star.size = 8,
+                           star.nudge_y = -0.38, colors = blueWhiteRed(100, gamma = 0.9), limit = NULL,
+                           axis.text.size = 12, legend.position = c(1.08, 0.915), legend.text.size = 12,
+                           legend.title.size = 16, colColorMargins = c(-0.7,4.21,1.2,11.07), save = TRUE,
                            file = "ME_Trait_Correlation_Heatmap.pdf", width = 11, height = 9.5, verbose = TRUE){
         if(verbose){
                 message("[plotMEtraitCor] Plotting ME trait correlation heatmap")
@@ -827,7 +827,7 @@ plotMEtraitCor <- function(MEtraitCor, moduleOrder = 1:length(unique(MEtraitCor$
                 sigModules <- MEtraitCor$module[MEtraitCor$Significant == "TRUE"] %>% unique() %>% as.character()
                 sigTraits <- MEtraitCor$trait[MEtraitCor$Significant == "TRUE"] %>% unique() %>% as.character()
                 MEtraitCor <- subset(MEtraitCor, module %in% sigModules & trait %in% sigTraits)
-                MEtraitCor$module <- factor(MEtraitCor$module, 
+                MEtraitCor$module <- factor(MEtraitCor$module,
                                             levels = levels(MEtraitCor$module)[levels(MEtraitCor$module) %in% sigModules])
         }
         if("bicor" %in% colnames(MEtraitCor)){
@@ -845,21 +845,21 @@ plotMEtraitCor <- function(MEtraitCor, moduleOrder = 1:length(unique(MEtraitCor$
         }
         heatmap <- ggplot(data = MEtraitCor) +
                 geom_tile(aes(x = module, y = trait, color = corData, fill = corData)) +
-                geom_text(aes(x = module, y = trait, alpha = Significant), label = "*", color = "black", 
+                geom_text(aes(x = module, y = trait, alpha = Significant), label = "*", color = "black",
                           size = star.size, nudge_y = star.nudge_y) +
-                scale_fill_gradientn(str_to_title(corType), colors = colors, limits = c(-limit, limit), 
+                scale_fill_gradientn(str_to_title(corType), colors = colors, limits = c(-limit, limit),
                                      aesthetics = c("color", "fill")) +
                 scale_x_discrete(expand = expansion(mult = 0.01)) +
                 scale_y_discrete(expand = expansion(mult = 0.01)) +
                 scale_alpha_manual(breaks = c("TRUE", "FALSE"), values = c("TRUE" = 1, "FALSE" = 0), guide = FALSE) +
                 theme_bw(base_size = 24) +
-                theme(axis.text.x = element_blank(), axis.text.y = element_text(size = axis.text.size, color = "black"), 
-                      axis.ticks.x = element_blank(), axis.ticks.y = element_line(size = 0.8, color = "black"), 
-                      axis.title = element_blank(), legend.background = element_blank(), legend.position = legend.position, 
-                      legend.text = element_text(size = legend.text.size), legend.title = element_text(size = legend.title.size), 
-                      panel.background = element_blank(), panel.border = element_rect(color = "black", size = 1.25), 
+                theme(axis.text.x = element_blank(), axis.text.y = element_text(size = axis.text.size, color = "black"),
+                      axis.ticks.x = element_blank(), axis.ticks.y = element_line(size = 0.8, color = "black"),
+                      axis.title = element_blank(), legend.background = element_blank(), legend.position = legend.position,
+                      legend.text = element_text(size = legend.text.size), legend.title = element_text(size = legend.title.size),
+                      panel.background = element_blank(), panel.border = element_rect(color = "black", size = 1.25),
                       panel.grid = element_blank(), plot.background = element_blank(), plot.margin = unit(c(1,6,1,1), "lines"))
-        colColors <- ggplot(data = data.frame(x = 1:length(levels(MEtraitCor$module)), y = 0, 
+        colColors <- ggplot(data = data.frame(x = 1:length(levels(MEtraitCor$module)), y = 0,
                                               color = levels(MEtraitCor$module))) +
                 geom_tile(aes(x = x, y = y, color = color, fill = color)) +
                 scale_fill_identity(aesthetics = c("color", "fill")) +
@@ -875,7 +875,7 @@ plotMEtraitCor <- function(MEtraitCor, moduleOrder = 1:length(unique(MEtraitCor$
         return(gg)
 }
 
-plotMEtraitDot <- function(ME, trait, traitCode = NULL, colors = NULL, fun.data = "median_hilow", 
+plotMEtraitDot <- function(ME, trait, traitCode = NULL, colors = NULL, fun.data = "median_hilow",
                            fun.args = list(conf.int = 0.5), binwidth = 0.01, stackratio = 1.4, dotsize = 0.85, ylim = NULL,
                            nBreaks = 4, axis.title.size = 20, axis.text.size = 16, xlab = "Trait", ylab = "Module Eigennode",
                            save = TRUE, file = "ME_Trait_Dotplot.pdf", width = 6, height = 6, verbose = TRUE){
@@ -888,17 +888,17 @@ plotMEtraitDot <- function(ME, trait, traitCode = NULL, colors = NULL, fun.data 
                 trait <- as.factor(trait)
         }
         dotplot <- ggplot() +
-                stat_summary(aes(x = trait, y = ME, group = trait), fun.data = fun.data, geom = "crossbar", 
+                stat_summary(aes(x = trait, y = ME, group = trait), fun.data = fun.data, geom = "crossbar",
                              color = "black", size = 0.5, fun.args = fun.args) +
-                geom_dotplot(aes(x = trait, y = ME, fill = trait, color = trait), binwidth = binwidth, binaxis = "y", 
+                geom_dotplot(aes(x = trait, y = ME, fill = trait, color = trait), binwidth = binwidth, binaxis = "y",
                              stackdir = "center", position = "dodge", stackratio = stackratio, dotsize = dotsize) +
                 coord_cartesian(ylim = ylim) +
                 scale_y_continuous(breaks = breaks_pretty(n = nBreaks)) +
                 theme_bw(base_size = 25) +
                 theme(legend.position = "none", panel.grid.major = element_blank(),
-                      panel.border = element_rect(color = "black", size = 1.25), axis.ticks = element_line(size = 1.25), 
+                      panel.border = element_rect(color = "black", size = 1.25), axis.ticks = element_line(size = 1.25),
                       panel.grid.minor = element_blank(), strip.background = element_blank(),
-                      axis.text = element_text(color = "black", size = axis.text.size), 
+                      axis.text = element_text(color = "black", size = axis.text.size),
                       axis.title = element_text(size = axis.title.size), plot.margin = unit(c(1,1,1,1), "lines")) +
                 xlab(xlab) +
                 ylab(ylab)
@@ -912,23 +912,23 @@ plotMEtraitDot <- function(ME, trait, traitCode = NULL, colors = NULL, fun.data 
         ggsave(file, plot = dotplot, dpi = 600, width = width, height = height, units = "in")
 }
 
-plotMEtraitScatter <- function(ME, trait, color = "#132B43", xlim = NULL, ylim = NULL, nBreaks = 4, point.size = 2.5, 
-                               axis.title.size = 20, axis.text.size = 16, xlab = "Trait", ylab = "Module Eigennode", 
+plotMEtraitScatter <- function(ME, trait, color = "#132B43", xlim = NULL, ylim = NULL, nBreaks = 4, point.size = 2.5,
+                               axis.title.size = 20, axis.text.size = 16, xlab = "Trait", ylab = "Module Eigennode",
                                save = TRUE, file = "ME_Trait_Scatterplot.pdf", width = 6, height = 6, verbose = TRUE){
         if(verbose){
                 message("[plotMEtraitScatter] Plotting module eigennode by continuous trait")
         }
         scatterplot <- ggplot() +
-                geom_smooth(aes(x = trait, y = ME), method = MASS::rlm, formula = y ~ x, color = "#56B1F7", fill = "#336A98") +   
-                geom_point(aes(x = trait, y = ME), color = color, size = point.size) +   
+                geom_smooth(aes(x = trait, y = ME), method = MASS::rlm, formula = y ~ x, color = "#56B1F7", fill = "#336A98") +
+                geom_point(aes(x = trait, y = ME), color = color, size = point.size) +
                 coord_cartesian(xlim = xlim, ylim = ylim) +
                 scale_x_continuous(breaks = breaks_pretty(n = nBreaks)) +
                 scale_y_continuous(breaks = breaks_pretty(n = nBreaks)) +
                 theme_bw(base_size = 25) +
                 theme(legend.position = "none", panel.grid.major = element_blank(),
-                      panel.border = element_rect(color = "black", size = 1.25), axis.ticks = element_line(size = 1.25), 
+                      panel.border = element_rect(color = "black", size = 1.25), axis.ticks = element_line(size = 1.25),
                       panel.grid.minor = element_blank(), strip.background = element_blank(),
-                      axis.text = element_text(color = "black", size = axis.text.size), 
+                      axis.text = element_text(color = "black", size = axis.text.size),
                       axis.title = element_text(size = axis.title.size), plot.margin = unit(c(1,1,1,1), "lines")) +
                 xlab(xlab) +
                 ylab(ylab)
@@ -938,7 +938,7 @@ plotMEtraitScatter <- function(ME, trait, color = "#132B43", xlim = NULL, ylim =
         ggsave(file, plot = scatterplot, dpi = 600, width = width, height = height, units = "in")
 }
 
-plotMethTrait <- function(module, regions, meth, trait, discrete = NULL, traitCode = NULL, traitColors = NULL, 
+plotMethTrait <- function(module, regions, meth, trait, discrete = NULL, traitCode = NULL, traitColors = NULL,
                           heatmapColors = blueWhiteRed(100, gamma = 0.3), limit = NULL, expandY = 0.05, axis.text.size = 11,
                           heatmap.legend.position = c(1.1,0.743), trait.legend.position = c(1.017,4.39),
                           heatmap.legend.title = "Relative\nMethylation (%)", trait.legend.title = "Trait",
@@ -966,26 +966,26 @@ plotMethTrait <- function(module, regions, meth, trait, discrete = NULL, traitCo
         }
         heatmap <- ggplot(data = meth) +
                 geom_tile(aes(x = Var2, y = Var1, color = value, fill = value)) +
-                scale_fill_gradientn(heatmap.legend.title, colors = heatmapColors, limits = c(-limit,limit), 
+                scale_fill_gradientn(heatmap.legend.title, colors = heatmapColors, limits = c(-limit,limit),
                                      aesthetics = c("color", "fill")) +
                 scale_y_discrete(expand = expansion(mult = expandY)) +
                 theme_bw(base_size = 24) +
                 theme(axis.text.x = element_blank(), axis.text.y = element_text(size = axis.text.size, color = "black"),
                       axis.ticks.x = element_blank(), axis.ticks.y = element_line(size = 0.8, color = "black"),
-                      axis.title = element_blank(), legend.background = element_blank(), 
-                      legend.position = heatmap.legend.position, legend.text = element_text(size = legend.text.size), 
-                      legend.title = element_text(size = legend.title.size), panel.background = element_blank(), 
-                      panel.border = element_rect(color = "black", size = 1.25), panel.grid = element_blank(), 
+                      axis.title = element_blank(), legend.background = element_blank(),
+                      legend.position = heatmap.legend.position, legend.text = element_text(size = legend.text.size),
+                      legend.title = element_text(size = legend.title.size), panel.background = element_blank(),
+                      panel.border = element_rect(color = "black", size = 1.25), panel.grid = element_blank(),
                       plot.background = element_blank(), plot.margin = unit(heatmapMargins, "lines"))
         colColors <- ggplot(data = data.frame(x = 1:length(trait), y = 0, color = sort(trait))) +
                 geom_tile(aes(x = x, y = y, color = color, fill = color)) +
                 theme_void() +
-                theme(legend.position = trait.legend.position, legend.text = element_text(size = legend.text.size), 
+                theme(legend.position = trait.legend.position, legend.text = element_text(size = legend.text.size),
                       legend.title = element_text(size = legend.title.size), plot.margin = unit(traitMargins, "lines"))
         if(discrete){
                 if(!is.null(traitColors)){
                         colColors <- colColors +
-                                scale_color_manual(trait.legend.title, breaks = names(traitColors), values = traitColors, 
+                                scale_color_manual(trait.legend.title, breaks = names(traitColors), values = traitColors,
                                                    aesthetics = c("color", "fill"))
                 } else {
                         colColors <- colColors +
@@ -1004,10 +1004,10 @@ plotMethTrait <- function(module, regions, meth, trait, discrete = NULL, traitCo
         }
 }
 
-annotateModule <- function(regions, module = NULL, grey = FALSE, genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "danRer7"), 
-                           includeCuratedRegDoms = FALSE, rule = c("basalPlusExt", "twoClosest", "oneClosest"), 
-                           adv_upstream = 5, adv_downstream = 1, adv_span = 1000, adv_twoDistance = 1000, 
-                           adv_oneDistance = 1000, version = c("4.0.4", "3.0.0", "2.0.2"), save = TRUE, 
+annotateModule <- function(regions, module = NULL, grey = FALSE, genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "danRer7"),
+                           includeCuratedRegDoms = FALSE, rule = c("basalPlusExt", "twoClosest", "oneClosest"),
+                           adv_upstream = 5, adv_downstream = 1, adv_span = 1000, adv_twoDistance = 1000,
+                           adv_oneDistance = 1000, version = c("4.0.4", "3.0.0", "2.0.2"), save = TRUE,
                            file = "Annotated_Module_Regions.txt", verbose =  TRUE){
         if(!is.null(module)){
                 if(verbose){
@@ -1037,13 +1037,13 @@ annotateModule <- function(regions, module = NULL, grey = FALSE, genome = c("hg3
                               adv_upstream = adv_upstream, adv_downstream = adv_downstream, adv_span = adv_span,
                               adv_twoDistance = adv_twoDistance, adv_oneDistance = adv_oneDistance, request_interval = 0,
                               version = version)
-        regions_genes <- suppressGraphics(plotRegionGeneAssociationGraphs(job, type = 1, request_interval = 0)) %>% 
+        regions_genes <- suppressGraphics(plotRegionGeneAssociationGraphs(job, type = 1, request_interval = 0)) %>%
                 as.data.frame() %>%
-                merge(x = regions[,c("RegionID", "chr", "start", "end")], 
-                      y = .[,c("seqnames", "start", "end", "gene", "distTSS")], by.x = c("chr", "start", "end"), 
+                merge(x = regions[,c("RegionID", "chr", "start", "end")],
+                      y = .[,c("seqnames", "start", "end", "gene", "distTSS")], by.x = c("chr", "start", "end"),
                       by.y = c("seqnames", "start", "end"), all = TRUE, sort = FALSE)
         regions_genes$RegionID <- factor(regions_genes$RegionID, levels = unique(regions_genes$RegionID))
-        colnames(regions_genes) <- str_replace_all(colnames(regions_genes), pattern = c("gene" = "gene_symbol", 
+        colnames(regions_genes) <- str_replace_all(colnames(regions_genes), pattern = c("gene" = "gene_symbol",
                                                                                         "distTSS" = "distance_to_TSS"))
         if(verbose){
                 message("[annotateModule] Adding gene info from BioMart")
@@ -1051,19 +1051,19 @@ annotateModule <- function(regions, module = NULL, grey = FALSE, genome = c("hg3
         dataset <- str_sub(genome, start = 1, end = 2) %>% switch(hg = "hsapiens_gene_ensembl", mm = "mmusculus_gene_ensembl",
                                                                   da = "drerio_gene_ensembl")
         ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset = dataset)
-        genes_annotated <- suppressMessages(getBM(attributes = c("external_gene_name", "description", "ensembl_gene_id", "entrezgene_id"), 
+        genes_annotated <- suppressMessages(getBM(attributes = c("external_gene_name", "description", "ensembl_gene_id", "entrezgene_id"),
                                                   filters = c("external_gene_name"), values = regions_genes$gene, mart = ensembl,
                                                   useCache = FALSE))
         colnames(genes_annotated) <- colnames(genes_annotated) %>%
                 str_replace_all(pattern = c("external_gene_name" = "gene_symbol", "description" = "gene_description",
                                             "ensembl_gene_id" = "gene_ensemblID", "entrezgene_id" = "gene_entrezID"))
-        genes_annotated$gene_description <- str_split_fixed(genes_annotated$gene_description, 
+        genes_annotated$gene_description <- str_split_fixed(genes_annotated$gene_description,
                                                             pattern = fixed(" ["), n = 2)[,1] %>%
                 str_remove_all(",")
-        regions_annotated <- merge(x = regions_genes, y = genes_annotated, by = "gene_symbol", all.x = TRUE, all.y = FALSE, 
-                                   sort = FALSE) %>% 
+        regions_annotated <- merge(x = regions_genes, y = genes_annotated, by = "gene_symbol", all.x = TRUE, all.y = FALSE,
+                                   sort = FALSE) %>%
                 unique() %>%
-                aggregate(formula = cbind(gene_symbol, distance_to_TSS, gene_description, gene_ensemblID, gene_entrezID) ~ RegionID, 
+                aggregate(formula = cbind(gene_symbol, distance_to_TSS, gene_description, gene_ensemblID, gene_entrezID) ~ RegionID,
                           data = ., FUN = function(x) paste(x, collapse = " | "), simplify = TRUE, drop = FALSE) %>%
                 merge(x = regions, y = ., by = "RegionID", all.x = TRUE, all.y = FALSE, sort = FALSE)
         if(!genome %in% c("hg18", "danRer7")){
@@ -1073,27 +1073,27 @@ annotateModule <- function(regions, module = NULL, grey = FALSE, genome = c("hg3
                 annotations <- paste(genome, c("basicgenes", "genes_intergenic", "enhancers_fantom"), sep = "_")
                 regions_GeneReg <- suppressWarnings(suppressMessages(build_annotations(genome = genome, annotations = annotations))) %>%
                         GenomeInfoDb::keepStandardChromosomes(pruning.mode = "coarse") %>%
-                        annotate_regions(regions = GR_regions, annotations = ., ignore.strand = TRUE, quiet = TRUE) %>% 
+                        annotate_regions(regions = GR_regions, annotations = ., ignore.strand = TRUE, quiet = TRUE) %>%
                         as.data.frame()
                 colnames(regions_GeneReg)[colnames(regions_GeneReg) == "annot.type"] <- "gene_context"
                 pattern <- rep("", times = 5)
                 names(pattern) <- c(genome, "genes", "s", "fantom", "_")
                 regions_GeneReg$gene_context <- str_replace_all(regions_GeneReg$gene_context, pattern = pattern)
-                regions_annotated <- aggregate(formula = gene_context ~ RegionID, data = regions_GeneReg, 
+                regions_annotated <- aggregate(formula = gene_context ~ RegionID, data = regions_GeneReg,
                                                FUN = function(x) paste(unique(x), collapse = ", "), simplify = TRUE) %>%
-                        merge(x = regions_annotated, y = ., by = "RegionID", all.x = TRUE, all.y = FALSE, sort = FALSE) 
+                        merge(x = regions_annotated, y = ., by = "RegionID", all.x = TRUE, all.y = FALSE, sort = FALSE)
                 if(verbose){
                         message("[annotateModule] Getting CpG context from annotatr")
                 }
                 regions_CpGs <- suppressMessages(build_annotations(genome = genome, annotations = paste(genome, "cpgs", sep = "_"))) %>%
                         GenomeInfoDb::keepStandardChromosomes(pruning.mode = "coarse") %>%
-                        annotate_regions(regions = GR_regions, annotations = ., ignore.strand = TRUE, quiet = TRUE) %>% 
+                        annotate_regions(regions = GR_regions, annotations = ., ignore.strand = TRUE, quiet = TRUE) %>%
                         as.data.frame()
                 colnames(regions_CpGs)[colnames(regions_CpGs) == "annot.type"] <- "CpG_context"
                 pattern <- c("island", "shore", "shelf", "open sea")
                 names(pattern) <- paste(genome, "cpg", c("islands", "shores", "shelves", "inter"), sep = "_")
                 regions_CpGs$CpG_context <- str_replace_all(regions_CpGs$CpG_context, pattern = pattern)
-                regions_annotated <- aggregate(formula = CpG_context ~ RegionID, data = regions_CpGs, 
+                regions_annotated <- aggregate(formula = CpG_context ~ RegionID, data = regions_CpGs,
                                                FUN = function(x) paste(unique(x), collapse = ", "), simplify = TRUE) %>%
                         merge(x = regions_annotated, y = ., by = "RegionID", all.x = TRUE, all.y = FALSE, sort = FALSE)
         } else {
@@ -1101,7 +1101,7 @@ annotateModule <- function(regions, module = NULL, grey = FALSE, genome = c("hg3
                         message("[annotateModule] Gene and CpG context not supported by annotatr for hg18 and danRer7")
                 }
         }
-        regions_annotated <- regions_annotated[order(regions_annotated$module, as.integer(str_remove_all(regions_annotated$RegionID, 
+        regions_annotated <- regions_annotated[order(regions_annotated$module, as.integer(str_remove_all(regions_annotated$RegionID,
                                                                                                          pattern = "Region_"))),]
         if(save){
                 if(verbose){
@@ -1112,7 +1112,7 @@ annotateModule <- function(regions, module = NULL, grey = FALSE, genome = c("hg3
         return(regions_annotated)
 }
 
-getGeneList <- function(regions_annotated, module = NULL,type = c("symbol", "description", "ensemblID", "entrezID"), 
+getGeneList <- function(regions_annotated, module = NULL,type = c("symbol", "description", "ensemblID", "entrezID"),
                         verbose = TRUE){
         if(!is.null(module)){
                 if(verbose){
@@ -1129,7 +1129,7 @@ getGeneList <- function(regions_annotated, module = NULL,type = c("symbol", "des
         return(geneList)
 }
 
-listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "danRer7"), 
+listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "danRer7"),
                            version = c("4.0.4", "3.0.0", "2.0.2"), verbose =  TRUE){
         genome <- match.arg(genome)
         version <- match.arg(version)
@@ -1138,27 +1138,27 @@ listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "da
                 stop("[listOntologies] The ", genome, " genome assembly is not supported for GREAT v", version)
         }
         if(verbose){
-                message("[listOntologies] Getting available ontologies for GREAT v", version, " with the ", genome, 
+                message("[listOntologies] Getting available ontologies for GREAT v", version, " with the ", genome,
                         " genome assembly")
         }
         ontologies <- GRanges("chr1", ranges = IRanges(1, end = 2)) %>%
-                submitGreatJob(species = genome, request_interval = 0, version = version) %>% 
+                submitGreatJob(species = genome, request_interval = 0, version = version) %>%
                 availableOntologies()
         return(ontologies)
 }
 
-enrichModule <- function(regions, module = NULL, genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "danRer7"), 
-                         includeCuratedRegDoms = FALSE, rule = c("basalPlusExt", "twoClosest", "oneClosest"), 
-                         adv_upstream = 5, adv_downstream = 1, adv_span = 1000, adv_twoDistance = 1000, 
-                         adv_oneDistance = 1000, version = c("4.0.4", "3.0.0", "2.0.2"), 
+enrichModule <- function(regions, module = NULL, genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "danRer7"),
+                         includeCuratedRegDoms = FALSE, rule = c("basalPlusExt", "twoClosest", "oneClosest"),
+                         adv_upstream = 5, adv_downstream = 1, adv_span = 1000, adv_twoDistance = 1000,
+                         adv_oneDistance = 1000, version = c("4.0.4", "3.0.0", "2.0.2"),
                          ontologies = c("GO Molecular Function", "GO Biological Process", "GO Cellular Component",
                                         "Mouse Phenotype", "Human Phenotype"), min_background_region_hits = 5,
-                         adjMethod = c("fdr", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "none"), 
-                         min_region_hits = 2, pvalue_threshold = 0.01, save = TRUE, file = "Module_Enrichment_Results.txt", 
+                         adjMethod = c("fdr", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "none"),
+                         min_region_hits = 2, pvalue_threshold = 0.01, save = TRUE, file = "Module_Enrichment_Results.txt",
                          verbose =  TRUE){
         if(!is.null(module)){
                 if(verbose){
-                        message("[enrichModule] Analyzing functional enrichment for regions in ", 
+                        message("[enrichModule] Analyzing functional enrichment for regions in ",
                                 paste(module, collapse = ", "), " module(s)")
                 }
                 moduleRegions <- regions[regions$module %in% module,]
@@ -1177,7 +1177,7 @@ enrichModule <- function(regions, module = NULL, genome = c("hg38", "hg19", "hg1
         }
         adjMethod <- match.arg(adjMethod)
         if(verbose){
-                message("[enrichModule] Using GREAT v", version, " with the ", genome, " genome assembly and the ", rule, 
+                message("[enrichModule] Using GREAT v", version, " with the ", genome, " genome assembly and the ", rule,
                         " rule")
         }
         if(genome == "danRer7"){
@@ -1195,9 +1195,9 @@ enrichModule <- function(regions, module = NULL, genome = c("hg38", "hg19", "hg1
         enrichTables <- getEnrichmentTables(job, ontology = ontologies)
         results <- list.rbind(enrichTables)
         rownames(results) <- 1:nrow(results)
-        pattern <- c("hyper_" = "", "id" = "ID", "name" = "term", "total_regions" = "background_region_hits", 
-                     "expected" = "expected_region_hits", "foreground_region_hits" = "region_hits", 
-                     "region_set_coverage" = "region_coverage", "foreground_gene_hits" = "gene_hits", 
+        pattern <- c("hyper_" = "", "id" = "ID", "name" = "term", "total_regions" = "background_region_hits",
+                     "expected" = "expected_region_hits", "foreground_region_hits" = "region_hits",
+                     "region_set_coverage" = "region_coverage", "foreground_gene_hits" = "gene_hits",
                      "total_genes_annotated" = "term_genes", "raw_pvalue" = "p")
         colnames(results) <- colnames(results) %>% str_to_lower() %>% str_replace_all(pattern = pattern)
         results$ontology <- rep(names(enrichTables), sapply(enrichTables, nrow))
@@ -1211,12 +1211,12 @@ enrichModule <- function(regions, module = NULL, genome = c("hg38", "hg19", "hg1
         }
         results$genes <- mapply(function(x,y){
                 suppressGraphics(plotRegionGeneAssociationGraphs(job, type = 1, ontology = x, termID = y, request_interval = 0,
-                                                                 max_tries = 10000, verbose = FALSE)) %>% .$gene %>% 
+                                                                 max_tries = 10000, verbose = FALSE)) %>% .$gene %>%
                         unique() %>% sort() %>% paste(collapse = ", ")
         }, x = results$ontology, y = results$ID, USE.NAMES = FALSE)
-        results <- results[order(results$p), c("ID", "term", "ontology", "background_region_hits", "expected_region_hits", 
-                                               "region_hits", "fold_enrichment", "region_coverage", "term_region_coverage", 
-                                               "gene_hits", "genes", "background_gene_hits", "term_genes", "p", "log_p", 
+        results <- results[order(results$p), c("ID", "term", "ontology", "background_region_hits", "expected_region_hits",
+                                               "region_hits", "fold_enrichment", "region_coverage", "term_region_coverage",
+                                               "gene_hits", "genes", "background_gene_hits", "term_genes", "p", "log_p",
                                                "adj_p", "log_adj_p")]
         if(save){
                 if(verbose){
@@ -1227,8 +1227,8 @@ enrichModule <- function(regions, module = NULL, genome = c("hg38", "hg19", "hg1
         return(results)
 }
 
-plotEnrichment <- function(enrichment, nTerms = 15, fill = "#132B43", xlim = NULL, nBreaks = 4, axis.title.x.size = 20, 
-                           axis.text.x.size = 16, axis.text.y.size = 16, save = TRUE, file = "Module_Enrichment_Plot.pdf", 
+plotEnrichment <- function(enrichment, nTerms = 15, fill = "#132B43", xlim = NULL, nBreaks = 4, axis.title.x.size = 20,
+                           axis.text.x.size = 16, axis.text.y.size = 16, save = TRUE, file = "Module_Enrichment_Plot.pdf",
                            width = 8, height = 6, verbose = TRUE){
         if(verbose){
                 message("[plotEnrichment] Plotting module enrichments from GREAT")
@@ -1239,15 +1239,15 @@ plotEnrichment <- function(enrichment, nTerms = 15, fill = "#132B43", xlim = NUL
         }
         enrichment$term <- factor(enrichment$term, levels = rev(unique(enrichment$term)))
         scatterplot <- ggplot() +
-                geom_col(aes(x = term, y = log_p), data = enrichment, fill = fill) +   
+                geom_col(aes(x = term, y = log_p), data = enrichment, fill = fill) +
                 coord_flip(ylim = xlim) +
                 scale_y_continuous(breaks = breaks_pretty(n = nBreaks), expand = expansion(c(0.004, 0.03))) +
                 theme_bw(base_size = 25) +
                 theme(legend.position = "none", panel.grid.major = element_blank(),
-                      panel.border = element_rect(color = "black", size = 1.25), axis.ticks = element_line(size = 1.25), 
+                      panel.border = element_rect(color = "black", size = 1.25), axis.ticks = element_line(size = 1.25),
                       panel.grid.minor = element_blank(), strip.background = element_blank(),
-                      axis.text.x = element_text(color = "black", size = axis.text.x.size), 
-                      axis.text.y = element_text(color = "black", size = axis.text.y.size), 
+                      axis.text.x = element_text(color = "black", size = axis.text.x.size),
+                      axis.text.y = element_text(color = "black", size = axis.text.y.size),
                       axis.title.x = element_text(size = axis.title.x.size), axis.title.y = element_blank(),
                       plot.margin = unit(c(1,1,0.5,1), "lines")) +
                 ylab(expression(-log[10]*(italic(p)-value)))
@@ -1314,7 +1314,7 @@ plotDendro(sampleDendro, labelSize = 3, nBreaks = 5, file = "Sample_ME_Dendrogra
 sampleCor <- getCor(MEs, transpose = TRUE, corType = "bicor")
 plotHeatmap(sampleCor, rowDendro = sampleDendro, colDendro = sampleDendro, file = "Sample_Correlation_Heatmap.pdf")
 
-plotHeatmap(MEs, rowDendro = sampleDendro, colDendro = moduleDendro, legend.title = "Module\nEigennode", 
+plotHeatmap(MEs, rowDendro = sampleDendro, colDendro = moduleDendro, legend.title = "Module\nEigennode",
             legend.position = c(0.37,0.89), file = "Sample_ME_Heatmap.pdf")
 
 # Test Correlations between Module Eigennodes and Sample Traits ####
@@ -1323,18 +1323,18 @@ traitDendro <- getCor(MEs, y = colData, corType = "bicor", robustY = FALSE) %>% 
 plotDendro(traitDendro, labelSize = 3.5, expandY = c(0.65,0.08), file = "Trait_Dendrogram.pdf")
 plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order, traitOrder = traitDendro$order,
                file = "ME_Trait_Correlation_Heatmap.pdf")
-plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order, traitOrder = traitDendro$order, sigOnly = TRUE, star.size = 11, 
-               star.nudge_y = -0.27, legend.position = c(1.14, 0.745), colColorMargins = c(-1,5.1,0.5,10.47), 
+plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order, traitOrder = traitDendro$order, sigOnly = TRUE, star.size = 11,
+               star.nudge_y = -0.27, legend.position = c(1.14, 0.745), colColorMargins = c(-1,5.1,0.5,10.47),
                file = "Sig_ME_Trait_Correlation_Heatmap.pdf", width = 7, height = 3.5)
 
 # Explore Significant ME-Trait Correlations ####
 # Plot Module Eigennodes vs Traits
-plotMEtraitDot(MEs$bisque4, trait = colData$Diagnosis_ASD, traitCode = c("TD" = 0, "ASD" = 1), 
-               colors = c("TD" = "#3366CC", "ASD" = "#FF3366"), ylim = c(-0.2,0.2), xlab = "Diagnosis", 
+plotMEtraitDot(MEs$bisque4, trait = colData$Diagnosis_ASD, traitCode = c("TD" = 0, "ASD" = 1),
+               colors = c("TD" = "#3366CC", "ASD" = "#FF3366"), ylim = c(-0.2,0.2), xlab = "Diagnosis",
                ylab = "Bisque 4 Module Eigennode", file = "bisque4_ME_Diagnosis_Dotplot.pdf")
-plotMEtraitScatter(MEs$paleturquoise, trait = colData$Gran, ylim = c(-0.15,0.15), xlab = "Granulocytes", 
+plotMEtraitScatter(MEs$paleturquoise, trait = colData$Gran, ylim = c(-0.15,0.15), xlab = "Granulocytes",
                    ylab = "Pale Turquoise Module Eigennode", file = "paleturquoise_ME_Granulocytes_Scatterplot.pdf")
-plotMEtraitScatter(MEs$paleturquoise, trait = colData$Bcell, ylim = c(-0.15,0.15), xlab = "B-cells", 
+plotMEtraitScatter(MEs$paleturquoise, trait = colData$Bcell, ylim = c(-0.15,0.15), xlab = "B-cells",
                    ylab = "Pale Turquoise Module Eigennode", file = "paleturquoise_ME_Bcells_Scatterplot.pdf")
 
 # Plot Region Methylation vs Traits
@@ -1343,10 +1343,10 @@ plotMethTrait("bisque4", regions = regions, meth = meth, trait = colData$Diagnos
               traitColors = c("TD" = "#3366CC", "ASD" = "#FF3366"), trait.legend.title = "Diagnosis",
               file = "bisque4_Module_Methylation_Diagnosis_Heatmap.pdf")
 plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$Gran, expandY = 0.04,
-              trait.legend.title = "Granulocytes", trait.legend.position = c(1.034,3.35), 
+              trait.legend.title = "Granulocytes", trait.legend.position = c(1.034,3.35),
               file = "paleturquoise_Module_Methylation_Granulocytes_Heatmap.pdf")
 plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$Bcell, expandY = 0.04,
-              trait.legend.title = "B-cells", trait.legend.position = c(1.004,3.35), 
+              trait.legend.title = "B-cells", trait.legend.position = c(1.004,3.35),
               file = "paleturquoise_Module_Methylation_Bcells_Heatmap.pdf")
 
 # Annotate Modules ####
@@ -1359,7 +1359,7 @@ geneList_paleturquoise <- getGeneList(regionsAnno, module = "paleturquoise")
 ontologies <- listOntologies("hg38", version = "4.0.4")
 enrich_bisque4 <- enrichModule(regions, module = "bisque4", genome = "hg38", file = "bisque4_Module_Enrichment.txt")
 plotEnrichment(enrich_bisque4, file = "bisque4_Module_Enrichment_Plot.pdf")
-enrich_paleturquoise <- enrichModule(regions, module = "paleturquoise", genome = "hg38", 
+enrich_paleturquoise <- enrichModule(regions, module = "paleturquoise", genome = "hg38",
                                      file = "paleturquoise_Module_Enrichment.txt")
 plotEnrichment(enrich_paleturquoise, axis.text.y.size = 14, width = 10, file = "paleturquoise_Module_Enrichment_Plot.pdf")
 
