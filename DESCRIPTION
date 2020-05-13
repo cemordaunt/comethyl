@@ -21,14 +21,17 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
 Imports: 
     annotatr,
+    BiocParallel,
     biomaRt,
     bsseq,
     cowplot,
+    DelayedMatrixStats,
     dmrseq,
     dplyr,
     forcats,
     ggdendro,
     ggplot2,
+    magrittr,
     openxlsx,
     purrr,
     R.devices,
