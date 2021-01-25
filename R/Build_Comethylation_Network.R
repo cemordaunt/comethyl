@@ -10,15 +10,16 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
                 verboseNum <- 0
         }
         if(corType == "pearson"){
-                sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector, networkType = "signed",
-                                         moreNetworkConcepts = TRUE, corFnc = "cor", blockSize = blockSize,
-                                         gcInterval = gcInterval, verbose = verboseNum)
+                sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector,
+                                         networkType = "signed", moreNetworkConcepts = TRUE, corFnc = "cor",
+                                         blockSize = blockSize, gcInterval = gcInterval, verbose = verboseNum)
         } else {
                 if(corType == "bicor"){
                         sft <- pickSoftThreshold(meth, RsquaredCut = RsquaredCut, powerVector = powerVector,
-                                                 networkType = "signed", moreNetworkConcepts = TRUE, corFnc = "bicor",
-                                                 corOptions = list(maxPOutliers = maxPOutliers), blockSize = blockSize,
-                                                 gcInterval = gcInterval, verbose = verboseNum)
+                                                 networkType = "signed", moreNetworkConcepts = TRUE,
+                                                 corFnc = "bicor", corOptions = list(maxPOutliers = maxPOutliers),
+                                                 blockSize = blockSize, gcInterval = gcInterval,
+                                                 verbose = verboseNum)
                 } else {
                         stop("[getSoftPower] Error: corType must be either pearson or bicor")
                 }
@@ -52,13 +53,17 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
                                  powerEstimate = sft$powerEstimate) %>%
                 reshape2::melt(id.vars = c("power", "powerEstimate"))
         powerEstimateY <- min(0, fitIndices$value)
+        fitIndices$variable <- str_replace_all(fitIndices$variable,
+                                               c(fit = "Fit", log10_meanConnectivity = "log[10]*(Mean~Connectivity)"))
+        fitIndices$variable <- factor(fitIndices$variable, levels = c("Fit", "log[10]*(Mean~Connectivity)"))
         gg <- ggplot(data = fitIndices)
         gg <- gg +
                 geom_vline(aes(xintercept = powerEstimate), color = lineCol) +
-                geom_text(aes(x = powerEstimate, y = powerEstimateY, label = powerEstimate), color = lineCol,
-                          nudge_x = -1) +
+                geom_text(aes(x = powerEstimate, y = powerEstimateY, label = powerEstimate),
+                          color = lineCol, nudge_x = -1) +
                 geom_point(aes(x = power, y = value), color = pointCol, size = 1.2) +
-                facet_wrap(vars(variable), nrow = 1, ncol = 2, scales = "free_y", strip.position = "left") +
+                facet_wrap(vars(variable), nrow = 1, ncol = 2, scales = "free_y", strip.position = "left",
+                           labeller = label_parsed) +
                 xlab("Soft Power Threshold") +
                 scale_x_continuous(breaks = breaks_pretty(n = nBreaks)) +
                 scale_y_continuous(breaks = breaks_pretty(n = nBreaks)) +
@@ -82,8 +87,8 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
 }
 
 getModules <- function(meth, power, regions, maxBlockSize = 40000, corType = c("pearson", "bicor"),
-                       maxPOutliers = 0.1, deepSplit = 4, minModuleSize = 10, mergeCutHeight = 0.1, nThreads = 4, save = TRUE,
-                       file = "Modules.rds", verbose = TRUE){
+                       maxPOutliers = 0.1, deepSplit = 4, minModuleSize = 10, mergeCutHeight = 0.1,
+                       nThreads = 4, save = TRUE, file = "Modules.rds", verbose = TRUE){
         if(is.null(power)){
                 stop("[getModules] You must select a soft power threshold")
         }
@@ -95,24 +100,28 @@ getModules <- function(meth, power, regions, maxBlockSize = 40000, corType = c("
                 stop("[getModules] corType must be either pearson or bicor")
         }
         if(verbose){
-                message("[getModules] Constructing network and detecting modules in blocks using ", corType, " correlation")
+                message("[getModules] Constructing network and detecting modules in blocks using ",
+                        corType, " correlation")
                 verboseNum <- 3
         } else {
                 verboseNum <- 0
         }
-        modules <- blockwiseModules(meth, checkMissingData = FALSE, maxBlockSize = maxBlockSize, corType = corType,
-                                    maxPOutliers = maxPOutliers, power = power, networkType = "signed", TOMtype = "signed",
-                                    deepSplit = deepSplit, minModuleSize = minModuleSize, mergeCutHeight = mergeCutHeight,
+        modules <- blockwiseModules(meth, checkMissingData = FALSE, maxBlockSize = maxBlockSize,
+                                    corType = corType, maxPOutliers = maxPOutliers, power = power,
+                                    networkType = "signed", TOMtype = "signed", deepSplit = deepSplit,
+                                    minModuleSize = minModuleSize, mergeCutHeight = mergeCutHeight,
                                     nThreads = nThreads, verbose = verboseNum)
         if(verbose){
-                message("[getModules] Assigning modules and calculating module membership using ", corType, " correlation")
+                message("[getModules] Assigning modules and calculating module membership using ",
+                        corType, " correlation")
         }
         colnames(modules$MEs) <- str_remove_all(colnames(modules$MEs), pattern = "ME")
         if(corType == "pearson"){
-                membership <- WGCNA::cor(x = meth, y = modules$MEs, use = "pairwise.complete.obs", nThreads = nThreads)
+                membership <- WGCNA::cor(x = meth, y = modules$MEs, use = "pairwise.complete.obs",
+                                         nThreads = nThreads)
         } else {
-                membership <- bicor(x = meth, y = modules$MEs, use = "pairwise.complete.obs", maxPOutliers = maxPOutliers,
-                                    nThreads = nThreads)
+                membership <- bicor(x = meth, y = modules$MEs, use = "pairwise.complete.obs",
+                                    maxPOutliers = maxPOutliers, nThreads = nThreads)
         }
         regions$module <- modules$colors[match(regions$RegionID, names(modules$colors))]
         regions <- lapply(unique(regions$module), function(x){
