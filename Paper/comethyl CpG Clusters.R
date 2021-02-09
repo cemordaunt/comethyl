@@ -1,5 +1,4 @@
 # Comethyl CpG Clusters ----------------------------------------------------------------------------
-# Autism Cord Blood Methylation
 # Charles Mordaunt
 # 1/24/20
 

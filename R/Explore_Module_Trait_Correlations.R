@@ -113,6 +113,11 @@ plotMEtraitDot <- function(ME, trait, traitCode = NULL, colors = NULL, fun.data 
         if(verbose){
                 message("[plotMEtraitDot] Plotting module eigennode by categorical trait")
         }
+        if(sum(is.na(trait)) > 1){
+                message("[plotMEtraitDot] Removing NA values")
+                ME <- ME[!is.na(trait)]
+                trait <- trait[!is.na(trait)]
+        }
         if(!is.null(traitCode)){
                 trait <- names(traitCode)[match(trait, traitCode)] %>% factor(levels = names(traitCode))
         } else {
@@ -178,6 +183,11 @@ plotMethTrait <- function(module, regions, meth, trait, discrete = NULL, traitCo
                           width = 11, height = 4, verbose = TRUE){
         if(verbose){
                 message("[plotMethTrait] Plotting ", module, " module region methylation by ", trait.legend.title)
+        }
+        if(sum(is.na(trait)) > 1){
+                message("[plotMethTrait] Removing NA values")
+                meth <- meth[,!is.na(trait)]
+                trait <- trait[!is.na(trait)]
         }
         RegionIDs <- rev(regions$RegionID[regions$module == module])
         if(is.null(discrete)){
