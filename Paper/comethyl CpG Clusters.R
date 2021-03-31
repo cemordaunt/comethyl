@@ -116,3 +116,45 @@ enrich_paleturquoise <- enrichModule(regions, module = "paleturquoise", genome =
                                      file = "paleturquoise_Module_Enrichment.txt")
 plotEnrichment(enrich_paleturquoise, axis.text.y.size = 14, width = 10, file = "paleturquoise_Module_Enrichment_Plot.pdf")
 
+# Circos Plot ####
+library(circlize)
+regions_col <- subset(regions, !module == "grey") %>% dplyr::select(chr, start, end, module)
+pdf("Testing/Default/Module_Circos_Plot.pdf", width = 3.5, height = 3.5)
+circos.par(gap.degree = 2, cell.padding = c(0.007,0,0.007,0), circle.margin = 0.00001)
+circos.initializeWithIdeogram(species = "hg38", plotType = c("ideogram", "labels"))
+circos.genomicTrack(regions_col, ylim = c(0, 1),
+                    panel.fun = function(region, value, ...) {
+                            circos.genomicRect(region, value, ytop = 1, ybottom = 0,
+                                               border = unlist(value))
+                    })
+circos.clear()
+dev.off()
+
+# Module Region Counts ####
+region_counts <- table(regions_col$module) %>% sort(decreasing = TRUE) %>% as.data.frame()
+region_counts$Var1 <- as.character(region_counts$Var1) %>% factor(levels = rev(region_counts$Var1))
+barplot <- ggplot(aes(x = Var1, y = Freq), data = region_counts) +
+        geom_col(fill = "#132B43") +
+        coord_flip() +
+        scale_x_discrete(expand = expansion(c(0.02))) +
+        scale_y_continuous(breaks = breaks_pretty(n = 4), expand = expansion(c(0.004, 0.03))) +
+        theme_bw(base_size = 25) +
+        theme(legend.position = "none", panel.grid.major = element_blank(),
+              panel.border = element_rect(color = "black", size = 1.25),
+              axis.ticks.x = element_line(size = 1.25),
+              axis.ticks.y = element_blank(),
+              panel.grid.minor = element_blank(), strip.background = element_blank(),
+              axis.text.x = element_text(color = "black", size = 16),
+              axis.text.y = element_blank(),
+              axis.title.x = element_text(size = 20), axis.title.y = element_blank(),
+              plot.margin = unit(c(1,1,0.5,0), "lines")) +
+        ylab("Regions")
+rowColors <- ggplot(data = data.frame(x = 0, y = 1:nrow(region_counts), color = rev(region_counts$Var1))) +
+        geom_tile(aes(x = x, y = y, color = color, fill = color)) +
+        scale_fill_identity(aesthetics = c("color", "fill")) +
+        theme_void() +
+        theme(legend.position = "none", plot.margin = unit(c(-0.15,-2,2.9,1), "lines"))
+gg <- plot_grid(rowColors, barplot, ncol = 2, rel_widths = c(0.1, 1))
+ggsave("Testing/Default/Module_Region_Counts.pdf", plot = gg, dpi = 600, width = 5, height = 7,
+       units = "in")
+
