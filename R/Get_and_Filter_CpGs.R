@@ -1,14 +1,17 @@
 #' Read Bismark CpG reports
 #'
 #' \code{getCpGs()} reads individual sample Bismark CpG reports into a single
-#' \code{\link[bsseq]{BSseq}} object and then saves it as a .rds file.
+#' \code{\link[bsseq:`BSseq-class`]{BSseq}} object and then saves it as a .rds
+#' file.
 #'
-#' More information on these arguments is given in the documentation for
+#' This \code{\link[bsseq:`BSseq-class`]{BSseq}} object still needs to be
+#'         filtered for coverage at individual CpGs. More information on these
+#'         arguments is given in the documentation for
 #'         \code{\link[bsseq]{read.bismark()}}.
 #'
 #' @param colData A \code{data.frame} whose row names specify CpG reports to
-#'         load into the BSseq object and whose columns are sample traits with
-#'         numeric values.
+#'         load into the \code{\link[bsseq:`BSseq-class`]{BSseq}} object and
+#'         whose columns are sample traits with numeric values.
 #' @param path A \code{character} giving the path(s) to the CpG reports.
 #' @param pattern A regular expression used to filter for CpG reports.
 #' @param sameLoci A \code{logical(1)} indicating whether CpG reports contain
@@ -17,22 +20,23 @@
 #'         The default \code{sameLoci = TRUE} speeds up \code{getCpGs()} by
 #'         only having to parse each CpG report once.
 #' @param chroms A \code{character} giving the chromosomes to include in the
-#'         BSseq object.
+#'         \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
 #' @param BPPARAM A \code{\link[BiocParallel]{BiocParallelParam}} instance
 #'         providing the parallel back-end to use during evaluation.
-#' @param save A \code{logical(1)} indicating whether to save the BSseq object.
+#' @param save A \code{logical(1)} indicating whether to save the
+#'         \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
 #' @param file A \code{character(1)} giving the file name (.rds) for the saved
-#'         BSseq object.
+#'         \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
 #' @param verbose A \code{logical(1)} indicating whether messages should be
 #'         printed.
 #'
-#' @return A \code{\link[bsseq]{BSseq}} object.
+#' @return A \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
 #'
 #' @seealso \itemize{
 #'         \item \code{\link{getCpGtotals()}} and \code{\link{plotCpGtotals()}}
 #'                 for help with deciding coverage cutoffs.
 #'         \item \code{\link{filterCpGs()}} to filter the
-#'                 \code{\link[bsseq]{BSseq}} object.
+#'                 \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
 #'         \item \code{\link[bsseq]{read.bismark()}} for more details on the
 #'                 arguments and the underlying functions.
 #' }
@@ -47,7 +51,7 @@
 #' CpGtotals <- getCpGtotals(bs, file = "CpG_Totals.txt")
 #' plotCpGtotals(CpGtotals, file = "CpG_Totals.pdf")
 #'
-#' # Filter BSobject
+#' # Filter BSseq Object
 #' bs <- filterCpGs(bs, cov = 2, perSample = 0.75, file = "Filtered_BSseq.rds")
 #' }
 #'
@@ -91,16 +95,16 @@ getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz",
 #' Get the Total CpGs at Different Coverage Cutoffs
 #'
 #' \code{getCpGtotals()} calculates the total number and percent of CpGs
-#'         remaining in a \code{\link[bsseq]{BSseq}} object after filtering at
-#'         different \code{cov} and \code{perSample} cutoffs and then saves it
-#'         as a tab-separated text file.
+#'         remaining in a \code{\link[bsseq:`BSseq-class`]{BSseq}} object after
+#'         filtering at different \code{cov} and \code{perSample} cutoffs and
+#'         then saves it as a tab-delimited text file.
 #'
 #' The purpose of this function is to help determine cutoffs to maximize the
 #'         number of CpGs with sufficient data after filtering. Typically,
 #'         the number of CpGs covered in 100% of samples decreases as the
 #'         sample size increases, especially with low-coverage datasets.
 #'
-#' @param bs A \code{\link[bsseq]{BSseq}} object.
+#' @param bs A \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
 #' @param cov A \code{numeric} specifying the minimum number of reads
 #'         overlapping a CpG for it to be included in the total.
 #' @param perSample A \code{numeric} specifying the minimum percent of samples
@@ -118,12 +122,12 @@ getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz",
 #'         \code{perSample} is also given.
 #'
 #' @seealso \itemize{
+#'         \item \code{\link{getCpGs()}} to generate the
+#'                 \code{\link[bsseq:`BSseq-class`]{BSseq}} object from
+#'                 individual Bismark CpG reports.
 #'         \item \code{\link{plotCpGtotals()}} to visualize the CpG totals.
 #'         \item \code{\link{filterCpGs()}} to filter the
-#'                 \code{\link[bsseq]{BSseq}} object.
-#'         \item \code{\link{getCpGs()}} to generate the
-#'                 \code{\link[bsseq]{BSseq}} object from individual Bismark CpG
-#'                 reports.
+#'                 \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
 #' }
 #'
 #' @examples \dontrun{
@@ -136,7 +140,7 @@ getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz",
 #' CpGtotals <- getCpGtotals(bs, file = "CpG_Totals.txt")
 #' plotCpGtotals(CpGtotals, file = "CpG_Totals.pdf")
 #'
-#' # Filter BSobject
+#' # Filter BSseq Object
 #' bs <- filterCpGs(bs, cov = 2, perSample = 0.75, file = "Filtered_BSseq.rds")
 #' }
 #'
@@ -199,12 +203,12 @@ getCpGtotals <- function(bs, cov = seq(0,10,1), perSample = seq(0.5,1,0.05),
 #'
 #' @return A \code{ggplot} object.
 #' @seealso \itemize{
+#'         \item \code{\link{getCpGs()}} to generate the
+#'                 \code{\link[bsseq:`BSseq-class`]{BSseq}} object from
+#'                 individual Bismark CpG reports.
 #'         \item \code{\link{getCpGtotals()}} to generate \code{CpGtotals}.
 #'         \item \code{\link{filterCpGs()}} to filter the
-#'                 \code{\link[bsseq]{BSseq}} object.
-#'         \item \code{\link{getCpGs()}} to generate the
-#'                 \code{\link[bsseq]{BSseq}} object from individual Bismark CpG
-#'                 reports.
+#'                 \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
 #' }
 #'
 #' @examples \dontrun{
@@ -217,7 +221,7 @@ getCpGtotals <- function(bs, cov = seq(0,10,1), perSample = seq(0.5,1,0.05),
 #' CpGtotals <- getCpGtotals(bs, file = "CpG_Totals.txt")
 #' plotCpGtotals(CpGtotals, file = "CpG_Totals.pdf")
 #'
-#' # Filter BSobject
+#' # Filter BSseq Object
 #' bs <- filterCpGs(bs, cov = 2, perSample = 0.75, file = "Filtered_BSseq.rds")
 #' }
 #'
@@ -273,36 +277,37 @@ plotCpGtotals <- function(CpGtotals, nBreaks = 4,
 
 #' Filter BSseq Objects by Coverage
 #'
-#' \code{filterCpGs()} subsets a \code{\link[bsseq]{BSseq}} object to include
-#'         only those CpGs meeting \code{cov} and \code{perSample} cutoffs and
-#'         then saves it as a .rds file.
+#' \code{filterCpGs()} subsets a \code{\link[bsseq:`BSseq-class`]{BSseq}} object
+#'         to include only those CpGs meeting \code{cov} and \code{perSample}
+#'         cutoffs and then saves it as a .rds file.
 #'
 #' \code{filterCpGs()} is designed to be used after \code{cov} and
 #'         \code{perSample} arguments have been optimized by
 #'         \code{\link{getCpGtotals()}} and \code{\link{plotCpGtotals()}}.
 #'
-#' @param bs A \code{\link[bsseq]{BSseq}} object.
+#' @param bs A \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
 #' @param cov A \code{numeric(1)} specifying the minimum number of reads
 #'         overlapping a CpG for it to be included in the total.
 #' @param perSample A \code{numeric(1)} specifying the minimum percent of
 #'         samples with \code{cov} reads at a CpG for it to be included in the
 #'         total.
-#' @param save A \code{logical(1)} indicating whether to save the BSseq object.
+#' @param save A \code{logical(1)} indicating whether to save the
+#'         \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
 #' @param file A \code{character(1)} giving the file name (.rds) for the saved
 #'         BSseq object.
 #' @param verbose A \code{logical(1)} indicating whether messages should be
 #'         printed.
 #'
-#' @return A \code{\link[bsseq]{BSseq}} object.
+#' @return A \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
 #'
 #' @seealso \itemize{
+#'         \item \code{\link{getCpGs()}} to generate the
+#'                 \code{\link[bsseq:`BSseq-class`]{BSseq}} object from
+#'                 individual Bismark CpG reports.
 #'         \item \code{\link{getCpGtotals()}} and \code{\link{plotCpGtotals()}}
 #'                 for help with deciding coverage cutoffs.
-#'         \item \code{\link{filterCpGs()}} to filter the
-#'                 \code{\link[bsseq]{BSseq}} object.
-#'         \item \code{\link{getCpGs()}} to generate the
-#'                 \code{\link[bsseq]{BSseq}} object from individual Bismark CpG
-#'                 reports.
+#'         \item \code{\link{getRegions()}} to generate a set of regions based
+#'                 on the CpGs.
 #' }
 #'
 #' @examples \dontrun{
@@ -315,7 +320,7 @@ plotCpGtotals <- function(CpGtotals, nBreaks = 4,
 #' CpGtotals <- getCpGtotals(bs, file = "CpG_Totals.txt")
 #' plotCpGtotals(CpGtotals, file = "CpG_Totals.pdf")
 #'
-#' # Filter BSobject
+#' # Filter BSseq Object
 #' bs <- filterCpGs(bs, cov = 2, perSample = 0.75, file = "Filtered_BSseq.rds")
 #' }
 #'

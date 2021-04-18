@@ -1,5 +1,91 @@
-getRegions <- function(bs, annotation = NULL, genome = c("hg38", "hg19", "mm10", "mm9", "rn6", "rn5", "rn4", "dm6", "dm3", "galGal5"),
-                       upstream = 5000, downstream = 1000, custom = NULL, maxGap = 150, n = 3, save = TRUE,
+#' Generate Regions from CpGs
+#'
+#' \code{getRegions()} generates a set of regions and some statistics based on
+#' the CpGs in a \code{\link[bsseq:`BSseq-class`]{BSseq}} object and then saves
+#' it as a tab-delimited text file. Regions can be defined based on CpG
+#' locations (for CpG clusters), built-in genomic annotations from
+#' \pkg{annotatr}, or a custom genomic annotation.
+#'
+#' These regions still need to be filtered for minimum coverage and methylation
+#'         standard deviation.
+#'
+#' @param bs A \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
+#' @param annotation A \code{character(1)} giving the built-in genomic
+#'         annotation to use for defining regions. Shortcuts are available for
+#'         \code{genes}, \code{promoters}, and \code{transcripts}. Get the
+#'         entire list of possible annotations with
+#'         \code{\link[annotatr]{builtin_annotations()}}, which also includes
+#'         CpG islands, enhancers, and chromatin states.
+#' @param genome A \code{character(1)} with the genome build to use for
+#'         built-in annotations. Available builds include \code{hg38},
+#'         \code{hg19}, \code{mm10}, \code{mm9}, \code{rn6}, \code{rn5},
+#'         \code{rn4}, \code{dm6}, \code{dm3}, and \code{galGal5}.
+#' @param upstream A \code{numeric(1)} giving the number of bases upstream of a
+#'         transcription start site to specify a promoter. Used for the
+#'         \code{promoters} built-in annotation.
+#' @param downstream A \code{numeric(1)} giving the number of bases downstream
+#'         of a transcription start site to specify a promoter. Used for the
+#'         \code{promoters} built-in annotation.
+#' @param custom A \code{\link[GenomicRanges:`GRanges-class`]{GRanges}} object
+#'         with a custom genomic annotation for defining regions. Construct this
+#'         using \code{\link[GenomicRanges]{GRanges()}}.
+#' @param maxGap A \code{numeric(1)} specifying the maximum number of bases
+#'         between CpGs to be included in the same CpG cluster.
+#' @param n A \code{numeric(1)} giving the minimum number of CpGs for a region
+#'         to be returned. This applies to CpG clusters, built-in, and custom,
+#'         annotations.
+#' @param save A \code{logical(1)} indicating whether to save the
+#'         \code{data.frame}.
+#' @param file A \code{character(1)} giving the file name (.txt) for the saved
+#'         \code{data.frame}.
+#' @param verbose A \code{logical(1)} indicating whether messages should be
+#'         printed.
+#'
+#' @return A \code{data.frame} with the region genomic locations along with some
+#'         statistics, including number of CpGs, coverage minimum, mean, and
+#'         standard deviation, and methylation mean and standard deviation.
+#'
+#' @seealso \itemize{
+#'         \item \code{\link{plotRegionStats()}}, \code{\link{plotSDstats()}},
+#'                 \code{\link{getRegionTotals()}}, and
+#'                 \code{\link{plotRegionTotals()}} for help visualizing region
+#'                 characteristics and setting cutoffs for filtering.
+#'        \item \code{\link{filterRegions()}} for filtering regions by minimum
+#'                coverage and methylation standard deviation.
+#' }
+#'
+#' @examples \dontrun{
+#'
+#' # Call Regions
+#' regions <- getRegions(bs, file = "Unfiltered_Regions.txt")
+#' plotRegionStats(regions, maxQuantile = 0.99,
+#'                 file = "Unfiltered_Region_Plots.pdf")
+#' plotSDstats(regions, maxQuantile = 0.99,
+#'             file = "Unfiltered_SD_Plots.pdf")
+#'
+#' # Examine Region Totals at Different Cutoffs
+#' regionTotals <- getRegionTotals(regions, file = "Region_Totals.txt")
+#' plotRegionTotals(regionTotals, file = "Region_Totals.pdf")
+#'
+#' # Filter Regions
+#' regions <- filterRegions(regions, covMin = 10, methSD = 0.05,
+#'                          file = "Filtered_Regions.txt")
+#' plotRegionStats(regions, maxQuantile = 0.99,
+#'                 file = "Filtered_Region_Plots.pdf")
+#' plotSDstats(regions, maxQuantile = 0.99,
+#'             file = "Filtered_SD_Plots.pdf")
+#' }
+#'
+#' @export
+#'
+#' @import bsseq
+#' @importFrom magrittr %>%
+
+getRegions <- function(bs, annotation = NULL,
+                       genome = c("hg38", "hg19", "mm10", "mm9", "rn6", "rn5",
+                                  "rn4", "dm6", "dm3", "galGal5"),
+                       upstream = 5000, downstream = 1000, custom = NULL,
+                       maxGap = 150, n = 3, save = TRUE,
                        file = "Unfiltered_Regions.txt", verbose = TRUE){
         if(!is.null(annotation) & !is.null(custom)){
                 stop("[getRegions] annotation and custom cannot both have values")
@@ -7,7 +93,8 @@ getRegions <- function(bs, annotation = NULL, genome = c("hg38", "hg19", "mm10",
         if(!is.null(annotation)){
                 genome <- match.arg(genome)
                 if(verbose){
-                        message("[getRegions] Using ", annotation, " annotation for the ", genome,
+                        message("[getRegions] Using ", annotation,
+                                " annotation for the ", genome,
                                 " genome as regions")
                 }
                 if(annotation %in% c("genes", "promoters", "transcripts")){
@@ -17,27 +104,35 @@ getRegions <- function(bs, annotation = NULL, genome = c("hg38", "hg19", "mm10",
                         }
                         txdb <- get(txdb)
                         orgdb <- annotatr:::get_orgdb_name(genome)
-                        if (requireNamespace(sprintf("org.%s.eg.db", orgdb), quietly = TRUE)) {
-                                library(sprintf("org.%s.eg.db", orgdb), character.only = TRUE)
+                        if (requireNamespace(sprintf("org.%s.eg.db", orgdb),
+                                             quietly = TRUE)) {
+                                library(sprintf("org.%s.eg.db", orgdb),
+                                        character.only = TRUE)
                         }
-                        regions <- suppressWarnings(switch(annotation,
-                                                           genes = genes(txdb),
-                                                           promoters = promoters(txdb, upstream = upstream,
-                                                                                 downstream = downstream,
-                                                                                 use.names = FALSE),
-                                                           transcripts = transcripts(txdb)))
+                        regions <- suppressWarnings(
+                                switch(annotation,
+                                       genes = GenomicFeatures::genes(txdb),
+                                       promoters = GenomicFeatures::promoters(txdb,
+                                                                              upstream = upstream,
+                                                                              downstream = downstream,
+                                                                              use.names = FALSE),
+                                       transcripts = GenomicFeatures::transcripts(txdb))
+                        )
                 } else {
-                        if(annotation %in% builtin_annotations()){
+                        if(annotation %in% annotatr::builtin_annotations()){
                                 if(!grepl(genome, x = annotation, fixed = TRUE)){
                                         stop("[getRegions] Annotation must match genome")
                                 }
-                                regions <- build_annotations(genome, annotations = annotation)
+                                regions <- annotatr::build_annotations(genome,
+                                                                       annotations = annotation)
                         } else {
                                 stop("[getRegions] Annotation not supported")
                         }
                 }
-                regions <- keepStandardChromosomes(regions, pruning.mode = "coarse") %>% trim()
-                regions$n <- countOverlaps(regions, subject = bs)
+                regions <- GenomeInfoDb::keepStandardChromosomes(regions,
+                                                                 pruning.mode = "coarse") %>%
+                        trim()
+                regions$n <- GenomicRanges::countOverlaps(regions, subject = bs)
                 regions <- as.data.frame(regions)
                 colnames(regions)[colnames(regions) == "seqnames"] <- "chr"
         } else {
@@ -46,41 +141,52 @@ getRegions <- function(bs, annotation = NULL, genome = c("hg38", "hg19", "mm10",
                                 message("[getRegions] Using custom regions")
                         }
                         regions <- custom
-                        regions$n <- countOverlaps(regions, subject = bs)
+                        regions$n <- GenomicRanges::countOverlaps(regions,
+                                                                  subject = bs)
                         regions <- as.data.frame(regions)
                         colnames(regions)[colnames(regions) == "seqnames"] <- "chr"
                 } else {
                         if(verbose){
-                                message("[getRegions] Calling regions when at least ", n, " CpGs are no more than ",
-                                        maxGap, " bases apart")
+                                message("[getRegions] Calling regions when at least ",
+                                        n, " CpGs are no more than ", maxGap,
+                                        " bases apart")
                         }
-                        regions <- bsseq:::regionFinder3(x = as.integer(rep(1, length(bs))), chr = as.character(seqnames(bs)),
-                                                         positions = start(bs), maxGap = maxGap, verbose = FALSE)[["up"]]
+                        regions <- bsseq:::regionFinder3(x = as.integer(rep(1, length(bs))),
+                                                         chr = as.character(GenomeInfoDb::seqnames(bs)),
+                                                         positions = BiocGenerics::start(bs),
+                                                         maxGap = maxGap,
+                                                         verbose = FALSE)[["up"]]
                 }
         }
-        regions$chr <- factor(regions$chr, levels = seqlevels(bs))
-        regions <- regions[regions$n >= n,] %>% .[with(., order(chr, start, end)),]
+        regions$chr <- factor(regions$chr, levels = GenomeInfoDb::seqlevels(bs))
+        regions <- regions[regions$n >= n,] %>%
+                .[with(., order(chr, start, end)),]
         regions$RegionID <- paste("Region", 1:nrow(regions), sep = "_")
         regions$chr <- as.character(regions$chr)
         if(verbose){
                 message("[getRegions] Calculating region statistics")
         }
         regions$width <- regions$end - regions$start
-        cov <- getCoverage(bs, regions = regions[,c("chr", "start", "end")], what = "perRegionTotal")
+        cov <- getCoverage(bs, regions = regions[,c("chr", "start", "end")],
+                           what = "perRegionTotal")
         regions$covMin <- DelayedArray::rowMins(cov)
         regions$covMean <- DelayedMatrixStats::rowMeans2(cov)
         regions$covSD <- DelayedMatrixStats::rowSds(cov)
-        meth <- getMeth(bs, regions = regions[,c("chr", "start", "end")], type = "raw", what = "perRegion")
+        meth <- getMeth(bs, regions = regions[,c("chr", "start", "end")],
+                        type = "raw", what = "perRegion")
         regions$methMean <- DelayedMatrixStats::rowMeans2(meth, na.rm = TRUE)
         regions$methSD <- DelayedMatrixStats::rowSds(meth, na.rm = TRUE)
-        colnames <- c("RegionID", "chr", "start", "end", "width", "n", "covMin", "covMean", "covSD", "methMean", "methSD")
-        regions <- regions[,c(colnames, colnames(regions)[!colnames(regions) %in% colnames &
-                                                                  !colnames(regions) %in% c("idxStart", "idxEnd", "cluster")])]
+        colnames <- c("RegionID", "chr", "start", "end", "width", "n", "covMin",
+                      "covMean", "covSD", "methMean", "methSD")
+        regions <- regions[,c(colnames,
+                              colnames(regions)[!colnames(regions) %in% colnames &
+                                                        !colnames(regions) %in% c("idxStart", "idxEnd", "cluster")])]
         if(save){
                 if(verbose){
                         message("[getRegions] Saving file as ", file)
                 }
-                write.table(regions, file = file, quote = FALSE, sep = "\t", row.names = FALSE)
+                write.table(regions, file = file, quote = FALSE, sep = "\t",
+                            row.names = FALSE)
         }
         return(regions)
 }

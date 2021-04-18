@@ -3,6 +3,7 @@
 export(filterCpGs)
 export(getCpGs)
 export(getCpGtotals)
+export(getRegions)
 export(plotCpGtotals)
 import(bsseq)
 import(ggplot2)

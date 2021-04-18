@@ -14,7 +14,7 @@ filterCpGs(
 )
 }
 \arguments{
-\item{bs}{A \code{\link[bsseq]{BSseq}} object.}
+\item{bs}{A \code{\link[bsseq:`BSseq-class`]{BSseq}} object.}
 
 \item{cov}{A \code{numeric(1)} specifying the minimum number of reads
 overlapping a CpG for it to be included in the total.}
@@ -23,7 +23,8 @@ overlapping a CpG for it to be included in the total.}
 samples with \code{cov} reads at a CpG for it to be included in the
 total.}
 
-\item{save}{A \code{logical(1)} indicating whether to save the BSseq object.}
+\item{save}{A \code{logical(1)} indicating whether to save the
+\code{\link[bsseq:`BSseq-class`]{BSseq}} object.}
 
 \item{file}{A \code{character(1)} giving the file name (.rds) for the saved
 BSseq object.}
@@ -32,12 +33,12 @@ BSseq object.}
 printed.}
 }
 \value{
-A \code{\link[bsseq]{BSseq}} object.
+A \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
 }
 \description{
-\code{filterCpGs()} subsets a \code{\link[bsseq]{BSseq}} object to include
-only those CpGs meeting \code{cov} and \code{perSample} cutoffs and
-then saves it as a .rds file.
+\code{filterCpGs()} subsets a \code{\link[bsseq:`BSseq-class`]{BSseq}} object
+to include only those CpGs meeting \code{cov} and \code{perSample}
+cutoffs and then saves it as a .rds file.
 }
 \details{
 \code{filterCpGs()} is designed to be used after \code{cov} and
@@ -55,19 +56,19 @@ bs <- getCpGs(colData, file = "Unfiltered_BSseq.rds")
 CpGtotals <- getCpGtotals(bs, file = "CpG_Totals.txt")
 plotCpGtotals(CpGtotals, file = "CpG_Totals.pdf")
 
-# Filter BSobject
+# Filter BSseq Object
 bs <- filterCpGs(bs, cov = 2, perSample = 0.75, file = "Filtered_BSseq.rds")
 }
 
 }
 \seealso{
 \itemize{
+\item \code{\link{getCpGs()}} to generate the
+\code{\link[bsseq:`BSseq-class`]{BSseq}} object from
+individual Bismark CpG reports.
 \item \code{\link{getCpGtotals()}} and \code{\link{plotCpGtotals()}}
 for help with deciding coverage cutoffs.
-\item \code{\link{filterCpGs()}} to filter the
-\code{\link[bsseq]{BSseq}} object.
-\item \code{\link{getCpGs()}} to generate the
-\code{\link[bsseq]{BSseq}} object from individual Bismark CpG
-reports.
+\item \code{\link{getRegions()}} to generate a set of regions based
+on the CpGs.
 }
 }

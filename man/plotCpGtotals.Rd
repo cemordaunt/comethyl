@@ -63,18 +63,18 @@ bs <- getCpGs(colData, file = "Unfiltered_BSseq.rds")
 CpGtotals <- getCpGtotals(bs, file = "CpG_Totals.txt")
 plotCpGtotals(CpGtotals, file = "CpG_Totals.pdf")
 
-# Filter BSobject
+# Filter BSseq Object
 bs <- filterCpGs(bs, cov = 2, perSample = 0.75, file = "Filtered_BSseq.rds")
 }
 
 }
 \seealso{
 \itemize{
+\item \code{\link{getCpGs()}} to generate the
+\code{\link[bsseq:`BSseq-class`]{BSseq}} object from
+individual Bismark CpG reports.
 \item \code{\link{getCpGtotals()}} to generate \code{CpGtotals}.
 \item \code{\link{filterCpGs()}} to filter the
-\code{\link[bsseq]{BSseq}} object.
-\item \code{\link{getCpGs()}} to generate the
-\code{\link[bsseq]{BSseq}} object from individual Bismark CpG
-reports.
+\code{\link[bsseq:`BSseq-class`]{BSseq}} object.
 }
 }
