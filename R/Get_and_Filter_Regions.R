@@ -752,8 +752,10 @@ filterRegions <- function(regions, covMin = 10, methSD = 0.05, save = TRUE,
 
 .regionTotals <- function(regions, covMin, methSD){
         regions <- regions[regions$covMin >= covMin & regions$methSD >= methSD,]
-        totals <- c("covMin" = covMin, "methSD" = methSD, "totalRegions_K" = nrow(regions)/10^3,
-                    "totalWidth_Mb" = sum(regions$width)/10^6, "totalN_M" = sum(regions$n)/10^6)
+        totals <- c("covMin" = covMin, "methSD" = methSD,
+                    "totalRegions_K" = nrow(regions)/10^3,
+                    "totalWidth_Mb" = sum(regions$width)/10^6,
+                    "totalN_M" = sum(regions$n)/10^6)
         return(totals)
 }
 
