@@ -2,7 +2,7 @@
 % Please edit documentation in R/Get_and_Filter_CpGs.R
 \name{getCpGtotals}
 \alias{getCpGtotals}
-\title{Get the Total CpGs at Different Coverage Cutoffs}
+\title{Get Total CpGs at Different Coverage Cutoffs}
 \usage{
 getCpGtotals(
   bs,
@@ -40,13 +40,14 @@ the percent of total CpGs at all combinations of \code{cov} and
 \description{
 \code{getCpGtotals()} calculates the total number and percent of CpGs
 remaining in a \code{\link[bsseq:`BSseq-class`]{BSseq}} object after
-filtering at different \code{cov} and \code{perSample} cutoffs and
-then saves it as a tab-delimited text file.
+filtering at different \code{cov} and \code{perSample} cutoffs and then saves
+it as a tab-delimited text file.
 }
 \details{
 The purpose of this function is to help determine cutoffs to maximize the
-number of CpGs with sufficient data after filtering. Typically,
-the number of CpGs covered in 100\% of samples decreases as the
+number of CpGs with sufficient data after filtering. It's recommended to
+input multiple \code{cov} and \code{perSample} cutoffs for comparison.
+Typically, the number of CpGs covered in 100\% of samples decreases as the
 sample size increases, especially with low-coverage datasets.
 }
 \examples{

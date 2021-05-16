@@ -56,9 +56,8 @@ file.
 }
 \details{
 This \code{\link[bsseq:`BSseq-class`]{BSseq}} object still needs to be
-filtered for coverage at individual CpGs. More information on these
-arguments is given in the documentation for
-\code{\link[bsseq]{read.bismark()}}.
+filtered for coverage at individual CpGs. More information on these arguments
+is given in the documentation for \code{\link[bsseq]{read.bismark()}}.
 }
 \examples{
 \dontrun{

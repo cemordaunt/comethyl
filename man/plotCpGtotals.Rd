@@ -2,7 +2,7 @@
 % Please edit documentation in R/Get_and_Filter_CpGs.R
 \name{plotCpGtotals}
 \alias{plotCpGtotals}
-\title{Visualize CpG Totals}
+\title{Visualize Total CpGs at Different Coverage Cutoffs}
 \usage{
 plotCpGtotals(
   CpGtotals,
@@ -16,7 +16,7 @@ plotCpGtotals(
 )
 }
 \arguments{
-\item{CpGtotals}{A \code{data.frame}, output from \code{\link{getCpGs()}}.}
+\item{CpGtotals}{A \code{data.frame}, output from \code{\link{getCpGtotals()}}.}
 
 \item{nBreaks}{A \code{numeric(1)} specifying the number of breaks used for
 both axes and the legend.}
@@ -44,13 +44,13 @@ A \code{ggplot} object.
 }
 \description{
 \code{plotCpGtotals()} plots the number of CpGs remaining after filtering by
-different combinations of \code{cov} and \code{perSample} in a line
-plot and then saves it as a pdf.
+different combinations of \code{cov} and \code{perSample} in a line plot and
+then saves it as a pdf.
 }
 \details{
 \code{plotCpGtotals()} is designed to be used in combination with
-\code{\link{getCpGtotals()}}. A \code{ggplot} object is produced and
-can be further edited outside of this function if desired.
+\code{\link{getCpGtotals()}}. A \code{ggplot} object is produced and can be
+edited outside of this function if desired.
 }
 \examples{
 \dontrun{

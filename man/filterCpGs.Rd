@@ -37,13 +37,13 @@ A \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
 }
 \description{
 \code{filterCpGs()} subsets a \code{\link[bsseq:`BSseq-class`]{BSseq}} object
-to include only those CpGs meeting \code{cov} and \code{perSample}
-cutoffs and then saves it as a .rds file.
+to include only those CpGs meeting \code{cov} and \code{perSample} cutoffs
+and then saves it as a .rds file.
 }
 \details{
 \code{filterCpGs()} is designed to be used after \code{cov} and
-\code{perSample} arguments have been optimized by
-\code{\link{getCpGtotals()}} and \code{\link{plotCpGtotals()}}.
+\code{perSample} arguments have been optimized by \code{\link{getCpGtotals()}}
+and \code{\link{plotCpGtotals()}}.
 }
 \examples{
 \dontrun{

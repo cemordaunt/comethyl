@@ -5,9 +5,8 @@
 #' file.
 #'
 #' This \code{\link[bsseq:`BSseq-class`]{BSseq}} object still needs to be
-#'         filtered for coverage at individual CpGs. More information on these
-#'         arguments is given in the documentation for
-#'         \code{\link[bsseq]{read.bismark()}}.
+#' filtered for coverage at individual CpGs. More information on these arguments
+#' is given in the documentation for \code{\link[bsseq]{read.bismark()}}.
 #'
 #' @param colData A \code{data.frame} whose row names specify CpG reports to
 #'         load into the \code{\link[bsseq:`BSseq-class`]{BSseq}} object and
@@ -92,17 +91,18 @@ getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz",
         return(bs)
 }
 
-#' Get the Total CpGs at Different Coverage Cutoffs
+#' Get Total CpGs at Different Coverage Cutoffs
 #'
 #' \code{getCpGtotals()} calculates the total number and percent of CpGs
-#'         remaining in a \code{\link[bsseq:`BSseq-class`]{BSseq}} object after
-#'         filtering at different \code{cov} and \code{perSample} cutoffs and
-#'         then saves it as a tab-delimited text file.
+#' remaining in a \code{\link[bsseq:`BSseq-class`]{BSseq}} object after
+#' filtering at different \code{cov} and \code{perSample} cutoffs and then saves
+#' it as a tab-delimited text file.
 #'
 #' The purpose of this function is to help determine cutoffs to maximize the
-#'         number of CpGs with sufficient data after filtering. Typically,
-#'         the number of CpGs covered in 100% of samples decreases as the
-#'         sample size increases, especially with low-coverage datasets.
+#' number of CpGs with sufficient data after filtering. It's recommended to
+#' input multiple \code{cov} and \code{perSample} cutoffs for comparison.
+#' Typically, the number of CpGs covered in 100% of samples decreases as the
+#' sample size increases, especially with low-coverage datasets.
 #'
 #' @param bs A \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
 #' @param cov A \code{numeric} specifying the minimum number of reads
@@ -175,17 +175,17 @@ getCpGtotals <- function(bs, cov = seq(0,10,1), perSample = seq(0.5,1,0.05),
         return(CpGtotals)
 }
 
-#' Visualize CpG Totals
+#' Visualize Total CpGs at Different Coverage Cutoffs
 #'
 #' \code{plotCpGtotals()} plots the number of CpGs remaining after filtering by
-#'         different combinations of \code{cov} and \code{perSample} in a line
-#'         plot and then saves it as a pdf.
+#' different combinations of \code{cov} and \code{perSample} in a line plot and
+#' then saves it as a pdf.
 #'
 #' \code{plotCpGtotals()} is designed to be used in combination with
-#'         \code{\link{getCpGtotals()}}. A \code{ggplot} object is produced and
-#'         can be further edited outside of this function if desired.
+#' \code{\link{getCpGtotals()}}. A \code{ggplot} object is produced and can be
+#' edited outside of this function if desired.
 #'
-#' @param CpGtotals A \code{data.frame}, output from \code{\link{getCpGs()}}.
+#' @param CpGtotals A \code{data.frame}, output from \code{\link{getCpGtotals()}}.
 #' @param nBreaks A \code{numeric(1)} specifying the number of breaks used for
 #'         both axes and the legend.
 #' @param legend.position A \code{numeric(2)} specifying the position of the
@@ -202,6 +202,7 @@ getCpGtotals <- function(bs, cov = seq(0,10,1), perSample = seq(0.5,1,0.05),
 #'         printed.
 #'
 #' @return A \code{ggplot} object.
+#'
 #' @seealso \itemize{
 #'         \item \code{\link{getCpGs()}} to generate the
 #'                 \code{\link[bsseq:`BSseq-class`]{BSseq}} object from
@@ -278,12 +279,12 @@ plotCpGtotals <- function(CpGtotals, nBreaks = 4,
 #' Filter BSseq Objects by Coverage
 #'
 #' \code{filterCpGs()} subsets a \code{\link[bsseq:`BSseq-class`]{BSseq}} object
-#'         to include only those CpGs meeting \code{cov} and \code{perSample}
-#'         cutoffs and then saves it as a .rds file.
+#' to include only those CpGs meeting \code{cov} and \code{perSample} cutoffs
+#' and then saves it as a .rds file.
 #'
 #' \code{filterCpGs()} is designed to be used after \code{cov} and
-#'         \code{perSample} arguments have been optimized by
-#'         \code{\link{getCpGtotals()}} and \code{\link{plotCpGtotals()}}.
+#' \code{perSample} arguments have been optimized by \code{\link{getCpGtotals()}}
+#' and \code{\link{plotCpGtotals()}}.
 #'
 #' @param bs A \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
 #' @param cov A \code{numeric(1)} specifying the minimum number of reads

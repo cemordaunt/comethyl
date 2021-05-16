@@ -58,8 +58,10 @@ Region-level statistics include width, number of CpGs, minimum coverage, mean
 coverage, mean methylation, and methylation standard deviation.
 }
 \details{
-The vertical line on each histogram indicates the median value for that feature.
 It's recommended to examine region characteristics before and after filtering.
+The vertical line on each histogram indicates the median value for that feature.
+A \code{ggplot} object is produced and can be edited outside of this function
+if desired.
 }
 \examples{
 \dontrun{
