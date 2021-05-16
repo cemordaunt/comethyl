@@ -180,7 +180,8 @@ getRegions <- function(bs, annotation = NULL,
                       "covMean", "covSD", "methMean", "methSD")
         regions <- regions[,c(colnames,
                               colnames(regions)[!colnames(regions) %in% colnames &
-                                                        !colnames(regions) %in% c("idxStart", "idxEnd", "cluster")])]
+                                                        !colnames(regions) %in%
+                                                        c("idxStart", "idxEnd", "cluster")])]
         if(save){
                 if(verbose){
                         message("[getRegions] Saving file as ", file)
@@ -191,8 +192,77 @@ getRegions <- function(bs, annotation = NULL,
         return(regions)
 }
 
-plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132B43", lineCol = "red", nBreaks = 4,
-                            save = TRUE, file = "Region_Plots.pdf", width = 11, height = 8.5, verbose = TRUE){
+#' Plot Histograms of Region Statistics
+#'
+#' \code{plotRegionStats()} takes a set of regions from \code{\link{getRegions()}},
+#' generates histograms of region characteristics, and saves it as a pdf.
+#' Region-level statistics include width, number of CpGs, minimum coverage, mean
+#' coverage, mean methylation, and methylation standard deviation.
+#'
+#' The vertical line on each histogram indicates the median value for that feature.
+#' It's recommended to examine region characteristics before and after filtering.
+#'
+#' @param regions A \code{data.frame} output from \code{\link{getRegions()}}
+#'         giving the set of regions and statistics for each region.
+#' @param maxQuantile A \code{numeric(1)} giving the maximum quantile of each
+#'         feature to plot.
+#' @param bins A \code{numeric(1)} specifying the number of bins in each histogram.
+#' @param histCol A \code{character(1)} giving the color of the histogram.
+#' @param lineCol A \code{character(1)} giving the color of the vertical median
+#'         line.
+#' @param nBreaks A \code{numeric(1)} specifying the number of breaks for the
+#'         x-axis.
+#' @param save A \code{logical(1)} indicating whether to save the plot.
+#' @param file A \code{character(1)} giving the file name (.pdf) for the plot.
+#' @param width A \code{numeric(1)} specifying the width in inches of the saved
+#'         plot.
+#' @param height A \code{numeric(1)} specifying the height in inches of the saved
+#'         plot.
+#' @param verbose A \code{logical(1)} indicating whether messages should be
+#'         printed.
+#'
+#' @return A \code{ggplot} object.
+#'
+#' @seealso \itemize{
+#'         \item \code{\link{getRegions()}} to generate the set of regions.
+#'         \item \code{\link{plotSDstats()}}, \code{\link{getRegionTotals()}},
+#'                 and \code{\link{plotRegionTotals()}} for more help visualizing
+#'                 region characteristics and setting cutoffs for filtering.
+#'        \item \code{\link{filterRegions()}} for filtering regions by minimum
+#'                 coverage and methylation standard deviation.
+#' }
+#'
+#' @examples \dontrun{
+#'
+#' # Call Regions
+#' regions <- getRegions(bs, file = "Unfiltered_Regions.txt")
+#' plotRegionStats(regions, maxQuantile = 0.99,
+#'                 file = "Unfiltered_Region_Plots.pdf")
+#' plotSDstats(regions, maxQuantile = 0.99,
+#'             file = "Unfiltered_SD_Plots.pdf")
+#'
+#' # Examine Region Totals at Different Cutoffs
+#' regionTotals <- getRegionTotals(regions, file = "Region_Totals.txt")
+#' plotRegionTotals(regionTotals, file = "Region_Totals.pdf")
+#'
+#' # Filter Regions
+#' regions <- filterRegions(regions, covMin = 10, methSD = 0.05,
+#'                          file = "Filtered_Regions.txt")
+#' plotRegionStats(regions, maxQuantile = 0.99,
+#'                 file = "Filtered_Region_Plots.pdf")
+#' plotSDstats(regions, maxQuantile = 0.99,
+#'             file = "Filtered_SD_Plots.pdf")
+#' }
+#'
+#' @export
+#'
+#' @import ggplot2
+#' @importFrom scales breaks_pretty
+
+plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132B43",
+                            lineCol = "red", nBreaks = 4, save = TRUE,
+                            file = "Region_Plots.pdf", width = 11, height = 8.5,
+                            verbose = TRUE){
         if(verbose){
                 message("[plotRegionStats] Plotting histograms of region statistics")
         }
@@ -201,81 +271,181 @@ plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132
                               value = sapply(regions[,variables], FUN = median))
         if(maxQuantile < 1){
                 if(verbose){
-                        message("[plotRegionStats] Limiting x-axis to values in bottom ", maxQuantile * 100,
-                                "% for width, n, covMin, and covMean")
+                        message("[plotRegionStats] Limiting x-axis to values in bottom ",
+                                maxQuantile * 100, "% for width, n, covMin, and covMean")
                 }
-                regions$width[regions$width >= quantile(regions$width, probs = maxQuantile)] <- NA
-                regions$n[regions$n >= quantile(regions$n, probs = maxQuantile)] <- NA
-                regions$covMin[regions$covMin >= quantile(regions$covMin, probs = maxQuantile)] <- NA
-                regions$covMean[regions$covMean >= quantile(regions$covMean, probs = maxQuantile)] <- NA
+                regions$width[regions$width >= quantile(regions$width,
+                                                        probs = maxQuantile)] <- NA
+                regions$n[regions$n >= quantile(regions$n,
+                                                probs = maxQuantile)] <- NA
+                regions$covMin[regions$covMin >= quantile(regions$covMin,
+                                                          probs = maxQuantile)] <- NA
+                regions$covMean[regions$covMean >= quantile(regions$covMean,
+                                                            probs = maxQuantile)] <- NA
         }
-        regions <- reshape2::melt(regions[,c("RegionID", "width", "n", "covMin", "covMean", "methMean", "methSD")],
+        regions <- reshape2::melt(regions[,c("RegionID", "width", "n", "covMin",
+                                             "covMean", "methMean", "methSD")],
                                   id.vars = "RegionID")
         gg <- ggplot(data = regions)
         gg <- gg +
-                geom_histogram(aes(x = value), bins = bins, fill = histCol, color = histCol, na.rm = TRUE) +
+                geom_histogram(aes(x = value), bins = bins, fill = histCol,
+                               color = histCol, na.rm = TRUE) +
                 geom_vline(data = medians, aes(xintercept = value), color = lineCol) +
-                facet_wrap(vars(variable), nrow = 2, ncol = 3, scales = "free", strip.position = "bottom") +
+                facet_wrap(vars(variable), nrow = 2, ncol = 3, scales = "free",
+                           strip.position = "bottom") +
                 scale_x_continuous(breaks = breaks_pretty(n = nBreaks)) +
                 scale_y_continuous(expand = expansion(mult = c(0.008, 0.05))) +
                 theme_bw(base_size = 24) +
-                theme(axis.text.x = element_text(size = 12, color = "black"), axis.text.y = element_blank(),
-                      axis.ticks.x = element_line(size = 1.25, color = "black"), axis.ticks.y = element_blank(),
-                      axis.title = element_blank(), legend.position = "none",
+                theme(axis.text.x = element_text(size = 12, color = "black"),
+                      axis.text.y = element_blank(),
+                      axis.ticks.x = element_line(size = 1.25, color = "black"),
+                      axis.ticks.y = element_blank(), axis.title = element_blank(),
+                      legend.position = "none",
                       panel.border = element_rect(color = "black", size = 1.25),
                       panel.grid = element_blank(), panel.spacing.x = unit(0.6, "lines"),
-                      panel.spacing.y = unit(0.8, "lines"), plot.margin = unit(c(1,1,0.3,0.6), "lines"),
+                      panel.spacing.y = unit(0.8, "lines"),
+                      plot.margin = unit(c(1,1,0.3,0.6), "lines"),
                       strip.background = element_blank(), strip.placement = "outside",
-                      strip.switch.pad.wrap = unit(0, "lines"), strip.text.x = element_text(size = 16))
+                      strip.switch.pad.wrap = unit(0, "lines"),
+                      strip.text.x = element_text(size = 16))
         if(save){
                 if(verbose){
                         message("[plotRegionStats] Saving plots as ", file)
                 }
-                ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
+                ggsave(filename = file, plot = gg, dpi = 600, width = width,
+                       height = height, units = "in")
         }
         return(gg)
 }
 
-plotSDstats <- function(regions, maxQuantile = 1, bins = 30, nBreaks = 4, legend.position = c(1.09,0.9), save = TRUE,
-                        file = "SD_Plots.pdf", width = 8.5, height = 8.5, verbose = TRUE){
+#' Plot Heatmaps of Region Standard Deviation vs Features
+#'
+#' \code{plotSDstats()} takes a set of regions from \code{\link{getRegions()}},
+#' generates heatmaps of methylation standard deviation against region features,
+#' and saves it as a pdf. Compared features include number of CpGs, minimum
+#' coverage, mean coverage, and mean methylation.
+#'
+#' Plots are heatmaps of 2D bin counts, with the color indicating the number of
+#' regions in that bin on the log10 scale. It's recommended examine these plots
+#' before and after filtering to ensure removal of regions with high variability
+#' due to insufficient data.
+#'
+#' @param regions A \code{data.frame} output from \code{\link{getRegions()}}
+#'         giving the set of regions and statistics for each region.
+#' @param maxQuantile A \code{numeric(1)} giving the maximum quantile of each
+#'         feature to plot.
+#' @param bins A \code{numeric(1)} specifying the number of bins for both axes
+#'         in each heatmap.
+#' @param nBreaks A \code{numeric(1)} specifying the number of breaks for both
+#'         axes.
+#' @param legend.position A \code{numeric(2)} specifying the position of the
+#'         legend, as x-axis, y-axis. May also be a \code{character(1)}
+#'         indicating "none", "left", "right", "bottom", or "top".
+#' @param save A \code{logical(1)} indicating whether to save the plot.
+#' @param file A \code{character(1)} giving the file name (.pdf) for the plot.
+#' @param width A \code{numeric(1)} specifying the width in inches of the saved
+#'         plot.
+#' @param height A \code{numeric(1)} specifying the height in inches of the saved
+#'         plot.
+#' @param verbose A \code{logical(1)} indicating whether messages should be
+#'         printed.
+#'
+#' @return A \code{ggplot} object.
+#'
+#' @seealso \itemize{
+#'         \item \code{\link{getRegions()}} to generate the set of regions.
+#'         \item \code{\link{plotRegionStats()}}, \code{\link{getRegionTotals()}},
+#'                 and \code{\link{plotRegionTotals()}} for more help visualizing
+#'                 region characteristics and setting cutoffs for filtering.
+#'        \item \code{\link{filterRegions()}} for filtering regions by minimum
+#'                 coverage and methylation standard deviation.
+#' }
+#'
+#' @examples \dontrun{
+#'
+#' # Call Regions
+#' regions <- getRegions(bs, file = "Unfiltered_Regions.txt")
+#' plotRegionStats(regions, maxQuantile = 0.99,
+#'                 file = "Unfiltered_Region_Plots.pdf")
+#' plotSDstats(regions, maxQuantile = 0.99,
+#'             file = "Unfiltered_SD_Plots.pdf")
+#'
+#' # Examine Region Totals at Different Cutoffs
+#' regionTotals <- getRegionTotals(regions, file = "Region_Totals.txt")
+#' plotRegionTotals(regionTotals, file = "Region_Totals.pdf")
+#'
+#' # Filter Regions
+#' regions <- filterRegions(regions, covMin = 10, methSD = 0.05,
+#'                          file = "Filtered_Regions.txt")
+#' plotRegionStats(regions, maxQuantile = 0.99,
+#'                 file = "Filtered_Region_Plots.pdf")
+#' plotSDstats(regions, maxQuantile = 0.99,
+#'             file = "Filtered_SD_Plots.pdf")
+#' }
+#'
+#' @export
+#'
+#' @import ggplot2
+#' @importFrom scales breaks_pretty
+
+plotSDstats <- function(regions, maxQuantile = 1, bins = 30, nBreaks = 4,
+                        legend.position = c(1.09,0.9), save = TRUE,
+                        file = "SD_Plots.pdf", width = 8.5, height = 8.5,
+                        verbose = TRUE){
         if(verbose){
                 message("[plotSDstats] Plotting methylation SD vs region statistics")
         }
         if(maxQuantile < 1){
                 if(verbose){
-                        message("[plotSDstats] Limiting x-axis to values in bottom ", maxQuantile * 100,
-                                "% for n, covMin, and covMean")
+                        message("[plotSDstats] Limiting x-axis to values in bottom ",
+                                maxQuantile * 100, "% for n, covMin, and covMean")
                 }
-                regions$n[regions$n >= quantile(regions$n, probs = maxQuantile)] <- NA
-                regions$covMin[regions$covMin >= quantile(regions$covMin, probs = maxQuantile)] <- NA
-                regions$covMean[regions$covMean >= quantile(regions$covMean, probs = maxQuantile)] <- NA
+                regions$n[regions$n >= quantile(regions$n,
+                                                probs = maxQuantile)] <- NA
+                regions$covMin[regions$covMin >= quantile(regions$covMin,
+                                                          probs = maxQuantile)] <- NA
+                regions$covMean[regions$covMean >= quantile(regions$covMean,
+                                                            probs = maxQuantile)] <- NA
         }
-        regions <- reshape2::melt(regions[,c("RegionID", "n", "covMin", "covMean", "methMean", "methSD")],
+        regions <- reshape2::melt(regions[,c("RegionID", "n", "covMin", "covMean",
+                                             "methMean", "methSD")],
                                   id.vars = c("RegionID", "methSD"))
         gg <- ggplot(data = regions)
         gg <- gg +
-                geom_bin2d(aes(x = value, y = methSD, color = ..count..), bins = bins, na.rm = TRUE) +
-                facet_wrap(vars(variable), nrow = 2, ncol = 2, scales = "free_x", strip.position = "bottom") +
+                geom_bin2d(aes(x = value, y = methSD, color = ..count..),
+                           bins = bins, na.rm = TRUE) +
+                facet_wrap(vars(variable), nrow = 2, ncol = 2, scales = "free_x",
+                           strip.position = "bottom") +
                 scale_fill_continuous(name = "Count", trans = "log10") +
                 scale_color_continuous(guide = FALSE, trans = "log10") +
-                scale_x_continuous(breaks = breaks_pretty(n = nBreaks), expand = expansion(mult = c(0.0062, 0.05))) +
-                scale_y_continuous(breaks = breaks_pretty(n = nBreaks), expand = expansion(mult = c(0.006, 0.05))) +
+                scale_x_continuous(breaks = breaks_pretty(n = nBreaks),
+                                   expand = expansion(mult = c(0.0062, 0.05))) +
+                scale_y_continuous(breaks = breaks_pretty(n = nBreaks),
+                                   expand = expansion(mult = c(0.006, 0.05))) +
                 theme_bw(base_size = 24) +
                 theme(axis.text = element_text(size = 12, color = "black"),
                       axis.ticks = element_line(size = 1.25, color = "black"),
-                      axis.title.x = element_blank(), axis.title.y = element_text(size = 16, color = "black"),
-                      legend.background = element_blank(), legend.position = legend.position,
-                      legend.text = element_text(size = 12), legend.title = element_text(size = 16),
-                      panel.border = element_rect(color = "black", size = 1.25), panel.grid = element_blank(),
-                      panel.spacing.x = unit(1, "lines"), panel.spacing.y = unit(0.8, "lines"),
-                      plot.margin = unit(c(1,6,0.3,1), "lines"), strip.background = element_blank(),
-                      strip.placement = "outside", strip.switch.pad.wrap = unit(0, "lines"),
+                      axis.title.x = element_blank(),
+                      axis.title.y = element_text(size = 16, color = "black"),
+                      legend.background = element_blank(),
+                      legend.position = legend.position,
+                      legend.text = element_text(size = 12),
+                      legend.title = element_text(size = 16),
+                      panel.border = element_rect(color = "black", size = 1.25),
+                      panel.grid = element_blank(),
+                      panel.spacing.x = unit(1, "lines"),
+                      panel.spacing.y = unit(0.8, "lines"),
+                      plot.margin = unit(c(1,6,0.3,1), "lines"),
+                      strip.background = element_blank(),
+                      strip.placement = "outside",
+                      strip.switch.pad.wrap = unit(0, "lines"),
                       strip.text.x = element_text(size = 16))
         if(save){
                 if(verbose){
                         message("[plotSDstats] Saving plots as ", file)
                 }
-                ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
+                ggsave(filename = file, plot = gg, dpi = 600, width = width,
+                       height = height, units = "in")
         }
         return(gg)
 }
