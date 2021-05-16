@@ -1,8 +1,63 @@
-getRegionMeth <- function(regions, bs, type = "raw", save = TRUE, file = "Region_Methylation.rds", verbose = TRUE){
+#' Get Region Methylation Data
+#'
+#' \code{getRegionMeth()} extracts methylation values at specified regions for
+#' all samples and then saves it as a .rds file.
+#'
+#' Methylation is summarized at the region level, and is estimated as the
+#' methylated reads divided by the total reads. Methylation values are obtained
+#' from a \code{\link[bsseq:`BSseq-class`]{BSseq}} object and can be either raw
+#' or smoothed methylation.
+#'
+#' @param regions A \code{data.frame} of regions, typically after filtering with
+#'         \code{\link{filterRegions()}}. Must have the columns \code{chr},
+#'         \code{start}, and \code{end}.
+#' @param bs A \code{\link[bsseq:`BSseq-class`]{BSseq}} object, typically after
+#'         filtering with \code{\link{filterCpGs()}}.
+#' @param type A \code{character(1)}, specifying the type of methylation values
+#'         to extract. Accepted values are \code{raw} and \code{smooth}
+#' @param save A \code{logical(1)} indicating whether to save the \code{matrix}.
+#' @param file A \code{character(1)} giving the file name (.rds) for the saved
+#'         \code{matrix}.
+#' @param verbose A \code{logical(1)} indicating whether messages should be
+#'         printed.
+#'
+#' @return A \code{matrix}, where each row is a region and each column is a
+#'         sample.
+#'
+#' @seealso \itemize{
+#'         \item \code{\link{adjustRegionMeth()}} to adjust methylation for the
+#'                 top principal components.
+#'         \item \code{\link{getDendro()}} and \code{\link{plotDendro()}} to
+#'                 generate methylation-based dendrograms.
+#' }
+#'
+#' @examples \dontrun{
+#'
+#' # Get Methylation Data
+#' meth <- getRegionMeth(regions, bs = bs, file = "Region_Methylation.rds")
+#'
+#' # Adjust Methylation Data for PCs
+#' mod <- model.matrix(~1, data = pData(bs))
+#' methAdj <- adjustRegionMeth(meth, mod = mod,
+#'                             file = "Adjusted_Region_Methylation.rds")
+#'
+#' # Assess Sample Similarity
+#' getDendro(methAdj, distance = "euclidean") %>%
+#'         plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25,0.08))
+#' }
+#'
+#' @export
+#'
+#' @import bsseq
+
+getRegionMeth <- function(regions, bs, type = c("raw", "smooth"), save = TRUE,
+                          file = "Region_Methylation.rds", verbose = TRUE){
         if(verbose){
                 message("[getRegionMeth] Calculating region methylation from BSseq object")
         }
-        meth <- getMeth(bs, regions = regions[,c("chr", "start", "end")], type = type, what = "perRegion")
+        type <- match.arg(type)
+        meth <- getMeth(bs, regions = regions[,c("chr", "start", "end")],
+                        type = type, what = "perRegion")
         rownames(meth) <- regions$RegionID
         if(save){
                 if(verbose){
@@ -13,14 +68,66 @@ getRegionMeth <- function(regions, bs, type = "raw", save = TRUE, file = "Region
         return(meth)
 }
 
-adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1), save = TRUE,
-                             file = "Adjusted_Region_Methylation.rds", verbose = TRUE){
+#' Adjust Methylation Data for Principal Components
+#'
+#' \code{adjustRegionMeth()} adjusts region methylation data for the top
+#' principal components, transposes it, and then saves it as a .rds file.
+#'
+#' \code{adjustRegionMeth()} uses \code{\link[sva]{sva_network()}} to regress out
+#' the top principal components. More information on the function and approach is
+#' given in the documentation and publications related to the \code{sva} package.
+#'
+#' @param meth A \code{matrix}, where each row is a region and each column is a
+#'         sample. This is typically obtained from \code{\link{getRegionMeth()}}.
+#' @param mod A \code{matrix} giving the model matrix being used to fit the data.
+#'         See below for an example.
+#' @param save A \code{logical(1)} indicating whether to save the \code{matrix}.
+#' @param file A \code{character(1)} giving the file name (.rds) for the saved
+#'         \code{matrix}.
+#' @param verbose A \code{logical(1)} indicating whether messages should be
+#'         printed.
+#'
+#' @return A \code{matrix}, where each row is a sample and each column is a
+#'         region.
+#'
+#' @seealso \itemize{
+#'         \item \code{\link{getRegionMeth()}} to extract region methylation
+#'                 values.
+#'         \item \code{\link{getDendro()}} and \code{\link{plotDendro()}} to
+#'                 generate methylation-based dendrograms.
+#' }
+#'
+#' @examples \dontrun{
+#'
+#' # Get Methylation Data
+#' meth <- getRegionMeth(regions, bs = bs, file = "Region_Methylation.rds")
+#'
+#' # Adjust Methylation Data for PCs
+#' mod <- model.matrix(~1, data = pData(bs))
+#' methAdj <- adjustRegionMeth(meth, mod = mod,
+#'                             file = "Adjusted_Region_Methylation.rds")
+#'
+#' # Assess Sample Similarity
+#' getDendro(methAdj, distance = "euclidean") %>%
+#'         plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25,0.08))
+#' }
+#'
+#' @export
+#'
+#' @import sva
+#' @importFrom magrittr %>%
+
+adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
+                             save = TRUE,
+                             file = "Adjusted_Region_Methylation.rds",
+                             verbose = TRUE){
         if(verbose){
                 message("[adjustRegionMeth] Determining number of principal components to adjust for")
         }
         n.pc <- num.sv(meth, mod = mod, seed = 5)
         if(verbose){
-                message("[adjustRegionMeth] Adjusting region methylation for the top ", n.pc, " principal components")
+                message("[adjustRegionMeth] Adjusting region methylation for the top ",
+                        n.pc, " principal components")
         }
         methAdj <- sva_network(meth, n.pc = n.pc) %>% t()
         if(save){
@@ -32,8 +139,8 @@ adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
         return(methAdj)
 }
 
-getDendro <- function(x, transpose = FALSE, distance = c("euclidean", "pearson", "bicor"), maxPOutliers = 0.1,
-                      verbose = TRUE){
+getDendro <- function(x, transpose = FALSE, distance = c("euclidean", "pearson", "bicor"),
+                      maxPOutliers = 0.1, verbose = TRUE){
         if(transpose){
                 if(verbose){
                         message("[getDendro] Transposing data")
@@ -51,13 +158,15 @@ getDendro <- function(x, transpose = FALSE, distance = c("euclidean", "pearson",
                         if(verbose){
                                 message("[getDendro] Clustering with pearson correlation as the distance")
                         }
-                        dist <- (1 - WGCNA::cor(x, use = "pairwise.complete.obs")) %>% as.dist()
+                        dist <- (1 - WGCNA::cor(x, use = "pairwise.complete.obs")) %>%
+                                as.dist()
                 } else {
                         if(distance == "bicor"){
                                 if(verbose){
                                         message("[getDendro] Clustering with bicor correlation as the distance")
                                 }
-                                dist <- (1 - bicor(x, maxPOutliers = maxPOutliers, use = "pairwise.complete.obs")) %>%
+                                dist <- (1 - bicor(x, maxPOutliers = maxPOutliers,
+                                                   use = "pairwise.complete.obs")) %>%
                                         as.dist()
                         } else {
                                 stop("[getDendro] Error: Distance must be either euclidean, pearson, or bicor")
@@ -69,37 +178,50 @@ getDendro <- function(x, transpose = FALSE, distance = c("euclidean", "pearson",
         return(dendro)
 }
 
-plotDendro <- function(dendro, label = TRUE, labelSize = 2.5, expandX = c(0.03,0.03), expandY = c(0.3,0.08),
-                       nBreaks = 4, save = TRUE, file = "Dendrogram.pdf", width = 11, height = 4.25, verbose = TRUE){
+plotDendro <- function(dendro, label = TRUE, labelSize = 2.5,
+                       expandX = c(0.03,0.03), expandY = c(0.3,0.08), nBreaks = 4,
+                       save = TRUE, file = "Dendrogram.pdf", width = 11,
+                       height = 4.25, verbose = TRUE){
         if(verbose){
                 message("[plotDendro] Plotting dendrogram")
         }
         dendroPlot <- dendro_data(dendro)
         fix <- dendroPlot$segments$yend == 0
-        dendroPlot$segments$yend[fix] <- dendroPlot$segments$y[fix] - max(dendroPlot$segments$y) * 0.05
-        dendroPlot$labels$y <- dendroPlot$segments$yend[fix] - max(dendroPlot$segments$y) * 0.01
-        dendroPlot$labels$label <- str_remove_all(dendroPlot$labels$label, pattern = "ME")
+        dendroPlot$segments$yend[fix] <- dendroPlot$segments$y[fix] -
+                max(dendroPlot$segments$y) * 0.05
+        dendroPlot$labels$y <- dendroPlot$segments$yend[fix] -
+                max(dendroPlot$segments$y) * 0.01
+        dendroPlot$labels$label <- str_remove_all(dendroPlot$labels$label,
+                                                  pattern = "ME")
         gg <- ggplot()
         gg <- gg +
-                geom_segment(data = dendroPlot$segments, aes(x = x, y = y, xend = xend, yend = yend), lwd = 0.3, lineend = "square") +
+                geom_segment(data = dendroPlot$segments,
+                             aes(x = x, y = y, xend = xend, yend = yend),
+                             lwd = 0.3, lineend = "square") +
                 scale_x_continuous(expand = expansion(mult = expandX)) +
-                scale_y_continuous(expand = expansion(mult = expandY), breaks = breaks_pretty(n = nBreaks)) +
+                scale_y_continuous(expand = expansion(mult = expandY),
+                                   breaks = breaks_pretty(n = nBreaks)) +
                 ylab("Height") +
                 theme_dendro() +
                 theme(plot.margin = unit(c(1,1,0,1), "lines"),
-                      panel.background = element_rect(color = "black", fill = "white", size = 1.1),
-                      axis.ticks.y = element_line(), axis.text.y = element_text(size = 12, color = "black"),
-                      axis.title.y = element_text(size = 16, angle = 90, vjust = 2))
+                      panel.background = element_rect(color = "black",
+                                                      fill = "white", size = 1.1),
+                      axis.ticks.y = element_line(),
+                      axis.text.y = element_text(size = 12, color = "black"),
+                      axis.title.y = element_text(size = 16, angle = 90,
+                                                  vjust = 2))
         if(label){
                 gg <- gg +
-                        geom_text(data = dendroPlot$labels, aes(x = x, y = y, label = label), angle = 90, hjust = 1,
-                                  size = labelSize)
+                        geom_text(data = dendroPlot$labels,
+                                  aes(x = x, y = y, label = label), angle = 90,
+                                  hjust = 1, size = labelSize)
         }
         if(save){
                 if(verbose){
                         message("[plotDendro] Saving plot as ", file)
                 }
-                ggsave(filename = file, plot = gg, dpi = 600, width = width, height = height, units = "in")
+                ggsave(filename = file, plot = gg, dpi = 600, width = width,
+                       height = height, units = "in")
         }
         return(gg)
 }
