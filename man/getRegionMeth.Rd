@@ -68,6 +68,6 @@ getDendro(methAdj, distance = "euclidean") \%>\%
 \item \code{\link{adjustRegionMeth()}} to adjust methylation for the
 top principal components.
 \item \code{\link{getDendro()}} and \code{\link{plotDendro()}} to
-generate methylation-based dendrograms.
+generate and visualize dendrograms.
 }
 }

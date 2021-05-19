@@ -62,6 +62,6 @@ getDendro(methAdj, distance = "euclidean") \%>\%
 \item \code{\link{getRegionMeth()}} to extract region methylation
 values.
 \item \code{\link{getDendro()}} and \code{\link{plotDendro()}} to
-generate methylation-based dendrograms.
+generate and visualize dendrograms.
 }
 }
