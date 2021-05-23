@@ -607,6 +607,7 @@ getRegionTotals <- function(regions, covMin = seq(0,20,2), methSD = seq(0,0.1,0.
 #' @import ggplot2
 #' @importFrom scales breaks_pretty
 #' @importFrom magrittr %>%
+#' @importFrom stringr str_replace_all
 
 plotRegionTotals <- function(regionTotals, nBreaks = 4,
                              legend.position = c(1.08,0.897), save = TRUE,
@@ -618,9 +619,9 @@ plotRegionTotals <- function(regionTotals, nBreaks = 4,
         regionTotals <- reshape2::melt(regionTotals,
                                        id.vars = c("covMin", "methSD"))
         regionTotals$variable <- as.character(regionTotals$variable) %>%
-                stringr::str_replace_all(pattern = c("totalRegions_K" = "Total Regions (Thousands)",
-                                                     "totalWidth_Mb" = "Total Width (Mb)",
-                                                     "totalN_M" = "Total CpGs (Millions)")) %>%
+                str_replace_all(pattern = c("totalRegions_K" = "Total Regions (Thousands)",
+                                            "totalWidth_Mb" = "Total Width (Mb)",
+                                            "totalN_M" = "Total CpGs (Millions)")) %>%
                 factor(levels = c("Total Regions (Thousands)", "Total Width (Mb)",
                                   "Total CpGs (Millions)"))
         gg <- ggplot(data = regionTotals)

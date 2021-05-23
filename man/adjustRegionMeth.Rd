@@ -13,8 +13,9 @@ adjustRegionMeth(
 )
 }
 \arguments{
-\item{meth}{A \code{matrix}, where each row is a region and each column is a
-sample. This is typically obtained from \code{\link{getRegionMeth()}}.}
+\item{meth}{A \code{numeric matrix}, where each row is a region and each
+column is a sample. This is typically obtained from
+\code{\link{getRegionMeth()}}.}
 
 \item{mod}{A \code{matrix} giving the model matrix being used to fit the data.
 See below for an example.}
@@ -28,8 +29,8 @@ See below for an example.}
 printed.}
 }
 \value{
-A \code{matrix}, where each row is a sample and each column is a
-region.
+A \code{numeric matrix}, where each row is a sample and each column
+is a region.
 }
 \description{
 \code{adjustRegionMeth()} adjusts region methylation data for the top
@@ -54,6 +55,14 @@ methAdj <- adjustRegionMeth(meth, mod = mod,
 # Assess Sample Similarity
 getDendro(methAdj, distance = "euclidean") \%>\%
         plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25,0.08))
+
+# Select Soft Power Threshold
+sft <- getSoftPower(methAdj, corType = "pearson", file = "Soft_Power.rds")
+plotSoftPower(sft, file = "Soft_Power_Plots.pdf")
+
+# Get Comethylation Modules
+modules <- getModules(methAdj, power = sft$powerEstimate, regions = regions,
+                      corType = "pearson", file = "Modules.rds")
 }
 
 }
@@ -63,5 +72,10 @@ getDendro(methAdj, distance = "euclidean") \%>\%
 values.
 \item \code{\link{getDendro()}} and \code{\link{plotDendro()}} to
 generate and visualize dendrograms.
+\item \code{\link{getSoftPower()}} and \code{\link{plotSoftPower()}}
+to estimate the best soft-thresholding power and visualize
+scale-free topology fit and connectivity.
+\item \code{\link{getModules()}} to build a comethylation network and
+identify modules of comethylated regions.
 }
 }

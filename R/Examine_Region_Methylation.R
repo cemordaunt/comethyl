@@ -13,7 +13,7 @@
 #'         \code{start}, and \code{end}.
 #' @param bs A \code{\link[bsseq:`BSseq-class`]{BSseq}} object, typically after
 #'         filtering with \code{\link{filterCpGs()}}.
-#' @param type A \code{character(1)}, specifying the type of methylation values
+#' @param type A \code{character(1)} specifying the type of methylation values
 #'         to extract. Accepted values are \code{raw} and \code{smooth}
 #' @param save A \code{logical(1)} indicating whether to save the \code{matrix}.
 #' @param file A \code{character(1)} giving the file name (.rds) for the saved
@@ -21,8 +21,8 @@
 #' @param verbose A \code{logical(1)} indicating whether messages should be
 #'         printed.
 #'
-#' @return A \code{matrix}, where each row is a region and each column is a
-#'         sample.
+#' @return A \code{numeric matrix}, where each row is a region and each column
+#'         is a sample.
 #'
 #' @seealso \itemize{
 #'         \item \code{\link{adjustRegionMeth()}} to adjust methylation for the
@@ -77,8 +77,9 @@ getRegionMeth <- function(regions, bs, type = c("raw", "smooth"), save = TRUE,
 #' the top principal components. More information on the function and approach is
 #' given in the documentation and publications related to the \code{sva} package.
 #'
-#' @param meth A \code{matrix}, where each row is a region and each column is a
-#'         sample. This is typically obtained from \code{\link{getRegionMeth()}}.
+#' @param meth A \code{numeric matrix}, where each row is a region and each
+#'         column is a sample. This is typically obtained from
+#'         \code{\link{getRegionMeth()}}.
 #' @param mod A \code{matrix} giving the model matrix being used to fit the data.
 #'         See below for an example.
 #' @param save A \code{logical(1)} indicating whether to save the \code{matrix}.
@@ -87,14 +88,19 @@ getRegionMeth <- function(regions, bs, type = c("raw", "smooth"), save = TRUE,
 #' @param verbose A \code{logical(1)} indicating whether messages should be
 #'         printed.
 #'
-#' @return A \code{matrix}, where each row is a sample and each column is a
-#'         region.
+#' @return A \code{numeric matrix}, where each row is a sample and each column
+#'         is a region.
 #'
 #' @seealso \itemize{
 #'         \item \code{\link{getRegionMeth()}} to extract region methylation
 #'                 values.
 #'         \item \code{\link{getDendro()}} and \code{\link{plotDendro()}} to
 #'                 generate and visualize dendrograms.
+#'         \item \code{\link{getSoftPower()}} and \code{\link{plotSoftPower()}}
+#'                 to estimate the best soft-thresholding power and visualize
+#'                 scale-free topology fit and connectivity.
+#'         \item \code{\link{getModules()}} to build a comethylation network and
+#'                 identify modules of comethylated regions.
 #' }
 #'
 #' @examples \dontrun{
@@ -110,6 +116,14 @@ getRegionMeth <- function(regions, bs, type = c("raw", "smooth"), save = TRUE,
 #' # Assess Sample Similarity
 #' getDendro(methAdj, distance = "euclidean") %>%
 #'         plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25,0.08))
+#'
+#' # Select Soft Power Threshold
+#' sft <- getSoftPower(methAdj, corType = "pearson", file = "Soft_Power.rds")
+#' plotSoftPower(sft, file = "Soft_Power_Plots.pdf")
+#'
+#' # Get Comethylation Modules
+#' modules <- getModules(methAdj, power = sft$powerEstimate, regions = regions,
+#'                       corType = "pearson", file = "Modules.rds")
 #' }
 #'
 #' @export
@@ -200,6 +214,7 @@ adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
 #'
 #' @import WGCNA
 #' @importFrom magrittr %>%
+#' @importFrom stringr str_remove_all
 
 getDendro <- function(x, transpose = FALSE,
                       distance = c("euclidean", "pearson", "bicor"),
@@ -237,7 +252,7 @@ getDendro <- function(x, transpose = FALSE,
                 }
         }
         dendro <- hclust(dist, method = "average")
-        dendro$labels <- stringr::str_remove_all(dendro$labels, pattern = "ME")
+        dendro$labels <- str_remove_all(dendro$labels, pattern = "ME")
         return(dendro)
 }
 
@@ -307,6 +322,7 @@ getDendro <- function(x, transpose = FALSE,
 #' @import ggplot2
 #' @import ggdendro
 #' @importFrom scales breaks_pretty
+#' @importFrom stringr str_remove_all
 
 plotDendro <- function(dendro, label = TRUE, labelSize = 2.5,
                        expandX = c(0.03,0.03), expandY = c(0.3,0.08), nBreaks = 4,
@@ -321,8 +337,8 @@ plotDendro <- function(dendro, label = TRUE, labelSize = 2.5,
                 max(dendroPlot$segments$y) * 0.05
         dendroPlot$labels$y <- dendroPlot$segments$yend[fix] -
                 max(dendroPlot$segments$y) * 0.01
-        dendroPlot$labels$label <- stringr::str_remove_all(dendroPlot$labels$label,
-                                                           pattern = "ME")
+        dendroPlot$labels$label <- str_remove_all(dendroPlot$labels$label,
+                                                  pattern = "ME")
         gg <- ggplot()
         gg <- gg +
                 geom_segment(data = dendroPlot$segments,

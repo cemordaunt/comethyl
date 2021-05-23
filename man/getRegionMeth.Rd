@@ -21,7 +21,7 @@ getRegionMeth(
 \item{bs}{A \code{\link[bsseq:`BSseq-class`]{BSseq}} object, typically after
 filtering with \code{\link{filterCpGs()}}.}
 
-\item{type}{A \code{character(1)}, specifying the type of methylation values
+\item{type}{A \code{character(1)} specifying the type of methylation values
 to extract. Accepted values are \code{raw} and \code{smooth}}
 
 \item{save}{A \code{logical(1)} indicating whether to save the \code{matrix}.}
@@ -33,8 +33,8 @@ to extract. Accepted values are \code{raw} and \code{smooth}}
 printed.}
 }
 \value{
-A \code{matrix}, where each row is a region and each column is a
-sample.
+A \code{numeric matrix}, where each row is a region and each column
+is a sample.
 }
 \description{
 \code{getRegionMeth()} extracts methylation values at specified regions for
