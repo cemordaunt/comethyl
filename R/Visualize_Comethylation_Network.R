@@ -169,7 +169,8 @@ getModuleBED <- function(regions, grey = FALSE, save = TRUE, file = "Modules.bed
 #' @param transpose A \code{logical(1)} specifying whether to transpose the
 #'         \code{matrix}.
 #' @param corType A \code{character(1)} indicating which correlation statistic
-#'         to use in the calculation.
+#'         to use in the calculation. Potential values include \code{pearson} and
+#'         \code{bicor}.
 #' @param maxPOutliers A \code{numeric(1)} specifying the maximum percentile that
 #'         can be considered outliers on each side of the median for the
 #'         \code{bicor} statistic.

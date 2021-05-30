@@ -25,7 +25,8 @@ be calculated for columns of \code{x}.}
 \code{matrix}.}
 
 \item{corType}{A \code{character(1)} indicating which correlation statistic
-to use in the calculation.}
+to use in the calculation. Potential values include \code{pearson} and
+\code{bicor}.}
 
 \item{maxPOutliers}{A \code{numeric(1)} specifying the maximum percentile that
 can be considered outliers on each side of the median for the
