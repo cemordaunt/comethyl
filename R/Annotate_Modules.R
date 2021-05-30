@@ -63,7 +63,8 @@
 #'         downstream of the TSS (in kb) to define the maximum extension of the
 #'         regulatory domain in the \code{oneClosest} rule.
 #' @param version A \code{character(1)} specifying the version of GREAT to use
-#'         for gene annotation. Different versions of GREAT support different
+#'         for gene annotation. Possible values include \code{4.0.4}, \code{3.0.0},
+#'         and \code{2.0.2}. Different versions of GREAT support different
 #'         genomes. See \code{Details}.
 #' @param save A \code{logical(1)} indicating whether to save the
 #'         \code{data.frame}.
@@ -82,7 +83,7 @@
 #'                 from the annotated regions.
 #'         \item \code{\link{listOntologies()}}, \code{\link{enrichModule()}},
 #'                 and \code{\link{plotEnrichment()}} to investigate functional
-#'                 enrichments of module regions with GREAT.
+#'                 enrichment of module regions with GREAT.
 #' }
 #'
 #' @examples \dontrun{
@@ -297,11 +298,11 @@ annotateModule <- function(regions, module = NULL, grey = FALSE,
 #' @seealso \itemize{
 #'         \item \code{\link{getModules()}} to build a comethylation network and
 #'                 identify modules of comethylated regions.
-#'         \item \code{\link{annotateModule()}} to annotate set of regions with
+#'         \item \code{\link{annotateModule()}} to annotate a set of regions with
 #'                 genes and regulatory context.
 #'         \item \code{\link{listOntologies()}}, \code{\link{enrichModule()}},
 #'                 and \code{\link{plotEnrichment()}} to investigate functional
-#'                 enrichments of module regions with GREAT.
+#'                 enrichment of module regions with GREAT.
 #' }
 #'
 #' @examples \dontrun{

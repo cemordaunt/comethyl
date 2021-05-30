@@ -66,10 +66,10 @@ plotEnrichment(enrich_bisque4,
 \itemize{
 \item \code{\link{getModules()}} to build a comethylation network and
 identify modules of comethylated regions.
-\item \code{\link{annotateModule()}} to annotate set of regions with
+\item \code{\link{annotateModule()}} to annotate a set of regions with
 genes and regulatory context.
 \item \code{\link{listOntologies()}}, \code{\link{enrichModule()}},
 and \code{\link{plotEnrichment()}} to investigate functional
-enrichments of module regions with GREAT.
+enrichment of module regions with GREAT.
 }
 }

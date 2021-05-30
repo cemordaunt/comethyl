@@ -29,7 +29,7 @@
 #' @param adjMethod A \code{character(1)} specifying the method for adjusting
 #'         p-values, Potential values include \code{fdr}, \code{holm},
 #'         \code{hochberg}, \code{hommel}, \code{bonferroni}, \code{BH},
-#'         \code{BY} and \code{none}.
+#'         \code{BY}, and \code{none}.
 #' @param save A \code{logical(1)} indicating whether to save the
 #'         \code{data.frame}.
 #' @param file A \code{character(1)} giving the file name (.txt) for the saved
