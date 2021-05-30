@@ -605,9 +605,10 @@ getRegionTotals <- function(regions, covMin = seq(0,20,2), methSD = seq(0,0.1,0.
 #' @export
 #'
 #' @import ggplot2
+#' @import stringr
+#'
 #' @importFrom scales breaks_pretty
 #' @importFrom magrittr %>%
-#' @importFrom stringr str_replace_all
 
 plotRegionTotals <- function(regionTotals, nBreaks = 4,
                              legend.position = c(1.08,0.897), save = TRUE,

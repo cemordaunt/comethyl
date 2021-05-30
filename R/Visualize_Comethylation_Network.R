@@ -117,8 +117,9 @@ plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pd
 #'
 #' @export
 #'
+#' @import stringr
+#'
 #' @importFrom magrittr %>%
-#' @importFrom stringr str_remove_all
 
 getModuleBED <- function(regions, grey = FALSE, save = TRUE, file = "Modules.bed",
                          verbose = TRUE){
@@ -150,7 +151,6 @@ getModuleBED <- function(regions, grey = FALSE, save = TRUE, file = "Modules.bed
         }
         return(BED)
 }
-
 
 #' Calculate Correlations
 #'

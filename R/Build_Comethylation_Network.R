@@ -192,8 +192,8 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
 #' @export
 #'
 #' @import ggplot2
+#' @import stringr
 #' @importFrom scales breaks_pretty
-#' @importFrom stringr str_replace_all
 
 plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 4,
                           save = TRUE, file = "Soft_Power_Plots.pdf", width = 8.5,
@@ -342,8 +342,8 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
 #' @export
 #'
 #' @import WGCNA
+#' @import stringr
 #' @importFrom magrittr %>%
-#' @importFrom stringr str_remove_all
 
 getModules <- function(meth, power, regions, maxBlockSize = 40000,
                        corType = c("pearson", "bicor"), maxPOutliers = 0.1,

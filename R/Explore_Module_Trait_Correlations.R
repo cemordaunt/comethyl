@@ -84,8 +84,8 @@
 #' @export
 #'
 #' @import WGCNA
+#' @import stringr
 #' @importFrom magrittr %>%
-#' @importFrom stringr str_remove_all
 
 getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"),
                           maxPOutliers = 0.1, robustY = FALSE,
@@ -435,6 +435,7 @@ plotMEtraitCor <- function(MEtraitCor,
 #'
 #' @import ggplot2
 #' @importFrom magrittr %>%
+#' @importFrom scales breaks_pretty
 
 plotMEtraitDot <- function(ME, trait, traitCode = NULL, colors = NULL,
                            fun.data = c("median_hilow", "mean_cl_boot",
@@ -579,6 +580,8 @@ plotMEtraitDot <- function(ME, trait, traitCode = NULL, colors = NULL,
 #' @export
 #'
 #' @import ggplot2
+#'
+#' @importFrom scales breaks_pretty
 
 plotMEtraitScatter <- function(ME, trait, color = "#132B43", xlim = NULL,
                                ylim = NULL, nBreaks = 4, point.size = 2.5,

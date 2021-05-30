@@ -213,8 +213,8 @@ adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
 #' @export
 #'
 #' @import WGCNA
+#' @import stringr
 #' @importFrom magrittr %>%
-#' @importFrom stringr str_remove_all
 
 getDendro <- function(x, transpose = FALSE,
                       distance = c("euclidean", "pearson", "bicor"),
@@ -321,8 +321,8 @@ getDendro <- function(x, transpose = FALSE,
 #'
 #' @import ggplot2
 #' @import ggdendro
+#' @import stringr
 #' @importFrom scales breaks_pretty
-#' @importFrom stringr str_remove_all
 
 plotDendro <- function(dendro, label = TRUE, labelSize = 2.5,
                        expandX = c(0.03,0.03), expandY = c(0.3,0.08), nBreaks = 4,
