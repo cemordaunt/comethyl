@@ -39,7 +39,7 @@ if \code{y} is a binary variable.}
 \item{adjMethod}{A \code{character(1)} specifying the method for adjusting
 p-values, Potential values include \code{fdr}, \code{holm},
 \code{hochberg}, \code{hommel}, \code{bonferroni}, \code{BH},
-\code{BY} and \code{none}.}
+\code{BY}, and \code{none}.}
 
 \item{save}{A \code{logical(1)} indicating whether to save the
 \code{data.frame}.}

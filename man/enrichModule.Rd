@@ -87,7 +87,7 @@ when adjusting p-values for multiple comparisons.}
 \item{adjMethod}{A \code{character(1)} specifying the method for adjusting
 p-values, Potential values include \code{fdr}, \code{holm},
 \code{hochberg}, \code{hommel}, \code{bonferroni}, \code{BH},
-\code{BY} and \code{none}.}
+\code{BY}, and \code{none}.}
 
 \item{min_region_hits}{A \code{numeric(1)} giving the minimum number of overlaps
 of gene set regulatory domains with module regions to include that gene
