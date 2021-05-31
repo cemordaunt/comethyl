@@ -114,6 +114,7 @@
 #' @import stringr
 #' @import biomaRt
 #' @import annotatr
+#' @import utils
 #'
 #' @importFrom magrittr %>%
 
@@ -163,7 +164,7 @@ annotateModule <- function(regions, module = NULL, grey = FALSE,
                               adv_twoDistance = adv_twoDistance,
                               adv_oneDistance = adv_oneDistance,
                               request_interval = 0, version = version)
-        regions_genes <- suppressGraphics(
+        regions_genes <- R.devices::suppressGraphics(
                 plotRegionGeneAssociationGraphs(job, type = 1, request_interval = 0)) %>%
                 as.data.frame() %>%
                 merge(x = regions[,c("RegionID", "chr", "start", "end")],
@@ -201,11 +202,12 @@ annotateModule <- function(regions, module = NULL, grey = FALSE,
                                    by = "gene_symbol", all.x = TRUE, all.y = FALSE,
                                    sort = FALSE) %>%
                 unique() %>%
-                aggregate(formula = cbind(gene_symbol, distance_to_TSS,
-                                          gene_description, gene_ensemblID,
-                                          gene_entrezID) ~ RegionID,
-                          data = ., FUN = function(x) paste(x, collapse = " | "),
-                          simplify = TRUE, drop = FALSE) %>%
+                stats::aggregate(formula = cbind(gene_symbol, distance_to_TSS,
+                                                 gene_description, gene_ensemblID,
+                                                 gene_entrezID) ~ RegionID,
+                                 data = .,
+                                 FUN = function(x) paste(x, collapse = " | "),
+                                 simplify = TRUE, drop = FALSE) %>%
                 merge(x = regions, y = ., by = "RegionID", all.x = TRUE,
                       all.y = FALSE, sort = FALSE)
         if(!genome %in% c("hg18", "danRer7")){
@@ -226,10 +228,10 @@ annotateModule <- function(regions, module = NULL, grey = FALSE,
                 names(pattern) <- c(genome, "genes", "s", "fantom", "_")
                 regions_GeneReg$gene_context <- str_replace_all(regions_GeneReg$gene_context,
                                                                 pattern = pattern)
-                regions_annotated <- aggregate(formula = gene_context ~ RegionID,
-                                               data = regions_GeneReg,
-                                               FUN = function(x) paste(unique(x), collapse = ", "),
-                                               simplify = TRUE) %>%
+                regions_annotated <- stats::aggregate(formula = gene_context ~ RegionID,
+                                                      data = regions_GeneReg,
+                                                      FUN = function(x) paste(unique(x), collapse = ", "),
+                                                      simplify = TRUE) %>%
                         merge(x = regions_annotated, y = ., by = "RegionID",
                               all.x = TRUE, all.y = FALSE, sort = FALSE)
                 if(verbose){
@@ -248,10 +250,10 @@ annotateModule <- function(regions, module = NULL, grey = FALSE,
                                         sep = "_")
                 regions_CpGs$CpG_context <- str_replace_all(regions_CpGs$CpG_context,
                                                             pattern = pattern)
-                regions_annotated <- aggregate(formula = CpG_context ~ RegionID,
-                                               data = regions_CpGs,
-                                               FUN = function(x) paste(unique(x), collapse = ", "),
-                                               simplify = TRUE) %>%
+                regions_annotated <- stats::aggregate(formula = CpG_context ~ RegionID,
+                                                      data = regions_CpGs,
+                                                      FUN = function(x) paste(unique(x), collapse = ", "),
+                                                      simplify = TRUE) %>%
                         merge(x = regions_annotated, y = ., by = "RegionID",
                               all.x = TRUE, all.y = FALSE, sort = FALSE)
         } else {

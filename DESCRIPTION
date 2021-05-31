@@ -36,6 +36,7 @@ Imports:
     GenomicRanges,
     ggdendro,
     ggplot2,
+    grDevices,
     IRanges,
     magrittr,
     MASS,
@@ -48,8 +49,10 @@ Imports:
     rlist,
     rtracklayer,
     scales,
+    stats,
     stringr,
     sva,
     tibble,
     tidyr,
+    utils,
     WGCNA

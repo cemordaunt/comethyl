@@ -46,6 +46,7 @@
 #' @export
 #'
 #' @import WGCNA
+#' @import grDevices
 
 plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pdf",
                              width = 11, height = 4.25, verbose = TRUE){
@@ -118,6 +119,8 @@ plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pd
 #' @export
 #'
 #' @import stringr
+#' @import grDevices
+#' @import utils
 #'
 #' @importFrom magrittr %>%
 

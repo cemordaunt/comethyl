@@ -129,6 +129,7 @@ getRegionMeth <- function(regions, bs, type = c("raw", "smooth"), save = TRUE,
 #' @export
 #'
 #' @import sva
+#'
 #' @importFrom magrittr %>%
 
 adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
@@ -214,6 +215,7 @@ adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
 #'
 #' @import WGCNA
 #' @import stringr
+#'
 #' @importFrom magrittr %>%
 
 getDendro <- function(x, transpose = FALSE,
@@ -230,14 +232,14 @@ getDendro <- function(x, transpose = FALSE,
                 if(verbose){
                         message("[getDendro] Clustering by euclidean distance")
                 }
-                dist <- dist(x)
+                dist <- stats::dist(x)
         } else {
                 if(distance == "pearson"){
                         if(verbose){
                                 message("[getDendro] Clustering with pearson correlation as the distance")
                         }
                         dist <- (1 - WGCNA::cor(x, use = "pairwise.complete.obs")) %>%
-                                as.dist()
+                                stats::as.dist()
                 } else {
                         if(distance == "bicor"){
                                 if(verbose){
@@ -245,13 +247,13 @@ getDendro <- function(x, transpose = FALSE,
                                 }
                                 dist <- (1 - bicor(x, maxPOutliers = maxPOutliers,
                                                    use = "pairwise.complete.obs")) %>%
-                                        as.dist()
+                                        stats::as.dist()
                         } else {
                                 stop("[getDendro] Error: Distance must be either euclidean, pearson, or bicor")
                         }
                 }
         }
-        dendro <- hclust(dist, method = "average")
+        dendro <- stats::hclust(dist, method = "average")
         dendro$labels <- str_remove_all(dendro$labels, pattern = "ME")
         return(dendro)
 }
@@ -322,6 +324,7 @@ getDendro <- function(x, transpose = FALSE,
 #' @import ggplot2
 #' @import ggdendro
 #' @import stringr
+#'
 #' @importFrom scales breaks_pretty
 
 plotDendro <- function(dendro, label = TRUE, labelSize = 2.5,

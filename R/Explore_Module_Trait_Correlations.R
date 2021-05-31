@@ -85,6 +85,8 @@
 #'
 #' @import WGCNA
 #' @import stringr
+#' @import utils
+#'
 #' @importFrom magrittr %>%
 
 getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"),
@@ -112,7 +114,7 @@ getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"),
                         stop("[getMEtraitCor] corType must be either bicor or pearson")
                 }
         }
-        stats <- list.rbind(cor) %>% as.data.frame()
+        stats <- rlist::list.rbind(cor) %>% as.data.frame()
         stats$module <- rownames(cor$p) %>% str_remove_all(pattern = "ME") %>%
                 rep(length(cor)) %>% factor(levels = unique(.))
         stats$stat <- names(cor) %>% rep(each = nrow(cor$p)) %>%
@@ -125,7 +127,7 @@ getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"),
                 message("[getMEtraitCor] Adjusting p-values using the ",
                         adjMethod, " method")
         }
-        stats$adj_p <- p.adjust(stats$p, method = adjMethod)
+        stats$adj_p <- stats::p.adjust(stats$p, method = adjMethod)
         if(corType == "bicor"){
                 stats <- stats[,c("module", "trait", "nObs", "bicor", "Z", "t",
                                   "p", "adj_p")]
@@ -246,6 +248,7 @@ getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"),
 #' @import ggplot2
 #' @import cowplot
 #' @import WGCNA
+#'
 #' @importFrom magrittr %>%
 
 plotMEtraitCor <- function(MEtraitCor,
@@ -434,6 +437,7 @@ plotMEtraitCor <- function(MEtraitCor,
 #' @export
 #'
 #' @import ggplot2
+#'
 #' @importFrom magrittr %>%
 #' @importFrom scales breaks_pretty
 

@@ -79,6 +79,8 @@
 #' @export
 #'
 #' @import bsseq
+#' @import utils
+#'
 #' @importFrom magrittr %>%
 
 getRegions <- function(bs, annotation = NULL,
@@ -259,7 +261,9 @@ getRegions <- function(bs, annotation = NULL,
 #' @export
 #'
 #' @import ggplot2
+#'
 #' @importFrom scales breaks_pretty
+#' @importFrom stats quantile
 
 plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132B43",
                             lineCol = "red", nBreaks = 4, save = TRUE,
@@ -270,7 +274,7 @@ plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132
         }
         variables <- c("width", "n", "covMin", "covMean", "methMean", "methSD")
         medians <- data.frame(variable = factor(variables, levels = variables),
-                              value = sapply(regions[,variables], FUN = median))
+                              value = sapply(regions[,variables], FUN = stats::median))
         if(maxQuantile < 1){
                 if(verbose){
                         message("[plotRegionStats] Limiting x-axis to values in bottom ",
@@ -389,7 +393,9 @@ plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132
 #' @export
 #'
 #' @import ggplot2
+#'
 #' @importFrom scales breaks_pretty
+#' @importFrom stats quantile
 
 plotSDstats <- function(regions, maxQuantile = 1, bins = 30, nBreaks = 4,
                         legend.position = c(1.09,0.9), save = TRUE,
@@ -515,6 +521,8 @@ plotSDstats <- function(regions, maxQuantile = 1, bins = 30, nBreaks = 4,
 #' }
 #'
 #' @export
+#'
+#' @import utils
 #'
 #' @importFrom magrittr %>%
 
@@ -729,6 +737,8 @@ plotRegionTotals <- function(regionTotals, nBreaks = 4,
 #' }
 #'
 #' @export
+#'
+#' @import utils
 
 filterRegions <- function(regions, covMin = 10, methSD = 0.05, save = TRUE,
                           file = "Filtered_Regions.txt", verbose = TRUE){

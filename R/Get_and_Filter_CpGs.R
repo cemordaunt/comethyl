@@ -57,6 +57,7 @@
 #' @export
 #'
 #' @import bsseq
+#'
 #' @importFrom magrittr %>%
 
 getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz",
@@ -147,6 +148,8 @@ getCpGs <- function(colData, path = getwd(), pattern = "*CpG_report.txt.gz",
 #' @export
 #'
 #' @import bsseq
+#' @import utils
+#'
 #' @importFrom magrittr %>%
 
 getCpGtotals <- function(bs, cov = seq(0,10,1), perSample = seq(0.5,1,0.05),
@@ -229,6 +232,7 @@ getCpGtotals <- function(bs, cov = seq(0,10,1), perSample = seq(0.5,1,0.05),
 #' @export
 #'
 #' @import ggplot2
+#'
 #' @importFrom scales breaks_pretty
 
 plotCpGtotals <- function(CpGtotals, nBreaks = 4,
@@ -328,6 +332,7 @@ plotCpGtotals <- function(CpGtotals, nBreaks = 4,
 #' @export
 #'
 #' @import bsseq
+#'
 #' @importFrom magrittr %>%
 
 filterCpGs <- function(bs, cov = 2, perSample = 0.75, save = TRUE,

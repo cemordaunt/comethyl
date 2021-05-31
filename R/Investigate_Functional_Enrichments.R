@@ -224,6 +224,7 @@ listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "da
 #' @import GenomicRanges
 #' @import rGREAT
 #' @import stringr
+#' @import utils
 #'
 #' @importFrom magrittr %>%
 
@@ -300,10 +301,9 @@ enrichModule <- function(regions, module = NULL,
         colnames(results) <- colnames(results) %>% str_to_lower() %>%
                 str_replace_all(pattern = pattern)
         results$ontology <- rep(names(enrichTables), sapply(enrichTables, nrow))
-        results <- subset(results, background_region_hits >=
-                                  min_background_region_hits)
+        results <- subset(results, background_region_hits >= min_background_region_hits)
         results$log_p <- -log10(results$p)
-        results$adj_p <- p.adjust(results$p, method = adjMethod)
+        results$adj_p <- stats::p.adjust(results$p, method = adjMethod)
         results$log_adj_p <- -log10(results$adj_p)
         results <- subset(results, region_hits >= min_region_hits &
                                   p < pvalue_threshold)
@@ -311,7 +311,7 @@ enrichModule <- function(regions, module = NULL,
                 message("[enrichModule] Extracting genes for enriched terms")
         }
         results$genes <- mapply(function(x,y){
-                suppressGraphics(
+                R.devices::suppressGraphics(
                         plotRegionGeneAssociationGraphs(job, type = 1, ontology = x,
                                                         termID = y,
                                                         request_interval = 0,

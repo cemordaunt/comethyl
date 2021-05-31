@@ -193,6 +193,7 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
 #'
 #' @import ggplot2
 #' @import stringr
+#'
 #' @importFrom scales breaks_pretty
 
 plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 4,
@@ -343,6 +344,7 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
 #'
 #' @import WGCNA
 #' @import stringr
+#'
 #' @importFrom magrittr %>%
 
 getModules <- function(meth, power, regions, maxBlockSize = 40000,
@@ -398,7 +400,7 @@ getModules <- function(meth, power, regions, maxBlockSize = 40000,
                 regions$hubRegion <- regions$membership == max(regions$membership)
                 return(regions)
         })
-        regions <- list.rbind(regions) %>%
+        regions <- rlist::list.rbind(regions) %>%
                 .[order(as.integer(str_remove_all(.$RegionID, pattern = "Region_"))),]
         modules$regions <- regions
         if(save){
