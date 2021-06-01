@@ -18,8 +18,8 @@ getCpGs(
 }
 \arguments{
 \item{colData}{A \code{data.frame} whose row names specify CpG reports to
-load into the \code{\link[bsseq:`BSseq-class`]{BSseq}} object and
-whose columns are sample traits with numeric values.}
+load into the \link[bsseq:BSseq-class]{BSseq} object and whose columns
+are sample traits with numeric values.}
 
 \item{path}{A \code{character} giving the path(s) to the CpG reports.}
 
@@ -32,32 +32,31 @@ The default \code{sameLoci = TRUE} speeds up \code{getCpGs()} by
 only having to parse each CpG report once.}
 
 \item{chroms}{A \code{character} giving the chromosomes to include in the
-\code{\link[bsseq:`BSseq-class`]{BSseq}} object.}
+\link[bsseq:BSseq-class]{BSseq} object.}
 
-\item{BPPARAM}{A \code{\link[BiocParallel]{BiocParallelParam}} instance
-providing the parallel back-end to use during evaluation.}
+\item{BPPARAM}{A \link[BiocParallel:BiocParallelParam-class]{BiocParallel::BiocParallelParam} instance providing the
+parallel back-end to use during evaluation.}
 
 \item{save}{A \code{logical(1)} indicating whether to save the
-\code{\link[bsseq:`BSseq-class`]{BSseq}} object.}
+\link[bsseq:BSseq-class]{BSseq} object.}
 
 \item{file}{A \code{character(1)} giving the file name (.rds) for the saved
-\code{\link[bsseq:`BSseq-class`]{BSseq}} object.}
+\link[bsseq:BSseq-class]{BSseq} object.}
 
 \item{verbose}{A \code{logical(1)} indicating whether messages should be
 printed.}
 }
 \value{
-A \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
+A \link[bsseq:BSseq-class]{BSseq} object.
 }
 \description{
 \code{getCpGs()} reads individual sample Bismark CpG reports into a single
-\code{\link[bsseq:`BSseq-class`]{BSseq}} object and then saves it as a .rds
-file.
+\link[bsseq:BSseq-class]{BSseq} object and then saves it as a .rds file.
 }
 \details{
-This \code{\link[bsseq:`BSseq-class`]{BSseq}} object still needs to be
-filtered for coverage at individual CpGs. More information on these arguments
-is given in the documentation for \code{\link[bsseq]{read.bismark()}}.
+This \link[bsseq:BSseq-class]{BSseq} object still needs to be filtered for
+coverage at individual CpGs. More information on these arguments is given in
+the documentation for \code{\link[bsseq:read.bismark]{bsseq::read.bismark()}}.
 }
 \examples{
 \dontrun{
@@ -77,11 +76,10 @@ bs <- filterCpGs(bs, cov = 2, perSample = 0.75, file = "Filtered_BSseq.rds")
 }
 \seealso{
 \itemize{
-\item \code{\link{getCpGtotals()}} and \code{\link{plotCpGtotals()}}
-for help with deciding coverage cutoffs.
-\item \code{\link{filterCpGs()}} to filter the
-\code{\link[bsseq:`BSseq-class`]{BSseq}} object.
-\item \code{\link[bsseq]{read.bismark()}} for more details on the
-arguments and the underlying functions.
+\item \code{\link[=getCpGtotals]{getCpGtotals()}} and \code{\link[=plotCpGtotals]{plotCpGtotals()}} for help with deciding
+coverage cutoffs.
+\item \code{\link[=filterCpGs]{filterCpGs()}} to filter the \link[bsseq:BSseq-class]{BSseq} object.
+\item \code{\link[bsseq:read.bismark]{bsseq::read.bismark()}} for more details on the arguments and
+the underlying functions.
 }
 }

@@ -35,11 +35,10 @@ plotMethTrait(
 \item{module}{A \code{character(1)} giving the name of the module to plot.}
 
 \item{regions}{A \code{data.frame} of regions with module assignments, typically
-obtained from \code{\link{getModules()}}.}
+obtained from \code{\link[=getModules]{getModules()}}.}
 
 \item{meth}{A \code{numeric matrix}, where each row is a region and each
-column is a sample. This is typically obtained from
-\code{\link{getRegionMeth()}}.}
+column is a sample. This is typically obtained from \code{\link[=getRegionMeth]{getRegionMeth()}}.}
 
 \item{trait}{A \code{numeric} of sample trait values.}
 
@@ -54,8 +53,8 @@ numeric value. Example: c("Control" = 0, "Treatment" = 1).}
 to a color. Example: c("Control" = "blue", "Treatment" = "red").}
 
 \item{heatmapColors}{A \code{character} giving a vector of colors to use for
-the gradient on the heatmap. The default uses
-\code{\link[WGCNA]{blueWhiteRed()}} to generate these colors.}
+the gradient on the heatmap. The default uses \code{\link[WGCNA:blueWhiteRed]{WGCNA::blueWhiteRed()}}
+to generate these colors.}
 
 \item{limit}{A \code{numeric(1)} giving the maximum value (symmetric) for the
 heatmap color scale.}
@@ -161,11 +160,11 @@ plotMethTrait("bisque4", regions = regions, meth = meth,
 }
 \seealso{
 \itemize{
-\item \code{\link{getModules()}} to build a comethylation network and
-identify modules of comethylated regions.
-\item \code{\link{getMEtraitCor()}} and \code{\link{plotMEtraitCor()}}
-to calculate and visualize all ME-trait correlations.
-\item \code{\link{plotMEtraitDot()}} and \code{\link{plotMEtraitScatter()}}
-for other methods to visualize a single ME-trait correlation.
+\item \code{\link[=getModules]{getModules()}} to build a comethylation network and identify
+modules of comethylated regions.
+\item \code{\link[=getMEtraitCor]{getMEtraitCor()}} and \code{\link[=plotMEtraitCor]{plotMEtraitCor()}} to calculate and
+visualize all ME-trait correlations.
+\item \code{\link[=plotMEtraitDot]{plotMEtraitDot()}} and \code{\link[=plotMEtraitScatter]{plotMEtraitScatter()}} for other methods
+to visualize a single ME-trait correlation.
 }
 }

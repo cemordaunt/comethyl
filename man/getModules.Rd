@@ -22,14 +22,13 @@ getModules(
 }
 \arguments{
 \item{meth}{A \code{numeric matrix}, where each row is a sample and each
-column is a region. This is typically obtained from
-\code{\link{adjustRegionMeth()}}.}
+column is a region. This is typically obtained from \code{\link[=adjustRegionMeth]{adjustRegionMeth()}}.}
 
 \item{power}{A \code{numeric(1)} giving the soft-thresholding power. This is
-typically obtained from \code{\link{getSoftPower()}}.}
+typically obtained from \code{\link[=getSoftPower]{getSoftPower()}}.}
 
 \item{regions}{A \code{data.frame} of regions, typically after filtering with
-\code{\link{filterRegions()}}. Must have the column \code{RegionID}
+\code{\link[=filterRegions]{filterRegions()}}. Must have the column \code{RegionID}
 and correspond to the regions in \code{meth}.}
 
 \item{maxBlockSize}{A \code{numeric(1)} specifying the maximum number of
@@ -67,7 +66,7 @@ correlation calculations.}
 printed.}
 }
 \value{
-A \code{list} with 11 elements. See \code{\link[WGCNA]{blockwiseModules()}}
+A \code{list} with 11 elements. See \code{\link[WGCNA:blockwiseModules]{WGCNA::blockwiseModules()}}
 for a description of these. Additional \code{regions} element is a
 \code{data.frame} with the region locations, statistics, module
 assignment, module membership, and hub region status.
@@ -79,7 +78,7 @@ values, dendrograms, and module membership, and then saves this as a .rds file.
 }
 \details{
 Comethylation networks are built and modules are identified by
-\code{\link[WGCNA]{blockwiseModules()}}, with \code{corType} set to either
+\code{\link[WGCNA:blockwiseModules]{WGCNA::blockwiseModules()}}, with \code{corType} set to either
 \code{pearson} or \code{bicor}. Calculations are performed for a signed network
 in blocks of regions of maximum size \code{maxBlockSize} (default = 40000).
 If there are more than \code{maxBlocksize} regions, then regions are
@@ -87,8 +86,7 @@ pre-clustered into blocks using projective K-means clustering. Region
 correlations are performed within each block and regions are clustered with
 average linkage hierarchical clustering. Modules are then identified with a
 dynamic hybrid tree cut and highly correlated modules are merged together.
-More information is given in the \code{WGCNA} package documentation for
-\code{\link[WGCNA]{blockwiseModules()}}.
+More information is given in the documentation for \code{\link[WGCNA:blockwiseModules]{WGCNA::blockwiseModules()}}.
 }
 \examples{
 \dontrun{
@@ -117,14 +115,12 @@ BED <- getModuleBED(modules$regions, file = "Modules.bed")
 }
 \seealso{
 \itemize{
-\item \code{\link{getRegionMeth()}} and \code{\link{adjustRegionMeth()}}
-to extract methylation data and then adjust it for the top
-principal components.
-\item \code{\link{getSoftPower()}} and \code{\link{plotSoftPower()}}
-to estimate the best soft-thresholding power and visualize
-scale-free topology fit and connectivity.
-\item \code{\link{plotRegionDendro()}} and \code{\link{getModuleBED()}}
-to visualize region similarity, genomic locations, and
-module assignments.
+\item \code{\link[=getRegionMeth]{getRegionMeth()}} and \code{\link[=adjustRegionMeth]{adjustRegionMeth()}} to extract methylation
+data and then adjust it for the top principal components.
+\item \code{\link[=getSoftPower]{getSoftPower()}} and \code{\link[=plotSoftPower]{plotSoftPower()}} to estimate the best
+soft-thresholding power and visualize scale-free topology fit
+and connectivity.
+\item \code{\link[=plotRegionDendro]{plotRegionDendro()}} and \code{\link[=getModuleBED]{getModuleBED()}} to visualize region
+similarity, genomic locations, and module assignments.
 }
 }

@@ -15,11 +15,11 @@ getRegionMeth(
 }
 \arguments{
 \item{regions}{A \code{data.frame} of regions, typically after filtering with
-\code{\link{filterRegions()}}. Must have the columns \code{chr},
-\code{start}, and \code{end}.}
+\code{\link[=filterRegions]{filterRegions()}}. Must have the columns \code{chr}, \code{start}, and
+\code{end}.}
 
-\item{bs}{A \code{\link[bsseq:`BSseq-class`]{BSseq}} object, typically after
-filtering with \code{\link{filterCpGs()}}.}
+\item{bs}{A \link[bsseq:BSseq-class]{BSseq} object, typically after filtering
+with \code{\link[=filterCpGs]{filterCpGs()}}.}
 
 \item{type}{A \code{character(1)} specifying the type of methylation values
 to extract. Accepted values are \code{raw} and \code{smooth}}
@@ -43,7 +43,7 @@ all samples and then saves it as a .rds file.
 \details{
 Methylation is summarized at the region level, and is estimated as the
 methylated reads divided by the total reads. Methylation values are obtained
-from a \code{\link[bsseq:`BSseq-class`]{BSseq}} object and can be either raw
+from a \link[bsseq:BSseq-class]{BSseq} object and can be either raw
 or smoothed methylation.
 }
 \examples{
@@ -65,9 +65,9 @@ getDendro(methAdj, distance = "euclidean") \%>\%
 }
 \seealso{
 \itemize{
-\item \code{\link{adjustRegionMeth()}} to adjust methylation for the
-top principal components.
-\item \code{\link{getDendro()}} and \code{\link{plotDendro()}} to
-generate and visualize dendrograms.
+\item \code{\link[=adjustRegionMeth]{adjustRegionMeth()}} to adjust methylation for the top principal
+components.
+\item \code{\link[=getDendro]{getDendro()}} and \code{\link[=plotDendro]{plotDendro()}} to generate and visualize
+dendrograms.
 }
 }

@@ -22,7 +22,7 @@ plotEnrichment(
 }
 \arguments{
 \item{enrichment}{A \code{data.frame} of functional enrichment results,
-typically obtained from \code{\link{enrichModule()}}.}
+typically obtained from \code{\link[=enrichModule]{enrichModule()}}.}
 
 \item{nTerms}{A \code{numeric(1)} specifying the number of terms to include in
 the plot.}
@@ -59,14 +59,13 @@ A \code{ggplot} object.
 }
 \description{
 \code{plotEnrichment()} takes a \code{data.frame} of enrichment results from
-\code{\link{enrichModule()}}, plots the log p-values in a bar plot, and saves
-it as a .pdf.
+\code{\link[=enrichModule]{enrichModule()}}, plots the log p-values in a bar plot, and saves it as a .pdf.
 }
 \details{
 \code{plotEnrichment()} is designed to be used in combination with
-\code{\link{enrichModule()}}. The top 15 gene sets are plotted by default, but
-this can be expanded if needed. A \code{ggplot} object is produced and can be
-edited outside of this function if desired.
+\code{\link[=enrichModule]{enrichModule()}}. The top 15 gene sets are plotted by default, but this can
+be expanded if needed. A \code{ggplot} object is produced and can be edited
+outside of this function if desired.
 }
 \examples{
 \dontrun{
@@ -93,13 +92,12 @@ plotEnrichment(enrich_bisque4,
 }
 \seealso{
 \itemize{
-\item \code{\link{getModules()}} to build a comethylation network and
-identify modules of comethylated regions.
-\item \code{\link{annotateModule()}} and \code{\link{getGeneList()}}
-to annotate a set of regions with genes and regulatory context
-and then extract the gene symbols or IDs.
-\item \code{\link{listOntologies()}} and \code{\link{enrichModule()}},
-to investigate functional enrichment of module regions with
-GREAT.
+\item \code{\link[=getModules]{getModules()}} to build a comethylation network and identify
+modules of comethylated regions.
+\item \code{\link[=annotateModule]{annotateModule()}} and \code{\link[=getGeneList]{getGeneList()}} to annotate a set of
+regions with genes and regulatory context and then extract
+the gene symbols or IDs.
+\item \code{\link[=listOntologies]{listOntologies()}} and \code{\link[=enrichModule]{enrichModule()}}, to investigate
+functional enrichment of module regions with GREAT.
 }
 }

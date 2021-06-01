@@ -17,8 +17,8 @@ plotSoftPower(
 )
 }
 \arguments{
-\item{sft}{A \code{list} produced by \code{\link{getSoftPower()}} with two
-elements: \code{powerEstimate} and \code{fitIndices}.}
+\item{sft}{A \code{list} produced by \code{\link[=getSoftPower]{getSoftPower()}} with two elements:
+\code{powerEstimate} and \code{fitIndices}.}
 
 \item{pointCol}{A \code{character(1)} specifying the color of the points.}
 
@@ -52,8 +52,8 @@ for multiple soft power thresholds as a scatterplot, and then saves it as a
 }
 \details{
 \code{plotSoftPower()} is designed to be used in combination with
-\code{\link{getSoftPower()}}. A \code{ggplot} object is produced and can be
-edited outside of this function if desired.
+\code{\link[=getSoftPower]{getSoftPower()}}. A \code{ggplot} object is produced and can be edited outside
+of this function if desired.
 }
 \examples{
 \dontrun{
@@ -78,12 +78,11 @@ modules <- getModules(methAdj, power = sft$powerEstimate, regions = regions,
 }
 \seealso{
 \itemize{
-\item \code{\link{getRegionMeth()}} and \code{\link{adjustRegionMeth()}}
-to extract methylation data and then adjust it for the top
-principal components.
-\item \code{\link{getSoftPower()}} to calculate the best soft-thresholding
-power and fit indices for scale-free topology.
-\item \code{\link{getModules()}} to build a comethylation network and
-identify modules of comethylated regions.
+\item \code{\link[=getRegionMeth]{getRegionMeth()}} and \code{\link[=adjustRegionMeth]{adjustRegionMeth()}} to extract methylation
+data and then adjust it for the top principal components.
+\item \code{\link[=getSoftPower]{getSoftPower()}} to calculate the best soft-thresholding power
+and fit indices for scale-free topology.
+\item \code{\link[=getModules]{getModules()}} to build a comethylation network and identify
+modules of comethylated regions.
 }
 }

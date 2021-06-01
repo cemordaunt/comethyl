@@ -29,8 +29,7 @@ can be considered outliers on each side of the median for the
 printed.}
 }
 \value{
-An \code{\link[stats]{hclust}} object that describes the clustering
-tree.
+An \link[stats:hclust]{stats::hclust} object that describes the clustering tree.
 }
 \description{
 \code{getDendro()} computes the distance between the rows of a matrix and
@@ -39,12 +38,12 @@ performs hierarchical clustering. Possible distance measures include
 transposes the matrix.
 }
 \details{
-Euclidean distance is calculated by \code{\link[stats]{dist(method = "euclidean")}},
-while Pearson correlation and biweight midcorrelation (bicor) are computed by
-the \code{WGCNA} functions \code{\link[WGCNA]{cor}} and \code{\link[WGCNA]{bicor}},
+Euclidean distance is calculated by \code{\link[stats:dist]{stats::dist()}}, where
+\code{method = "euclidean"}, while Pearson correlation and biweight
+midcorrelation (bicor) are computed by \code{\link[WGCNA:cor]{WGCNA::cor()}} and \code{\link[WGCNA:bicor]{WGCNA::bicor()}},
 respectively. The \code{cor} and \code{bicor} are then subtracted from 1 to
 calculate the dissimilarity. Hierarchical clustering is done by
-\code{\link[stats]{hclust(method = average)}}.
+\code{\link[stats:hclust]{stats::hclust()}}, where \code{method = "average"}.
 }
 \examples{
 \dontrun{
@@ -74,7 +73,6 @@ plotDendro(traitDendro, labelSize = 3.5, expandY = c(0.65,0.08),
 }
 \seealso{
 \itemize{
-\item \code{\link{plotDendro()}} to visualize dendrograms from
-\code{getDendro()}.
+\item \code{\link[=plotDendro]{plotDendro()}} to visualize dendrograms from \code{getDendro()}.
 }
 }

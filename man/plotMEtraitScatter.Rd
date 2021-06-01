@@ -75,9 +75,8 @@ order.
 \details{
 The values in \code{ME} and \code{trait} are plotted as points along with a
 smoothed line with a shaded 95\% confidence interval. The smoothed line is fit
-using robust regression as implemented by \code{\link[MASS]{rlm}}. A
-\code{ggplot} object is produced and can be edited outside of this function
-if desired.
+using robust regression as implemented by \code{\link[MASS:rlm]{MASS::rlm()}}. A \code{ggplot}
+object is produced and can be edited outside of this function if desired.
 }
 \examples{
 \dontrun{
@@ -117,11 +116,11 @@ plotMethTrait("bisque4", regions = regions, meth = meth,
 }
 \seealso{
 \itemize{
-\item \code{\link{getModules()}} to build a comethylation network and
-identify modules of comethylated regions.
-\item \code{\link{getMEtraitCor()}} and \code{\link{plotMEtraitCor()}}
-to calculate and visualize all ME-trait correlations.
-\item \code{\link{plotMEtraitDot()}} and \code{\link{plotMethTrait()}}
-for other methods to visualize a single ME-trait correlation.
+\item \code{\link[=getModules]{getModules()}} to build a comethylation network and identify
+modules of comethylated regions.
+\item \code{\link[=getMEtraitCor]{getMEtraitCor()}} and \code{\link[=plotMEtraitCor]{plotMEtraitCor()}} to calculate and
+visualize all ME-trait correlations.
+\item \code{\link[=plotMEtraitDot]{plotMEtraitDot()}} and \code{\link[=plotMethTrait]{plotMethTrait()}} for other methods to
+visualize a single ME-trait correlation.
 }
 }

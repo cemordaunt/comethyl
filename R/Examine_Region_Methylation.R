@@ -5,14 +5,14 @@
 #'
 #' Methylation is summarized at the region level, and is estimated as the
 #' methylated reads divided by the total reads. Methylation values are obtained
-#' from a \code{\link[bsseq:`BSseq-class`]{BSseq}} object and can be either raw
+#' from a [BSseq][bsseq::BSseq-class] object and can be either raw
 #' or smoothed methylation.
 #'
 #' @param regions A \code{data.frame} of regions, typically after filtering with
-#'         \code{\link{filterRegions()}}. Must have the columns \code{chr},
-#'         \code{start}, and \code{end}.
-#' @param bs A \code{\link[bsseq:`BSseq-class`]{BSseq}} object, typically after
-#'         filtering with \code{\link{filterCpGs()}}.
+#'         [filterRegions()]. Must have the columns \code{chr}, \code{start}, and
+#'         \code{end}.
+#' @param bs A [BSseq][bsseq::BSseq-class] object, typically after filtering
+#'         with [filterCpGs()].
 #' @param type A \code{character(1)} specifying the type of methylation values
 #'         to extract. Accepted values are \code{raw} and \code{smooth}
 #' @param save A \code{logical(1)} indicating whether to save the \code{matrix}.
@@ -25,10 +25,10 @@
 #'         is a sample.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{adjustRegionMeth()}} to adjust methylation for the
-#'                 top principal components.
-#'         \item \code{\link{getDendro()}} and \code{\link{plotDendro()}} to
-#'                 generate and visualize dendrograms.
+#'         \item [adjustRegionMeth()] to adjust methylation for the top principal
+#'                 components.
+#'         \item [getDendro()] and [plotDendro()] to generate and visualize
+#'                 dendrograms.
 #' }
 #'
 #' @examples \dontrun{
@@ -73,13 +73,12 @@ getRegionMeth <- function(regions, bs, type = c("raw", "smooth"), save = TRUE,
 #' \code{adjustRegionMeth()} adjusts region methylation data for the top
 #' principal components, transposes it, and then saves it as a .rds file.
 #'
-#' \code{adjustRegionMeth()} uses \code{\link[sva]{sva_network()}} to regress out
-#' the top principal components. More information on the function and approach is
-#' given in the documentation and publications related to the \code{sva} package.
+#' \code{adjustRegionMeth()} uses [sva::sva_network()] to regress out the top
+#' principal components. More information on the function and approach is given
+#' in the documentation and publications related to the \pkg{sva} package.
 #'
 #' @param meth A \code{numeric matrix}, where each row is a region and each
-#'         column is a sample. This is typically obtained from
-#'         \code{\link{getRegionMeth()}}.
+#'         column is a sample. This is typically obtained from [getRegionMeth()].
 #' @param mod A \code{matrix} giving the model matrix being used to fit the data.
 #'         See below for an example.
 #' @param save A \code{logical(1)} indicating whether to save the \code{matrix}.
@@ -92,15 +91,14 @@ getRegionMeth <- function(regions, bs, type = c("raw", "smooth"), save = TRUE,
 #'         is a region.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getRegionMeth()}} to extract region methylation
-#'                 values.
-#'         \item \code{\link{getDendro()}} and \code{\link{plotDendro()}} to
-#'                 generate and visualize dendrograms.
-#'         \item \code{\link{getSoftPower()}} and \code{\link{plotSoftPower()}}
-#'                 to estimate the best soft-thresholding power and visualize
-#'                 scale-free topology fit and connectivity.
-#'         \item \code{\link{getModules()}} to build a comethylation network and
-#'                 identify modules of comethylated regions.
+#'         \item [getRegionMeth()] to extract region methylation values.
+#'         \item [getDendro()] and [plotDendro()] to generate and visualize
+#'                 dendrograms.
+#'         \item [getSoftPower()] and [plotSoftPower()] to estimate the best
+#'                 soft-thresholding power and visualize scale-free topology fit
+#'                 and connectivity.
+#'         \item [getModules()] to build a comethylation network and identify
+#'                 modules of comethylated regions.
 #' }
 #'
 #' @examples \dontrun{
@@ -161,12 +159,12 @@ adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
 #' \code{euclidean}, \code{pearson}, and \code{bicor}. The function also optionally
 #' transposes the matrix.
 #'
-#' Euclidean distance is calculated by \code{\link[stats]{dist(method = "euclidean")}},
-#' while Pearson correlation and biweight midcorrelation (bicor) are computed by
-#' the \code{WGCNA} functions \code{\link[WGCNA]{cor}} and \code{\link[WGCNA]{bicor}},
+#' Euclidean distance is calculated by [stats::dist()], where
+#' \code{method = "euclidean"}, while Pearson correlation and biweight
+#' midcorrelation (bicor) are computed by [WGCNA::cor()] and [WGCNA::bicor()],
 #' respectively. The \code{cor} and \code{bicor} are then subtracted from 1 to
 #' calculate the dissimilarity. Hierarchical clustering is done by
-#' \code{\link[stats]{hclust(method = average)}}.
+#' [stats::hclust()], where \code{method = "average"}.
 #'
 #' @param x A \code{numeric matrix}.
 #' @param transpose A \code{logical(1)} specifying whether to transpose the
@@ -179,12 +177,10 @@ adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
 #' @param verbose A \code{logical(1)} indicating whether messages should be
 #'         printed.
 #'
-#' @return An \code{\link[stats]{hclust}} object that describes the clustering
-#'         tree.
+#' @return An [stats::hclust] object that describes the clustering tree.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{plotDendro()}} to visualize dendrograms from
-#'                 \code{getDendro()}.
+#'         \item [plotDendro()] to visualize dendrograms from \code{getDendro()}.
 #' }
 #'
 #' @examples \dontrun{
@@ -260,15 +256,14 @@ getDendro <- function(x, transpose = FALSE,
 
 #' Plot a Dendrogram
 #'
-#' \code{plotDendro()} extracts plotting data from an \code{\link[stats]{hclust}}
+#' \code{plotDendro()} extracts plotting data from an [stats::hclust]
 #' object, plots a dendrogram, and then saves it as a .pdf.
 #'
-#' \code{plotDendro()} is designed to be used in combination with
-#' \code{\link{getDendro()}}. A \code{ggplot} object is produced and can be
-#' edited outside of this function if desired.
+#' \code{plotDendro()} is designed to be used in combination with [getDendro()].
+#' A \code{ggplot} object is produced and can be edited outside of this function
+#' if desired.
 #'
-#' @param dendro An \code{\link[stats]{hclust}} object generated by
-#'         \code{\link{getDendro()}}.
+#' @param dendro An [stats::hclust] object generated by [getDendro()].
 #' @param label A \code{logical(1)} indicating whether to add labels to the
 #'         dendrogram.
 #' @param labelSize A \code{numeric(1)} specifying the size of the label text.
@@ -291,8 +286,7 @@ getDendro <- function(x, transpose = FALSE,
 #' @return A \code{ggplot} object.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getDendro()}} to generate dendrograms for
-#'                 \code{plotDendro()}.
+#'         \item [getDendro()] to generate dendrograms for \code{plotDendro()}.
 #' }
 #'
 #' @examples \dontrun{

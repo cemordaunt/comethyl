@@ -19,8 +19,8 @@ plotRegionStats(
 )
 }
 \arguments{
-\item{regions}{A \code{data.frame} output from \code{\link{getRegions()}}
-giving the set of regions and statistics for each region.}
+\item{regions}{A \code{data.frame} output from \code{\link[=getRegions]{getRegions()}} giving the set
+of regions and statistics for each region.}
 
 \item{maxQuantile}{A \code{numeric(1)} giving the maximum quantile of each
 feature to plot.}
@@ -52,7 +52,7 @@ printed.}
 A \code{ggplot} object.
 }
 \description{
-\code{plotRegionStats()} takes a set of regions from \code{\link{getRegions()}},
+\code{plotRegionStats()} takes a set of regions from \code{\link[=getRegions]{getRegions()}},
 generates histograms of region characteristics, and saves it as a pdf.
 Region-level statistics include width, number of CpGs, minimum coverage, mean
 coverage, mean methylation, and methylation standard deviation.
@@ -89,11 +89,11 @@ plotSDstats(regions, maxQuantile = 0.99,
 }
 \seealso{
 \itemize{
-\item \code{\link{getRegions()}} to generate the set of regions.
-\item \code{\link{plotSDstats()}}, \code{\link{getRegionTotals()}},
-and \code{\link{plotRegionTotals()}} for more help visualizing
-region characteristics and setting cutoffs for filtering.
-\item \code{\link{filterRegions()}} for filtering regions by minimum
-coverage and methylation standard deviation.
+\item \code{\link[=getRegions]{getRegions()}} to generate the set of regions.
+\item \code{\link[=plotSDstats]{plotSDstats()}}, \code{\link[=getRegionTotals]{getRegionTotals()}}, and \code{\link[=plotRegionTotals]{plotRegionTotals()}}
+for more help visualizing region characteristics and setting
+cutoffs for filtering.
+\item \code{\link[=filterRegions]{filterRegions()}} for filtering regions by minimum coverage and
+methylation standard deviation.
 }
 }

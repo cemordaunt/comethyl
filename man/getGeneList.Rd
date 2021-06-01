@@ -13,7 +13,7 @@ getGeneList(
 }
 \arguments{
 \item{regions_annotated}{A \code{data.frame} of regions with gene annotations,
-typically produced by \code{\link{annotateModule()}}.}
+typically produced by \code{\link[=annotateModule]{annotateModule()}}.}
 
 \item{module}{A \code{character} giving the name of one or more modules to
 include. If null, all modules will be included.}
@@ -35,8 +35,8 @@ or IDs.
 }
 \details{
 \code{getGeneList()} is designed to be used in combination with
-\code{\link{annotateModule()}}. \code{regions} can be filtered for one or more
-modules of interest. Values that can be extracted include gene \code{symbol},
+\code{\link[=annotateModule]{annotateModule()}}. \code{regions} can be filtered for one or more modules of
+interest. Values that can be extracted include gene \code{symbol},
 \code{description}, \code{ensemblID} and \code{entrezID}.
 }
 \examples{
@@ -64,12 +64,11 @@ plotEnrichment(enrich_bisque4,
 }
 \seealso{
 \itemize{
-\item \code{\link{getModules()}} to build a comethylation network and
-identify modules of comethylated regions.
-\item \code{\link{annotateModule()}} to annotate a set of regions with
-genes and regulatory context.
-\item \code{\link{listOntologies()}}, \code{\link{enrichModule()}},
-and \code{\link{plotEnrichment()}} to investigate functional
-enrichment of module regions with GREAT.
+\item \code{\link[=getModules]{getModules()}} to build a comethylation network and identify
+modules of comethylated regions.
+\item \code{\link[=annotateModule]{annotateModule()}} to annotate a set of regions with genes and
+regulatory context.
+\item \code{\link[=listOntologies]{listOntologies()}}, \code{\link[=enrichModule]{enrichModule()}}, and \code{\link[=plotEnrichment]{plotEnrichment()}} to
+investigate functional enrichment of module regions with GREAT.
 }
 }

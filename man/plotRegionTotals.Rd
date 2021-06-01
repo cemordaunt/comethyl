@@ -16,8 +16,7 @@ plotRegionTotals(
 )
 }
 \arguments{
-\item{regionTotals}{A \code{data.frame}, output from
-\code{\link{getRegionTotals()}}}
+\item{regionTotals}{A \code{data.frame}, output from \code{\link[=getRegionTotals]{getRegionTotals()}}.}
 
 \item{nBreaks}{A \code{numeric(1)} specifying the number of breaks used for
 both axes and the legend.}
@@ -50,8 +49,8 @@ number of CpGs remaining after filtering by different combinations of
 }
 \details{
 \code{plotRegionTotals()} is designed to be used in combination with
-\code{\link{getRegionTotals()}}. A \code{ggplot} object is produced and can
-be edited outside of this function if desired.
+\code{\link[=getRegionTotals]{getRegionTotals()}}. A \code{ggplot} object is produced and can be edited
+outside of this function if desired.
 }
 \examples{
 \dontrun{
@@ -79,11 +78,11 @@ plotSDstats(regions, maxQuantile = 0.99,
 }
 \seealso{
 \itemize{
-\item \code{\link{getRegions()}} to generate the set of regions.
-\item \code{\link{plotRegionStats()}}, \code{\link{plotSDstats()}},
-and \code{\link{getRegionTotals()}} for more help visualizing
-region characteristics and setting cutoffs for filtering.
-\item \code{\link{filterRegions()}} for filtering regions by minimum
-coverage and methylation standard deviation.
+\item \code{\link[=getRegions]{getRegions()}} to generate the set of regions.
+\item \code{\link[=plotRegionStats]{plotRegionStats()}}, \code{\link[=plotSDstats]{plotSDstats()}}, and \code{\link[=getRegionTotals]{getRegionTotals()}}
+for more help visualizing region characteristics and setting
+cutoffs for filtering.
+\item \code{\link[=filterRegions]{filterRegions()}} for filtering regions by minimum coverage and
+methylation standard deviation.
 }
 }

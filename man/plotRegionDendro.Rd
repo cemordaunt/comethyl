@@ -15,7 +15,7 @@ plotRegionDendro(
 }
 \arguments{
 \item{modules}{A \code{list} of module assignments and statistics produced by
-\code{\link{getModules()}}.}
+\code{\link[=getModules]{getModules()}}.}
 
 \item{save}{A \code{logical(1)} indicating whether to save the plot.}
 
@@ -40,9 +40,8 @@ plots a region dendrogram with module assignments, and then saves it as a .pdf.
 }
 \details{
 \code{plotRegionDendro()} is designed to be used in combination with
-\code{\link{getModules()}}. This function does not produce a \code{ggplot}
-object, but instead uses the \code{WGCNA} function
-\code{\link[WGCNA]{plotDendroAndColors()}} to plot the dendrogram.
+\code{\link[=getModules]{getModules()}}. This function does not produce a \code{ggplot} object, but
+instead uses \code{\link[WGCNA:plotDendroAndColors]{WGCNA::plotDendroAndColors()}} to plot the dendrogram.
 }
 \examples{
 \dontrun{
@@ -59,12 +58,11 @@ BED <- getModuleBED(modules$regions, file = "Modules.bed")
 }
 \seealso{
 \itemize{
-\item \code{\link{getModules()}} to build a comethylation network and
-identify modules of comethylated regions.
-\item \code{\link{getModuleBED()}} to visualize genomic locations and
-module assignments.
-\item \code{\link{getDendro()}} and \code{\link{plotDendro()}} to
-generate and visualize dendrograms for samples, modules, and
-traits.
+\item \code{\link[=getModules]{getModules()}} to build a comethylation network and identify
+modules of comethylated regions.
+\item \code{\link[=getModuleBED]{getModuleBED()}} to visualize genomic locations and module
+assignments.
+\item \code{\link[=getDendro]{getDendro()}} and \code{\link[=plotDendro]{plotDendro()}} to generate and visualize
+dendrograms for samples, modules, and traits.
 }
 }

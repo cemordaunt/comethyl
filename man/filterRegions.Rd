@@ -14,8 +14,8 @@ filterRegions(
 )
 }
 \arguments{
-\item{regions}{A \code{data.frame} output from \code{\link{getRegions()}}
-giving the set of regions and statistics for each region.}
+\item{regions}{A \code{data.frame} output from \code{\link[=getRegions]{getRegions()}} giving the set
+of regions and statistics for each region.}
 
 \item{covMin}{A \code{numeric(1)} specifying the minimum number of reads at CpGs
 in a region in any sample}
@@ -72,12 +72,11 @@ plotSDstats(regions, maxQuantile = 0.99,
 }
 \seealso{
 \itemize{
-\item \code{\link{getRegions()}} to generate the set of regions.
-\item \code{\link{plotRegionStats()}}, \code{\link{plotSDstats()}},
-\code{\link{getRegionTotals()}}, and
-\code{\link{plotRegionTotals()}} for help visualizing region
+\item \code{\link[=getRegions]{getRegions()}} to generate the set of regions.
+\item \code{\link[=plotRegionStats]{plotRegionStats()}}, \code{\link[=plotSDstats]{plotSDstats()}}, \code{\link[=getRegionTotals]{getRegionTotals()}}, and
+\code{\link[=plotRegionTotals]{plotRegionTotals()}} for help visualizing region
 characteristics and setting cutoffs for filtering.
-\item \code{\link{getRegionMeth()}} to get methylation values for
-these regions in all samples.
+\item \code{\link[=getRegionMeth]{getRegionMeth()}} to get methylation values for these regions
+in all samples.
 }
 }

@@ -29,7 +29,7 @@ enrichModule(
 }
 \arguments{
 \item{regions}{A \code{data.frame} of regions with module assignments, typically
-obtained from \code{\link{getModules()}}.}
+obtained from \code{\link[=getModules]{getModules()}}.}
 
 \item{module}{A \code{character} giving the name of one or more modules to
 analyze functional enrichment. If null, all modules will be analyzed,
@@ -44,9 +44,8 @@ curated regulatory domains for GREAT gene annotation.}
 
 \item{rule}{A \code{character(1)} specifying the rule used by GREAT for gene
 annotation. Possible values include \code{basalPlusExt},
-\code{twoClosest}, and \code{oneClosest}. See
-\code{\link[rGREAT]{submitGreatJob()}} for more details for this and
-the next six arguments.}
+\code{twoClosest}, and \code{oneClosest}. See \code{\link[rGREAT:submitGreatJob]{rGREAT::submitGreatJob()}}
+for more details for this and the next six arguments.}
 
 \item{adv_upstream}{A \code{numeric(1)} giving the distance upstream of the
 TSS (in kb) to define a basal regulatory domain in the
@@ -77,7 +76,7 @@ genomes. See \code{Details}.}
 Default ontologies include \code{GO Molecular Function},
 \code{GO Biological Process}, \code{GO Cellular Component},
 \code{Mouse Phenotype}, and \code{Human Phenotype}. All possible
-ontologies can be obtained with \code{\link{listOntologies()}}.}
+ontologies can be obtained with \code{\link[=listOntologies]{listOntologies()}}.}
 
 \item{min_background_region_hits}{A \code{numeric(1)} giving the minimum number
 of overlaps of gene set regulatory domains with background regions
@@ -115,7 +114,7 @@ enrichment analysis compared to gene sets in the specified ontologies. The
 results are then processed and saved as a .txt file.
 }
 \details{
-Submission to GREAT is performed by the \code{rGREAT} package, which allows
+Submission to GREAT is performed by the \pkg{rGREAT} package, which allows
 for different annotation rules and versions of GREAT. The default
 \code{basalPlusExt} annotation rule associates a gene with a region if the
 region is within the basal regulatory domain of the gene (5 kb upstream and 1
@@ -123,7 +122,7 @@ kb downstream of the TSS) or if it is within 1 Mb upstream or downstream of
 the TSS and not in the basal regulatory domain of another gene. Other rules
 include \code{twoClosest} and \code{oneClosest}, which effectively assign the
 two nearest genes or one nearest genes, respectively. See
-\code{\link[rGREAT]{submitGreatJob()}} for more details.
+\code{\link[rGREAT:submitGreatJob]{rGREAT::submitGreatJob()}} for more details.
 
 GREAT supports different genomes depending on the version:
 \describe{
@@ -171,13 +170,12 @@ plotEnrichment(enrich_bisque4,
 }
 \seealso{
 \itemize{
-\item \code{\link{getModules()}} to build a comethylation network and
-identify modules of comethylated regions.
-\item \code{\link{annotateModule()}} and \code{\link{getGeneList()}}
-to annotate a set of regions with genes and regulatory context
-and then extract the gene symbols or IDs.
-\item \code{\link{listOntologies()}} and \code{\link{plotEnrichment()}}
-to investigate functional enrichment of module regions with
-GREAT.
+\item \code{\link[=getModules]{getModules()}} to build a comethylation network and identify
+modules of comethylated regions.
+\item \code{\link[=annotateModule]{annotateModule()}} and \code{\link[=getGeneList]{getGeneList()}} to annotate a set of
+regions with genes and regulatory context and then extract
+the gene symbols or IDs.
+\item \code{\link[=listOntologies]{listOntologies()}} and \code{\link[=plotEnrichment]{plotEnrichment()}} to investigate
+functional enrichment of module regions with GREAT.
 }
 }

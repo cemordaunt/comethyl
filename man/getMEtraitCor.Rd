@@ -62,11 +62,11 @@ methods.
 }
 \details{
 \code{getMEtraitCor()} is designed to be used in combination with
-\code{\link{getModules()}}. The correlation calculations are performed by
-\code{WGCNA} functions \code{\link[WGCNA]{corAndPvalue()}} and
-\code{\link[WGCNA]{bicorAndPvalue()}}. P-values can be adjusted for multiple
-comparisons by several methods, including \code{fdr}, \code{holm},
-\code{hochberg}, \code{hommel}, \code{bonferroni}, \code{BH}, and \code{BY}.
+\code{\link[=getModules]{getModules()}}. The correlation calculations are performed by
+\code{\link[WGCNA:corAndPvalue]{WGCNA::corAndPvalue()}} and \code{\link[WGCNA:bicorAndPvalue]{WGCNA::bicorAndPvalue()}}. P-values can
+be adjusted for multiple comparisons by several methods, including \code{fdr},
+\code{holm}, \code{hochberg}, \code{hommel}, \code{bonferroni}, \code{BH}, and
+\code{BY}.
 }
 \examples{
 \dontrun{
@@ -104,11 +104,11 @@ plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order,
 }
 \seealso{
 \itemize{
-\item \code{\link{getModules()}} to build a comethylation network and
-identify modules of comethylated regions.
-\item \code{\link{getCor()}} to calculate correlation coefficients.
-\item \code{\link{getDendro()}} and \code{\link{plotDendro()}} to
-generate and visualize dendrograms.
-\item \code{\link{plotMEtraitCor()}} to visualize ME-trait correlations.
+\item \code{\link[=getModules]{getModules()}} to build a comethylation network and identify
+modules of comethylated regions.
+\item \code{\link[=getCor]{getCor()}} to calculate correlation coefficients.
+\item \code{\link[=getDendro]{getDendro()}} and \code{\link[=plotDendro]{plotDendro()}} to generate and visualize
+dendrograms.
+\item \code{\link[=plotMEtraitCor]{plotMEtraitCor()}} to visualize ME-trait correlations.
 }
 }

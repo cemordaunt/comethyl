@@ -9,14 +9,14 @@
 #'
 #' \code{regions} can be filtered for one or more modules of interest, or the
 #' grey (unassigned) module can be excluded. Gene annotation is performed by the
-#' \code{rGREAT} package, which allows for different annotation rules and versions
+#' \pkg{rGREAT} package, which allows for different annotation rules and versions
 #' of GREAT. The default \code{basalPlusExt} annotation rule associates a gene
 #' with a region if the region is within the basal regulatory domain of the gene
 #' (5 kb upstream and 1 kb downstream of the TSS) or if it is within 1 Mb upstream
 #' or downstream of the TSS and not in the basal regulatory domain of another gene.
 #' Other rules include \code{twoClosest} and \code{oneClosest}, which effectively
 #' assign the two nearest genes or one nearest genes, respectively. See
-#' \code{\link[rGREAT]{submitGreatJob()}} for more details.
+#' [rGREAT::submitGreatJob()] for more details.
 #'
 #' GREAT supports different genomes depending on the version:
 #' \describe{
@@ -25,14 +25,14 @@
 #'         \item{GREAT v2.0.2}{\code{hg19}, \code{hg18}, \code{mm9}, \code{danRer7}}
 #' }
 #'
-#' Gene information is provided by the \code{biomaRt} package, which adds the gene
+#' Gene information is provided by the \pkg{biomaRt} package, which adds the gene
 #' description along with Ensembl and NCBI Entrez gene IDs. Regulatory context
-#' is added by the \code{annotatr} package. This provides positional context of the
+#' is added by the \pkg{annotatr} package. This provides positional context of the
 #' region relative to nearby genes, enhancers, and CpG islands. Note that
-#' \code{annotatr} does not support the \code{hg18} or \code{danRer7} genomes.
+#' \pkg{annotatr} does not support the \code{hg18} or \code{danRer7} genomes.
 #'
 #' @param regions A \code{data.frame} of regions with module assignments, typically
-#'         obtained from \code{\link{getModules()}}.
+#'         obtained from [getModules()].
 #' @param module A \code{character} giving the name of one or more modules to
 #'         annotate. If null, all modules will be annotated.
 #' @param grey A \code{logical(1)} specifying whether or not to include the grey
@@ -44,9 +44,8 @@
 #'         curated regulatory domains for GREAT gene annotation.
 #' @param rule A \code{character(1)} specifying the rule used by GREAT for gene
 #'         annotation. Possible values include \code{basalPlusExt},
-#'         \code{twoClosest}, and \code{oneClosest}. See
-#'         \code{\link[rGREAT]{submitGreatJob()}} for more details for this and
-#'         the next six arguments.
+#'         \code{twoClosest}, and \code{oneClosest}. See [rGREAT::submitGreatJob()]
+#'         for more details for this and the next six arguments.
 #' @param adv_upstream A \code{numeric(1)} giving the distance upstream of the
 #'         TSS (in kb) to define a basal regulatory domain in the
 #'         \code{basalPlusExt} rule.
@@ -77,13 +76,12 @@
 #'         regions.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getModules()}} to build a comethylation network and
-#'                 identify modules of comethylated regions.
-#'         \item \code{\link{getGeneList()}} to extract a list of genes or IDs
-#'                 from the annotated regions.
-#'         \item \code{\link{listOntologies()}}, \code{\link{enrichModule()}},
-#'                 and \code{\link{plotEnrichment()}} to investigate functional
-#'                 enrichment of module regions with GREAT.
+#'         \item [getModules()] to build a comethylation network and identify
+#'                 modules of comethylated regions.
+#'         \item [getGeneList()] to extract a list of genes or IDs from the
+#'                 annotated regions.
+#'         \item [listOntologies()], [enrichModule()], and [plotEnrichment()] to
+#'                 investigate functional enrichment of module regions with GREAT.
 #' }
 #'
 #' @examples \dontrun{
@@ -281,12 +279,12 @@ annotateModule <- function(regions, module = NULL, grey = FALSE,
 #' or IDs.
 #'
 #' \code{getGeneList()} is designed to be used in combination with
-#' \code{\link{annotateModule()}}. \code{regions} can be filtered for one or more
-#' modules of interest. Values that can be extracted include gene \code{symbol},
+#' [annotateModule()]. \code{regions} can be filtered for one or more modules of
+#' interest. Values that can be extracted include gene \code{symbol},
 #' \code{description}, \code{ensemblID} and \code{entrezID}.
 #'
 #' @param regions_annotated A \code{data.frame} of regions with gene annotations,
-#'         typically produced by \code{\link{annotateModule()}}.
+#'         typically produced by [annotateModule()].
 #' @param module A \code{character} giving the name of one or more modules to
 #'         include. If null, all modules will be included.
 #' @param type A \code{character(1)} specifying the type of gene information to
@@ -298,13 +296,12 @@ annotateModule <- function(regions, module = NULL, grey = FALSE,
 #' @return A \code{vector} of unique values.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getModules()}} to build a comethylation network and
-#'                 identify modules of comethylated regions.
-#'         \item \code{\link{annotateModule()}} to annotate a set of regions with
-#'                 genes and regulatory context.
-#'         \item \code{\link{listOntologies()}}, \code{\link{enrichModule()}},
-#'                 and \code{\link{plotEnrichment()}} to investigate functional
-#'                 enrichment of module regions with GREAT.
+#'         \item [getModules()] to build a comethylation network and identify
+#'                 modules of comethylated regions.
+#'         \item [annotateModule()] to annotate a set of regions with genes and
+#'                 regulatory context.
+#'         \item [listOntologies()], [enrichModule()], and [plotEnrichment()] to
+#'                 investigate functional enrichment of module regions with GREAT.
 #' }
 #'
 #' @examples \dontrun{

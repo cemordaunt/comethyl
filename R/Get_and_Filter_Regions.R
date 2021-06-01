@@ -1,21 +1,21 @@
 #' Generate Regions from CpGs
 #'
 #' \code{getRegions()} generates a set of regions and some statistics based on
-#' the CpGs in a \code{\link[bsseq:`BSseq-class`]{BSseq}} object and then saves
-#' it as a tab-delimited text file. Regions can be defined based on CpG
-#' locations (for CpG clusters), built-in genomic annotations from
-#' \pkg{annotatr}, or a custom genomic annotation.
+#' the CpGs in a [BSseq][bsseq::BSseq-class] object and then saves it as a
+#' tab-delimited text file. Regions can be defined based on CpG locations (for
+#' CpG clusters), built-in genomic annotations from \pkg{annotatr}, or a custom
+#' genomic annotation.
 #'
 #' These regions still need to be filtered for minimum coverage and methylation
 #' standard deviation.
 #'
-#' @param bs A \code{\link[bsseq:`BSseq-class`]{BSseq}} object.
+#' @param bs A [BSseq][bsseq::BSseq-class] object.
 #' @param annotation A \code{character(1)} giving the built-in genomic
 #'         annotation to use for defining regions. Shortcuts are available for
 #'         \code{genes}, \code{promoters}, and \code{transcripts}. Get the
 #'         entire list of possible annotations with
-#'         \code{\link[annotatr]{builtin_annotations()}}, which also includes
-#'         CpG islands, enhancers, and chromatin states.
+#'         [annotatr::builtin_annotations()], which also includes CpG islands,
+#'         enhancers, and chromatin states.
 #' @param genome A \code{character(1)} with the genome build to use for
 #'         built-in annotations. Available builds include \code{hg38},
 #'         \code{hg19}, \code{mm10}, \code{mm9}, \code{rn6}, \code{rn5},
@@ -26,9 +26,9 @@
 #' @param downstream A \code{numeric(1)} giving the number of bases downstream
 #'         of a transcription start site to specify a promoter. Used for the
 #'         \code{promoters} built-in annotation.
-#' @param custom A \code{\link[GenomicRanges:`GRanges-class`]{GRanges}} object
-#'         with a custom genomic annotation for defining regions. Construct this
-#'         using \code{\link[GenomicRanges]{GRanges()}}.
+#' @param custom A [GRanges][GenomicRanges::GRanges-class] object with a custom
+#'         genomic annotation for defining regions. Construct this using
+#'         [GenomicRanges::GRanges()].
 #' @param maxGap A \code{numeric(1)} specifying the maximum number of bases
 #'         between CpGs to be included in the same CpG cluster.
 #' @param n A \code{numeric(1)} giving the minimum number of CpGs for a region
@@ -46,12 +46,11 @@
 #'         standard deviation, and methylation mean and standard deviation.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{plotRegionStats()}}, \code{\link{plotSDstats()}},
-#'                 \code{\link{getRegionTotals()}}, and
-#'                 \code{\link{plotRegionTotals()}} for help visualizing region
+#'         \item [plotRegionStats()], [plotSDstats()], [getRegionTotals()], and
+#'                 [plotRegionTotals()] for help visualizing region
 #'                 characteristics and setting cutoffs for filtering.
-#'        \item \code{\link{filterRegions()}} for filtering regions by minimum
-#'                coverage and methylation standard deviation.
+#'         \item [filterRegions()] for filtering regions by minimum coverage and
+#'                 methylation standard deviation.
 #' }
 #'
 #' @examples \dontrun{
@@ -196,7 +195,7 @@ getRegions <- function(bs, annotation = NULL,
 
 #' Plot Histograms of Region Statistics
 #'
-#' \code{plotRegionStats()} takes a set of regions from \code{\link{getRegions()}},
+#' \code{plotRegionStats()} takes a set of regions from [getRegions()],
 #' generates histograms of region characteristics, and saves it as a pdf.
 #' Region-level statistics include width, number of CpGs, minimum coverage, mean
 #' coverage, mean methylation, and methylation standard deviation.
@@ -206,8 +205,8 @@ getRegions <- function(bs, annotation = NULL,
 #' A \code{ggplot} object is produced and can be edited outside of this function
 #' if desired.
 #'
-#' @param regions A \code{data.frame} output from \code{\link{getRegions()}}
-#'         giving the set of regions and statistics for each region.
+#' @param regions A \code{data.frame} output from [getRegions()] giving the set
+#'         of regions and statistics for each region.
 #' @param maxQuantile A \code{numeric(1)} giving the maximum quantile of each
 #'         feature to plot.
 #' @param bins A \code{numeric(1)} specifying the number of bins in each histogram.
@@ -228,12 +227,12 @@ getRegions <- function(bs, annotation = NULL,
 #' @return A \code{ggplot} object.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getRegions()}} to generate the set of regions.
-#'         \item \code{\link{plotSDstats()}}, \code{\link{getRegionTotals()}},
-#'                 and \code{\link{plotRegionTotals()}} for more help visualizing
-#'                 region characteristics and setting cutoffs for filtering.
-#'        \item \code{\link{filterRegions()}} for filtering regions by minimum
-#'                 coverage and methylation standard deviation.
+#'         \item [getRegions()] to generate the set of regions.
+#'         \item [plotSDstats()], [getRegionTotals()], and [plotRegionTotals()]
+#'                 for more help visualizing region characteristics and setting
+#'                 cutoffs for filtering.
+#'         \item [filterRegions()] for filtering regions by minimum coverage and
+#'                 methylation standard deviation.
 #' }
 #'
 #' @examples \dontrun{
@@ -326,10 +325,10 @@ plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132
 
 #' Plot Heatmaps of Region Standard Deviation vs Features
 #'
-#' \code{plotSDstats()} takes a set of regions from \code{\link{getRegions()}},
-#' generates heatmaps of methylation standard deviation against region features,
-#' and saves it as a pdf. Compared features include number of CpGs, minimum
-#' coverage, mean coverage, and mean methylation.
+#' \code{plotSDstats()} takes a set of regions from [getRegions()], generates
+#' heatmaps of methylation standard deviation against region features, and saves
+#' it as a pdf. Compared features include number of CpGs, minimum coverage, mean
+#' coverage, and mean methylation.
 #'
 #' It's recommended examine these plots before and after filtering to ensure
 #' removal of regions with high variability due to insufficient data. Plots are
@@ -337,8 +336,8 @@ plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132
 #' that bin on the log10 scale. A \code{ggplot} object is produced and can be
 #' edited outside of this function if desired.
 #'
-#' @param regions A \code{data.frame} output from \code{\link{getRegions()}}
-#'         giving the set of regions and statistics for each region.
+#' @param regions A \code{data.frame} output from [getRegions()] giving the set
+#'         of regions and statistics for each region.
 #' @param maxQuantile A \code{numeric(1)} giving the maximum quantile of each
 #'         feature to plot.
 #' @param bins A \code{numeric(1)} specifying the number of bins for both axes
@@ -360,12 +359,12 @@ plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132
 #' @return A \code{ggplot} object.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getRegions()}} to generate the set of regions.
-#'         \item \code{\link{plotRegionStats()}}, \code{\link{getRegionTotals()}},
-#'                 and \code{\link{plotRegionTotals()}} for more help visualizing
-#'                 region characteristics and setting cutoffs for filtering.
-#'        \item \code{\link{filterRegions()}} for filtering regions by minimum
-#'                 coverage and methylation standard deviation.
+#'         \item [getRegions()] to generate the set of regions.
+#'         \item [plotRegionStats()], [getRegionTotals()], and [plotRegionTotals()]
+#'                 for more help visualizing region characteristics and setting
+#'                 cutoffs for filtering.
+#'         \item [filterRegions()] for filtering regions by minimum coverage and
+#'                 methylation standard deviation.
 #' }
 #'
 #' @examples \dontrun{
@@ -473,8 +472,8 @@ plotSDstats <- function(regions, maxQuantile = 1, bins = 30, nBreaks = 4,
 #' consideration for network construction, with region sets of 250K or less
 #' generally performing well.
 #'
-#' @param regions A \code{data.frame} output from \code{\link{getRegions()}}
-#'         giving the set of regions and statistics for each region.
+#' @param regions A \code{data.frame} output from [getRegions()] giving the set
+#'         of regions and statistics for each region.
 #' @param covMin A \code{numeric} specifying the minimum number of reads at CpGs
 #'         in a region in any sample for that region to be included in the total.
 #' @param methSD A \code{numeric} specifying the minimum methylation standard
@@ -490,12 +489,12 @@ plotSDstats <- function(regions, maxQuantile = 1, bins = 30, nBreaks = 4,
 #'         number of CpGs at all combinations of \code{covMin} and \code{methSD}.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getRegions()}} to generate the set of regions.
-#'         \item \code{\link{plotRegionStats()}}, \code{\link{plotSDstats()}},
-#'                 and \code{\link{plotRegionTotals()}} for more help visualizing
-#'                 region characteristics and setting cutoffs for filtering.
-#'        \item \code{\link{filterRegions()}} for filtering regions by minimum
-#'                 coverage and methylation standard deviation.
+#'         \item [getRegions()] to generate the set of regions.
+#'         \item [plotRegionStats()], [plotSDstats()], and [plotRegionTotals()]
+#'                 for more help visualizing region characteristics and setting
+#'                 cutoffs for filtering.
+#'         \item [filterRegions()] for filtering regions by minimum coverage and
+#'                 methylation standard deviation.
 #' }
 #'
 #' @examples \dontrun{
@@ -557,11 +556,10 @@ getRegionTotals <- function(regions, covMin = seq(0,20,2), methSD = seq(0,0.1,0.
 #' \code{covMin} and \code{methSD} in a line plot and then saves it as a .pdf.
 #'
 #' \code{plotRegionTotals()} is designed to be used in combination with
-#' \code{\link{getRegionTotals()}}. A \code{ggplot} object is produced and can
-#' be edited outside of this function if desired.
+#' [getRegionTotals()]. A \code{ggplot} object is produced and can be edited
+#' outside of this function if desired.
 #'
-#' @param regionTotals A \code{data.frame}, output from
-#'         \code{\link{getRegionTotals()}}
+#' @param regionTotals A \code{data.frame}, output from [getRegionTotals()].
 #' @param nBreaks A \code{numeric(1)} specifying the number of breaks used for
 #'         both axes and the legend.
 #' @param legend.position A \code{numeric(2)} specifying the position of the
@@ -580,12 +578,12 @@ getRegionTotals <- function(regions, covMin = seq(0,20,2), methSD = seq(0,0.1,0.
 #' @return A \code{ggplot} object.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getRegions()}} to generate the set of regions.
-#'         \item \code{\link{plotRegionStats()}}, \code{\link{plotSDstats()}},
-#'                 and \code{\link{getRegionTotals()}} for more help visualizing
-#'                 region characteristics and setting cutoffs for filtering.
-#'        \item \code{\link{filterRegions()}} for filtering regions by minimum
-#'                 coverage and methylation standard deviation.
+#'         \item [getRegions()] to generate the set of regions.
+#'         \item [plotRegionStats()], [plotSDstats()], and [getRegionTotals()]
+#'                 for more help visualizing region characteristics and setting
+#'                 cutoffs for filtering.
+#'         \item [filterRegions()] for filtering regions by minimum coverage and
+#'                 methylation standard deviation.
 #' }
 #'
 #' @examples \dontrun{
@@ -689,8 +687,8 @@ plotRegionTotals <- function(regionTotals, nBreaks = 4,
 #' consideration for network construction, with region sets of 250K or less
 #' generally performing well.
 #'
-#' @param regions A \code{data.frame} output from \code{\link{getRegions()}}
-#'         giving the set of regions and statistics for each region.
+#' @param regions A \code{data.frame} output from [getRegions()] giving the set
+#'         of regions and statistics for each region.
 #' @param covMin A \code{numeric(1)} specifying the minimum number of reads at CpGs
 #'         in a region in any sample
 #' @param methSD A \code{numeric(1)} specifying the minimum methylation standard
@@ -705,13 +703,12 @@ plotRegionTotals <- function(regionTotals, nBreaks = 4,
 #' @return A filtered version of the \code{regions} \code{data.frame}
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getRegions()}} to generate the set of regions.
-#'         \item \code{\link{plotRegionStats()}}, \code{\link{plotSDstats()}},
-#'                 \code{\link{getRegionTotals()}}, and
-#'                 \code{\link{plotRegionTotals()}} for help visualizing region
+#'         \item [getRegions()] to generate the set of regions.
+#'         \item [plotRegionStats()], [plotSDstats()], [getRegionTotals()], and
+#'                 [plotRegionTotals()] for help visualizing region
 #'                 characteristics and setting cutoffs for filtering.
-#'         \item \code{\link{getRegionMeth()}} to get methylation values for
-#'                 these regions in all samples.
+#'         \item [getRegionMeth()] to get methylation values for these regions
+#'                 in all samples.
 #' }
 #'
 #' @examples \dontrun{

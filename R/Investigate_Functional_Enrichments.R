@@ -5,9 +5,9 @@
 #' and genome build.
 #'
 #' \code{listOntologies()} generates the possible ontologies to use for functional
-#' enrichment analysis in \code{\link{enrichModule()}}. Supported ontologies may
-#' change over time, so this function queries GREAT using the \code{rGREAT}
-#' package to get the ones currently available.
+#' enrichment analysis in [enrichModule()]. Supported ontologies may change over
+#' time, so this function queries GREAT using the \pkg{rGREAT} package to get the
+#' ones currently available.
 #'
 #' GREAT supports different genomes depending on the version:
 #' \describe{
@@ -28,14 +28,13 @@
 #' @return A \code{character vector}.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getModules()}} to build a comethylation network and
-#'                 identify modules of comethylated regions.
-#'         \item \code{\link{annotateModule()}} and \code{\link{getGeneList()}}
-#'                 to annotate a set of regions with genes and regulatory context
-#'                 and then extract the gene symbols or IDs.
-#'         \item \code{\link{enrichModule()}} and \code{\link{plotEnrichment()}}
-#'                 to investigate functional enrichment of module regions with
-#'                 GREAT.
+#'         \item [getModules()] to build a comethylation network and identify
+#'                 modules of comethylated regions.
+#'         \item [annotateModule()] and [getGeneList()] to annotate a set of
+#'                 regions with genes and regulatory context and then extract
+#'                 the gene symbols or IDs.
+#'         \item [enrichModule()] and [plotEnrichment()] to investigate
+#'                 functional enrichment of module regions with GREAT.
 #' }
 #'
 #' @examples \dontrun{
@@ -95,7 +94,7 @@ listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "da
 #' enrichment analysis compared to gene sets in the specified ontologies. The
 #' results are then processed and saved as a .txt file.
 #'
-#' Submission to GREAT is performed by the \code{rGREAT} package, which allows
+#' Submission to GREAT is performed by the \pkg{rGREAT} package, which allows
 #' for different annotation rules and versions of GREAT. The default
 #' \code{basalPlusExt} annotation rule associates a gene with a region if the
 #' region is within the basal regulatory domain of the gene (5 kb upstream and 1
@@ -103,7 +102,7 @@ listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "da
 #' the TSS and not in the basal regulatory domain of another gene. Other rules
 #' include \code{twoClosest} and \code{oneClosest}, which effectively assign the
 #' two nearest genes or one nearest genes, respectively. See
-#' \code{\link[rGREAT]{submitGreatJob()}} for more details.
+#' [rGREAT::submitGreatJob()] for more details.
 #'
 #' GREAT supports different genomes depending on the version:
 #' \describe{
@@ -127,7 +126,7 @@ listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "da
 #' significant gene sets, and the result is saved as a .txt file.
 #'
 #' @param regions A \code{data.frame} of regions with module assignments, typically
-#'         obtained from \code{\link{getModules()}}.
+#'         obtained from [getModules()].
 #' @param module A \code{character} giving the name of one or more modules to
 #'         analyze functional enrichment. If null, all modules will be analyzed,
 #'         except the grey (unassigned) module.
@@ -138,9 +137,8 @@ listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "da
 #'         curated regulatory domains for GREAT gene annotation.
 #' @param rule A \code{character(1)} specifying the rule used by GREAT for gene
 #'         annotation. Possible values include \code{basalPlusExt},
-#'         \code{twoClosest}, and \code{oneClosest}. See
-#'         \code{\link[rGREAT]{submitGreatJob()}} for more details for this and
-#'         the next six arguments.
+#'         \code{twoClosest}, and \code{oneClosest}. See [rGREAT::submitGreatJob()]
+#'         for more details for this and the next six arguments.
 #' @param adv_upstream A \code{numeric(1)} giving the distance upstream of the
 #'         TSS (in kb) to define a basal regulatory domain in the
 #'         \code{basalPlusExt} rule.
@@ -164,7 +162,7 @@ listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "da
 #'         Default ontologies include \code{GO Molecular Function},
 #'         \code{GO Biological Process}, \code{GO Cellular Component},
 #'         \code{Mouse Phenotype}, and \code{Human Phenotype}. All possible
-#'         ontologies can be obtained with \code{\link{listOntologies()}}.
+#'         ontologies can be obtained with [listOntologies()].
 #' @param min_background_region_hits A \code{numeric(1)} giving the minimum number
 #'         of overlaps of gene set regulatory domains with background regions
 #'         to include that gene set in the results. This affects the results used
@@ -188,14 +186,13 @@ listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "da
 #' @return A \code{data.frame} of functional enrichment results.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getModules()}} to build a comethylation network and
-#'                 identify modules of comethylated regions.
-#'         \item \code{\link{annotateModule()}} and \code{\link{getGeneList()}}
-#'                 to annotate a set of regions with genes and regulatory context
-#'                 and then extract the gene symbols or IDs.
-#'         \item \code{\link{listOntologies()}} and \code{\link{plotEnrichment()}}
-#'                 to investigate functional enrichment of module regions with
-#'                 GREAT.
+#'         \item [getModules()] to build a comethylation network and identify
+#'                 modules of comethylated regions.
+#'         \item [annotateModule()] and [getGeneList()] to annotate a set of
+#'                 regions with genes and regulatory context and then extract
+#'                 the gene symbols or IDs.
+#'         \item [listOntologies()] and [plotEnrichment()] to investigate
+#'                 functional enrichment of module regions with GREAT.
 #' }
 #'
 #' @examples \dontrun{
@@ -340,16 +337,15 @@ enrichModule <- function(regions, module = NULL,
 #' Plot Functional Enrichment Results
 #'
 #' \code{plotEnrichment()} takes a \code{data.frame} of enrichment results from
-#' \code{\link{enrichModule()}}, plots the log p-values in a bar plot, and saves
-#' it as a .pdf.
+#' [enrichModule()], plots the log p-values in a bar plot, and saves it as a .pdf.
 #'
 #' \code{plotEnrichment()} is designed to be used in combination with
-#' \code{\link{enrichModule()}}. The top 15 gene sets are plotted by default, but
-#' this can be expanded if needed. A \code{ggplot} object is produced and can be
-#' edited outside of this function if desired.
+#' [enrichModule()]. The top 15 gene sets are plotted by default, but this can
+#' be expanded if needed. A \code{ggplot} object is produced and can be edited
+#' outside of this function if desired.
 #'
 #' @param enrichment A \code{data.frame} of functional enrichment results,
-#'         typically obtained from \code{\link{enrichModule()}}.
+#'         typically obtained from [enrichModule()].
 #' @param nTerms A \code{numeric(1)} specifying the number of terms to include in
 #'         the plot.
 #' @param fill A \code{character(1)} giving the color of the bars.
@@ -372,14 +368,13 @@ enrichModule <- function(regions, module = NULL,
 #' @return A \code{ggplot} object.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getModules()}} to build a comethylation network and
-#'                 identify modules of comethylated regions.
-#'         \item \code{\link{annotateModule()}} and \code{\link{getGeneList()}}
-#'                 to annotate a set of regions with genes and regulatory context
-#'                 and then extract the gene symbols or IDs.
-#'         \item \code{\link{listOntologies()}} and \code{\link{enrichModule()}},
-#'                 to investigate functional enrichment of module regions with
-#'                 GREAT.
+#'         \item [getModules()] to build a comethylation network and identify
+#'                 modules of comethylated regions.
+#'         \item [annotateModule()] and [getGeneList()] to annotate a set of
+#'                 regions with genes and regulatory context and then extract
+#'                 the gene symbols or IDs.
+#'         \item [listOntologies()] and [enrichModule()], to investigate
+#'                 functional enrichment of module regions with GREAT.
 #' }
 #'
 #' @examples \dontrun{

@@ -14,7 +14,7 @@ getModuleBED(
 }
 \arguments{
 \item{regions}{A \code{data.frame} of regions with module assignments, typically
-obtained from \code{\link{getModules()}}.}
+obtained from \code{\link[=getModules]{getModules()}}.}
 
 \item{grey}{A \code{logical(1)} specifying whether to include "grey" (unassigned)
 regions in the BED file.}
@@ -30,17 +30,16 @@ printed.}
 A BED file.
 }
 \description{
-\code{getModuleBED()} takes a \code{data.frame} of regions with module annotations,
-converts it to the BED file format suitable for viewing it on the UCSC Genome
-Browser, and then saves it.
+\code{getModuleBED()} takes a \code{data.frame} of regions with module
+annotations, converts it to the BED file format suitable for viewing it on
+the UCSC Genome Browser, and then saves it.
 }
 \details{
-\code{getModuleBED()} is designed to be used in combination with
-\code{\link{getModules()}}.The BED file produced includes a header line to
-enable single-step viewing on the UCSC Genome Browser. Each region is labeled
-by its \code{RegionID} and assigned module, and is colored by the module color.
-"Grey" (unassigned) regions are excluded by default, but can be optionally
-included.
+\code{getModuleBED()} is designed to be used in combination with \code{\link[=getModules]{getModules()}}.
+The BED file produced includes a header line to enable single-step viewing on
+the UCSC Genome Browser. Each region is labeled by its \code{RegionID} and
+assigned module, and is colored by the module color. "Grey" (unassigned)
+regions are excluded by default, but can be optionally included.
 }
 \examples{
 \dontrun{
@@ -57,9 +56,9 @@ BED <- getModuleBED(modules$regions, file = "Modules.bed")
 }
 \seealso{
 \itemize{
-\item \code{\link{getModules()}} to build a comethylation network and
-identify modules of comethylated regions.
-\item \code{\link{plotRegionDendro()}} to visualize region similarity
-and module assignments.
+\item \code{\link[=getModules]{getModules()}} to build a comethylation network and identify
+modules of comethylated regions.
+\item \code{\link[=plotRegionDendro]{plotRegionDendro()}} to visualize region similarity and module
+assignments.
 }
 }

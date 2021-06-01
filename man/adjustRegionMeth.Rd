@@ -14,8 +14,7 @@ adjustRegionMeth(
 }
 \arguments{
 \item{meth}{A \code{numeric matrix}, where each row is a region and each
-column is a sample. This is typically obtained from
-\code{\link{getRegionMeth()}}.}
+column is a sample. This is typically obtained from \code{\link[=getRegionMeth]{getRegionMeth()}}.}
 
 \item{mod}{A \code{matrix} giving the model matrix being used to fit the data.
 See below for an example.}
@@ -37,9 +36,9 @@ is a region.
 principal components, transposes it, and then saves it as a .rds file.
 }
 \details{
-\code{adjustRegionMeth()} uses \code{\link[sva]{sva_network()}} to regress out
-the top principal components. More information on the function and approach is
-given in the documentation and publications related to the \code{sva} package.
+\code{adjustRegionMeth()} uses \code{\link[sva:sva_network]{sva::sva_network()}} to regress out the top
+principal components. More information on the function and approach is given
+in the documentation and publications related to the \pkg{sva} package.
 }
 \examples{
 \dontrun{
@@ -68,14 +67,13 @@ modules <- getModules(methAdj, power = sft$powerEstimate, regions = regions,
 }
 \seealso{
 \itemize{
-\item \code{\link{getRegionMeth()}} to extract region methylation
-values.
-\item \code{\link{getDendro()}} and \code{\link{plotDendro()}} to
-generate and visualize dendrograms.
-\item \code{\link{getSoftPower()}} and \code{\link{plotSoftPower()}}
-to estimate the best soft-thresholding power and visualize
-scale-free topology fit and connectivity.
-\item \code{\link{getModules()}} to build a comethylation network and
-identify modules of comethylated regions.
+\item \code{\link[=getRegionMeth]{getRegionMeth()}} to extract region methylation values.
+\item \code{\link[=getDendro]{getDendro()}} and \code{\link[=plotDendro]{plotDendro()}} to generate and visualize
+dendrograms.
+\item \code{\link[=getSoftPower]{getSoftPower()}} and \code{\link[=plotSoftPower]{plotSoftPower()}} to estimate the best
+soft-thresholding power and visualize scale-free topology fit
+and connectivity.
+\item \code{\link[=getModules]{getModules()}} to build a comethylation network and identify
+modules of comethylated regions.
 }
 }

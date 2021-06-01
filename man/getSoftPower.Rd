@@ -20,7 +20,7 @@ getSoftPower(
 \arguments{
 \item{meth}{A \code{numeric matrix}, where each row is a sample and each
 column is a region. This is typically obtained from
-\code{\link{adjustRegionMeth()}}.}
+\code{\link[=adjustRegionMeth]{adjustRegionMeth()}}.}
 
 \item{powerVector}{A \code{numeric} specifying the soft power thresholds to
 examine for scale-free topology.}
@@ -64,13 +64,12 @@ then saves this as a .rds file. Possible correlation statistics include
 \code{pearson} and \code{bicor}.
 }
 \details{
-Soft power is estimated by \code{\link[WGCNA]{pickSoftThreshold()}}, with
-\code{corFnc} set to either \code{cor} or \code{bicor}. Calculations are
-performed for a signed network in blocks of regions of size \code{blockSize}
-(default = 40000). The best soft power threshold is chosen as the lowest power
-where fit (R-squared) is greater than \code{RsquaredCut} (default = 0.8). More
-information is given in the \code{WGCNA} package documentation for
-\code{\link[WGCNA]{pickSoftThreshold()}}.
+Soft power is estimated by \code{\link[WGCNA:pickSoftThreshold]{WGCNA::pickSoftThreshold()}}, with \code{corFnc}
+set to either \code{cor} or \code{bicor}. Calculations are performed for a
+signed network in blocks of regions of size \code{blockSize} (default = 40000).
+The best soft power threshold is chosen as the lowest power where fit
+(R-squared) is greater than \code{RsquaredCut} (default = 0.8). More
+information is given in the documentation for \code{\link[WGCNA:pickSoftThreshold]{WGCNA::pickSoftThreshold()}}.
 }
 \examples{
 \dontrun{
@@ -95,12 +94,11 @@ modules <- getModules(methAdj, power = sft$powerEstimate, regions = regions,
 }
 \seealso{
 \itemize{
-\item \code{\link{getRegionMeth()}} and \code{\link{adjustRegionMeth()}}
-to extract methylation data and then adjust it for the top
-principal components.
-\item \code{\link{plotSoftPower()}} to visualize fit and connectivity
-for soft power estimation.
-\item \code{\link{getModules()}} to build a comethylation network and
-identify modules of comethylated regions.
+\item \code{\link[=getRegionMeth]{getRegionMeth()}} and \code{\link[=adjustRegionMeth]{adjustRegionMeth()}} to extract methylation
+data and then adjust it for the top principal components.
+\item \code{\link[=plotSoftPower]{plotSoftPower()}} to visualize fit and connectivity for soft
+power estimation.
+\item \code{\link[=getModules]{getModules()}} to build a comethylation network and identify
+modules of comethylated regions.
 }
 }

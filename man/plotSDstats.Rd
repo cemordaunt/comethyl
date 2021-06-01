@@ -18,8 +18,8 @@ plotSDstats(
 )
 }
 \arguments{
-\item{regions}{A \code{data.frame} output from \code{\link{getRegions()}}
-giving the set of regions and statistics for each region.}
+\item{regions}{A \code{data.frame} output from \code{\link[=getRegions]{getRegions()}} giving the set
+of regions and statistics for each region.}
 
 \item{maxQuantile}{A \code{numeric(1)} giving the maximum quantile of each
 feature to plot.}
@@ -51,10 +51,10 @@ printed.}
 A \code{ggplot} object.
 }
 \description{
-\code{plotSDstats()} takes a set of regions from \code{\link{getRegions()}},
-generates heatmaps of methylation standard deviation against region features,
-and saves it as a pdf. Compared features include number of CpGs, minimum
-coverage, mean coverage, and mean methylation.
+\code{plotSDstats()} takes a set of regions from \code{\link[=getRegions]{getRegions()}}, generates
+heatmaps of methylation standard deviation against region features, and saves
+it as a pdf. Compared features include number of CpGs, minimum coverage, mean
+coverage, and mean methylation.
 }
 \details{
 It's recommended examine these plots before and after filtering to ensure
@@ -89,11 +89,11 @@ plotSDstats(regions, maxQuantile = 0.99,
 }
 \seealso{
 \itemize{
-\item \code{\link{getRegions()}} to generate the set of regions.
-\item \code{\link{plotRegionStats()}}, \code{\link{getRegionTotals()}},
-and \code{\link{plotRegionTotals()}} for more help visualizing
-region characteristics and setting cutoffs for filtering.
-\item \code{\link{filterRegions()}} for filtering regions by minimum
-coverage and methylation standard deviation.
+\item \code{\link[=getRegions]{getRegions()}} to generate the set of regions.
+\item \code{\link[=plotRegionStats]{plotRegionStats()}}, \code{\link[=getRegionTotals]{getRegionTotals()}}, and \code{\link[=plotRegionTotals]{plotRegionTotals()}}
+for more help visualizing region characteristics and setting
+cutoffs for filtering.
+\item \code{\link[=filterRegions]{filterRegions()}} for filtering regions by minimum coverage and
+methylation standard deviation.
 }
 }

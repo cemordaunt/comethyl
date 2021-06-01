@@ -4,12 +4,11 @@
 #' plots a region dendrogram with module assignments, and then saves it as a .pdf.
 #'
 #' \code{plotRegionDendro()} is designed to be used in combination with
-#' \code{\link{getModules()}}. This function does not produce a \code{ggplot}
-#' object, but instead uses the \code{WGCNA} function
-#' \code{\link[WGCNA]{plotDendroAndColors()}} to plot the dendrogram.
+#' [getModules()]. This function does not produce a \code{ggplot} object, but
+#' instead uses [WGCNA::plotDendroAndColors()] to plot the dendrogram.
 #'
 #' @param modules A \code{list} of module assignments and statistics produced by
-#'         \code{\link{getModules()}}.
+#'         [getModules()].
 #' @param save A \code{logical(1)} indicating whether to save the plot.
 #' @param file A \code{character(1)} giving the file name (.pdf) for the saved
 #'         plot.
@@ -23,13 +22,12 @@
 #' @return None, produces a plot as a side effect.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getModules()}} to build a comethylation network and
-#'                 identify modules of comethylated regions.
-#'         \item \code{\link{getModuleBED()}} to visualize genomic locations and
-#'                 module assignments.
-#'         \item \code{\link{getDendro()}} and \code{\link{plotDendro()}} to
-#'                 generate and visualize dendrograms for samples, modules, and
-#'                 traits.
+#'         \item [getModules()] to build a comethylation network and identify
+#'                 modules of comethylated regions.
+#'         \item [getModuleBED()] to visualize genomic locations and module
+#'                 assignments.
+#'         \item [getDendro()] and [plotDendro()] to generate and visualize
+#'                 dendrograms for samples, modules, and traits.
 #' }
 #'
 #' @examples \dontrun{
@@ -76,19 +74,18 @@ plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pd
 
 #' Get a Module BED file
 #'
-#' \code{getModuleBED()} takes a \code{data.frame} of regions with module annotations,
-#' converts it to the BED file format suitable for viewing it on the UCSC Genome
-#' Browser, and then saves it.
+#' \code{getModuleBED()} takes a \code{data.frame} of regions with module
+#' annotations, converts it to the BED file format suitable for viewing it on
+#' the UCSC Genome Browser, and then saves it.
 #'
-#' \code{getModuleBED()} is designed to be used in combination with
-#' \code{\link{getModules()}}.The BED file produced includes a header line to
-#' enable single-step viewing on the UCSC Genome Browser. Each region is labeled
-#' by its \code{RegionID} and assigned module, and is colored by the module color.
-#' "Grey" (unassigned) regions are excluded by default, but can be optionally
-#' included.
+#' \code{getModuleBED()} is designed to be used in combination with [getModules()].
+#' The BED file produced includes a header line to enable single-step viewing on
+#' the UCSC Genome Browser. Each region is labeled by its \code{RegionID} and
+#' assigned module, and is colored by the module color. "Grey" (unassigned)
+#' regions are excluded by default, but can be optionally included.
 #'
 #' @param regions A \code{data.frame} of regions with module assignments, typically
-#'         obtained from \code{\link{getModules()}}.
+#'         obtained from [getModules()].
 #' @param grey A \code{logical(1)} specifying whether to include "grey" (unassigned)
 #'         regions in the BED file.
 #' @param save A \code{logical(1)} indicating whether to save the BED file.
@@ -99,10 +96,10 @@ plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pd
 #' @return A BED file.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getModules()}} to build a comethylation network and
-#'                 identify modules of comethylated regions.
-#'         \item \code{\link{plotRegionDendro()}} to visualize region similarity
-#'                 and module assignments.
+#'         \item [getModules()] to build a comethylation network and identify
+#'                 modules of comethylated regions.
+#'         \item [plotRegionDendro()] to visualize region similarity and module
+#'                 assignments.
 #' }
 #'
 #' @examples \dontrun{
@@ -162,8 +159,7 @@ getModuleBED <- function(regions, grey = FALSE, save = TRUE, file = "Modules.bed
 #' matrix or between two vectors or matrices.
 #'
 #' The first input argument can be optionally transposed. The correlation
-#' calculations are performed by \code{WGCNA} functions \code{\link[WGCNA]{cor()}}
-#' and \code{\link[WGCNA]{bicor()}}.
+#' calculations are performed by [WGCNA::cor()] and [WGCNA::bicor()].
 #'
 #' @param x A \code{numeric vector} or \code{matrix}. \code{x} must be a \code{matrix}
 #'         if \code{y} is null.
@@ -186,12 +182,12 @@ getModuleBED <- function(regions, grey = FALSE, save = TRUE, file = "Modules.bed
 #' @return A \code{numeric matrix}.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getModules()}} to build a comethylation network and
-#'                 identify modules of comethylated regions.
-#'         \item \code{\link{getDendro()}} and \code{\link{plotDendro()}} to
-#'                 generate and visualize dendrograms.
-#'         \item \code{\link{plotHeatmap()}} to visualize correlations between
-#'                 samples and modules.
+#'         \item [getModules()] to build a comethylation network and identify
+#'                 modules of comethylated regions.
+#'         \item [getDendro()] and [plotDendro()] to generate and visualize
+#'                 dendrograms.
+#'         \item [plotHeatmap()] to visualize correlations between samples and
+#'                 modules.
 #' }
 #'
 #' @examples \dontrun{
@@ -262,21 +258,19 @@ getCor <- function(x, y = NULL, transpose = FALSE, corType = c("bicor", "pearson
 #' must include the same set of values as the labels of \code{rowDendro} and
 #' \code{colDendro}, respectively.
 #'
-#' \code{plotHeatmap()} is designed to be used in combination with
-#' \code{\link{getCor()}} and \code{\link{getDendro()}}. The function will
-#' check to see if module color names are in the row and column names and then
-#' plot a color bar with the module colors. A \code{ggplot} object is produced
-#' and can be edited outside of this function if desired.
+#' \code{plotHeatmap()} is designed to be used in combination with [getCor()]
+#' and [getDendro()]. The function will check to see if module color names are
+#' in the row and column names and then plot a color bar with the module colors.
+#' A \code{ggplot} object is produced and can be edited outside of this function
+#' if desired.
 #'
 #' @param x A \code{numeric matrix}. The row names and column names of \code{x}
 #'         must include the same set of values as the labels of \code{rowDendro}
 #'         and \code{colDendro}, respectively.
-#' @param rowDendro An \code{\link[stats]{hclust}} object generated by
-#'         \code{\link{getDendro()}}.
-#' @param colDendro An \code{\link[stats]{hclust}} object generated by
-#'         \code{\link{getDendro()}}.
+#' @param rowDendro An [stats::hclust] object generated by [getDendro()].
+#' @param colDendro An [stats::hclust] object generated by [getDendro()].
 #' @param colors A \code{character} giving a vector of colors to use for the
-#'         gradient on the heatmap. The default uses \code{\link[WGCNA]{blueWhiteRed()}}
+#'         gradient on the heatmap. The default uses [WGCNA::blueWhiteRed()]
 #'         to generate these colors.
 #' @param limit A \code{numeric(1)} giving the maximum value (symmetric) for the
 #'         heatmap color scale.
@@ -311,11 +305,11 @@ getCor <- function(x, y = NULL, transpose = FALSE, corType = c("bicor", "pearson
 #' @return A \code{ggplot} object.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getModules()}} to build a comethylation network and
-#'                 identify modules of comethylated regions.
-#'         \item \code{\link{getDendro()}} and \code{\link{plotDendro()}} to
-#'                 generate and visualize dendrograms.
-#'         \item \code{\link{getCor()}} to calculate correlation coefficients.
+#'         \item [getModules()] to build a comethylation network and identify
+#'                 modules of comethylated regions.
+#'         \item [getDendro()] and [plotDendro()] to generate and visualize
+#'                 dendrograms.
+#'         \item [getCor()] to calculate correlation coefficients.
 #' }
 #'
 #' @examples \dontrun{

@@ -32,9 +32,9 @@ and genome build.
 }
 \details{
 \code{listOntologies()} generates the possible ontologies to use for functional
-enrichment analysis in \code{\link{enrichModule()}}. Supported ontologies may
-change over time, so this function queries GREAT using the \code{rGREAT}
-package to get the ones currently available.
+enrichment analysis in \code{\link[=enrichModule]{enrichModule()}}. Supported ontologies may change over
+time, so this function queries GREAT using the \pkg{rGREAT} package to get the
+ones currently available.
 
 GREAT supports different genomes depending on the version:
 \describe{
@@ -68,13 +68,12 @@ plotEnrichment(enrich_bisque4,
 }
 \seealso{
 \itemize{
-\item \code{\link{getModules()}} to build a comethylation network and
-identify modules of comethylated regions.
-\item \code{\link{annotateModule()}} and \code{\link{getGeneList()}}
-to annotate a set of regions with genes and regulatory context
-and then extract the gene symbols or IDs.
-\item \code{\link{enrichModule()}} and \code{\link{plotEnrichment()}}
-to investigate functional enrichment of module regions with
-GREAT.
+\item \code{\link[=getModules]{getModules()}} to build a comethylation network and identify
+modules of comethylated regions.
+\item \code{\link[=annotateModule]{annotateModule()}} and \code{\link[=getGeneList]{getGeneList()}} to annotate a set of
+regions with genes and regulatory context and then extract
+the gene symbols or IDs.
+\item \code{\link[=enrichModule]{enrichModule()}} and \code{\link[=plotEnrichment]{plotEnrichment()}} to investigate
+functional enrichment of module regions with GREAT.
 }
 }

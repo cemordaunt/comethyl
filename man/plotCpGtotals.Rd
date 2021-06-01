@@ -16,7 +16,7 @@ plotCpGtotals(
 )
 }
 \arguments{
-\item{CpGtotals}{A \code{data.frame}, output from \code{\link{getCpGtotals()}}.}
+\item{CpGtotals}{A \code{data.frame}, output from \code{\link[=getCpGtotals]{getCpGtotals()}}.}
 
 \item{nBreaks}{A \code{numeric(1)} specifying the number of breaks used for
 both axes and the legend.}
@@ -49,8 +49,8 @@ then saves it as a pdf.
 }
 \details{
 \code{plotCpGtotals()} is designed to be used in combination with
-\code{\link{getCpGtotals()}}. A \code{ggplot} object is produced and can be
-edited outside of this function if desired.
+\code{\link[=getCpGtotals]{getCpGtotals()}}. A \code{ggplot} object is produced and can be edited outside
+of this function if desired.
 }
 \examples{
 \dontrun{
@@ -70,11 +70,9 @@ bs <- filterCpGs(bs, cov = 2, perSample = 0.75, file = "Filtered_BSseq.rds")
 }
 \seealso{
 \itemize{
-\item \code{\link{getCpGs()}} to generate the
-\code{\link[bsseq:`BSseq-class`]{BSseq}} object from
-individual Bismark CpG reports.
-\item \code{\link{getCpGtotals()}} to generate \code{CpGtotals}.
-\item \code{\link{filterCpGs()}} to filter the
-\code{\link[bsseq:`BSseq-class`]{BSseq}} object.
+\item \code{\link[=getCpGs]{getCpGs()}} to generate the \link[bsseq:BSseq-class]{BSseq} object
+from individual Bismark CpG reports.
+\item \code{\link[=getCpGtotals]{getCpGtotals()}} to generate \code{CpGtotals}.
+\item \code{\link[=filterCpGs]{filterCpGs()}} to filter the \link[bsseq:BSseq-class]{BSseq} object.
 }
 }

@@ -93,8 +93,8 @@ then saves it as a .pdf. \code{ME} and \code{trait} must be in the same order.
 \code{NA} values in the trait are removed if present, along with corresponding
 \code{ME} values. Data is summarized like a box plot (median, Q1, Q3) by
 default, but can also be summarized with other methods. See
-\code{\link[ggplot2]{stat_summary()}} for more details. A \code{ggplot} object
-is produced and can be edited outside of this function if desired.
+\code{\link[ggplot2:stat_summary]{ggplot2::stat_summary()}} for more details. A \code{ggplot} object is produced
+and can be edited outside of this function if desired.
 }
 \examples{
 \dontrun{
@@ -134,11 +134,11 @@ plotMethTrait("bisque4", regions = regions, meth = meth,
 }
 \seealso{
 \itemize{
-\item \code{\link{getModules()}} to build a comethylation network and
-identify modules of comethylated regions.
-\item \code{\link{getMEtraitCor()}} and \code{\link{plotMEtraitCor()}}
-to calculate and visualize all ME-trait correlations.
-\item \code{\link{plotMEtraitScatter()}} and \code{\link{plotMethTrait()}}
-for other methods to visualize a single ME-trait correlation.
+\item \code{\link[=getModules]{getModules()}} to build a comethylation network and identify
+modules of comethylated regions.
+\item \code{\link[=getMEtraitCor]{getMEtraitCor()}} and \code{\link[=plotMEtraitCor]{plotMEtraitCor()}} to calculate and
+visualize all ME-trait correlations.
+\item \code{\link[=plotMEtraitScatter]{plotMEtraitScatter()}} and \code{\link[=plotMethTrait]{plotMethTrait()}} for other methods
+to visualize a single ME-trait correlation.
 }
 }

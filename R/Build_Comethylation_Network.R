@@ -5,17 +5,16 @@
 #' then saves this as a .rds file. Possible correlation statistics include
 #' \code{pearson} and \code{bicor}.
 #'
-#' Soft power is estimated by \code{\link[WGCNA]{pickSoftThreshold()}}, with
-#' \code{corFnc} set to either \code{cor} or \code{bicor}. Calculations are
-#' performed for a signed network in blocks of regions of size \code{blockSize}
-#' (default = 40000). The best soft power threshold is chosen as the lowest power
-#' where fit (R-squared) is greater than \code{RsquaredCut} (default = 0.8). More
-#' information is given in the \code{WGCNA} package documentation for
-#' \code{\link[WGCNA]{pickSoftThreshold()}}.
+#' Soft power is estimated by [WGCNA::pickSoftThreshold()], with \code{corFnc}
+#' set to either \code{cor} or \code{bicor}. Calculations are performed for a
+#' signed network in blocks of regions of size \code{blockSize} (default = 40000).
+#' The best soft power threshold is chosen as the lowest power where fit
+#' (R-squared) is greater than \code{RsquaredCut} (default = 0.8). More
+#' information is given in the documentation for [WGCNA::pickSoftThreshold()].
 #'
 #' @param meth A \code{numeric matrix}, where each row is a sample and each
 #'         column is a region. This is typically obtained from
-#'         \code{\link{adjustRegionMeth()}}.
+#'         [adjustRegionMeth()].
 #' @param powerVector A \code{numeric} specifying the soft power thresholds to
 #'         examine for scale-free topology.
 #' @param corType A \code{character(1)} indicating which correlation statistic
@@ -43,13 +42,12 @@
 #'         centralization, and heterogeneity.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getRegionMeth()}} and \code{\link{adjustRegionMeth()}}
-#'                 to extract methylation data and then adjust it for the top
-#'                 principal components.
-#'         \item \code{\link{plotSoftPower()}} to visualize fit and connectivity
-#'                 for soft power estimation.
-#'         \item \code{\link{getModules()}} to build a comethylation network and
-#'                 identify modules of comethylated regions.
+#'         \item [getRegionMeth()] and [adjustRegionMeth()] to extract methylation
+#'                 data and then adjust it for the top principal components.
+#'         \item [plotSoftPower()] to visualize fit and connectivity for soft
+#'                 power estimation.
+#'         \item [getModules()] to build a comethylation network and identify
+#'                 modules of comethylated regions.
 #' }
 #'
 #' @examples \dontrun{
@@ -138,11 +136,11 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
 #' .pdf.
 #'
 #' \code{plotSoftPower()} is designed to be used in combination with
-#' \code{\link{getSoftPower()}}. A \code{ggplot} object is produced and can be
-#' edited outside of this function if desired.
+#' [getSoftPower()]. A \code{ggplot} object is produced and can be edited outside
+#' of this function if desired.
 #'
-#' @param sft A \code{list} produced by \code{\link{getSoftPower()}} with two
-#'         elements: \code{powerEstimate} and \code{fitIndices}.
+#' @param sft A \code{list} produced by [getSoftPower()] with two elements:
+#'         \code{powerEstimate} and \code{fitIndices}.
 #' @param pointCol A \code{character(1)} specifying the color of the points.
 #' @param lineCol A \code{character(1)} giving the color of line and label for
 #'         the estimated soft power threshold for scale-free topology.
@@ -161,13 +159,12 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
 #' @return A \code{ggplot} object.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getRegionMeth()}} and \code{\link{adjustRegionMeth()}}
-#'                 to extract methylation data and then adjust it for the top
-#'                 principal components.
-#'         \item \code{\link{getSoftPower()}} to calculate the best soft-thresholding
-#'                 power and fit indices for scale-free topology.
-#'         \item \code{\link{getModules()}} to build a comethylation network and
-#'                 identify modules of comethylated regions.
+#'         \item [getRegionMeth()] and [adjustRegionMeth()] to extract methylation
+#'                 data and then adjust it for the top principal components.
+#'         \item [getSoftPower()] to calculate the best soft-thresholding power
+#'                 and fit indices for scale-free topology.
+#'         \item [getModules()] to build a comethylation network and identify
+#'                 modules of comethylated regions.
 #' }
 #'
 #' @examples \dontrun{
@@ -256,7 +253,7 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
 #' values, dendrograms, and module membership, and then saves this as a .rds file.
 #'
 #' Comethylation networks are built and modules are identified by
-#' \code{\link[WGCNA]{blockwiseModules()}}, with \code{corType} set to either
+#' [WGCNA::blockwiseModules()], with \code{corType} set to either
 #' \code{pearson} or \code{bicor}. Calculations are performed for a signed network
 #' in blocks of regions of maximum size \code{maxBlockSize} (default = 40000).
 #' If there are more than \code{maxBlocksize} regions, then regions are
@@ -264,16 +261,14 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
 #' correlations are performed within each block and regions are clustered with
 #' average linkage hierarchical clustering. Modules are then identified with a
 #' dynamic hybrid tree cut and highly correlated modules are merged together.
-#' More information is given in the \code{WGCNA} package documentation for
-#' \code{\link[WGCNA]{blockwiseModules()}}.
+#' More information is given in the documentation for [WGCNA::blockwiseModules()].
 #'
 #' @param meth A \code{numeric matrix}, where each row is a sample and each
-#'         column is a region. This is typically obtained from
-#'         \code{\link{adjustRegionMeth()}}.
+#'         column is a region. This is typically obtained from [adjustRegionMeth()].
 #' @param power A \code{numeric(1)} giving the soft-thresholding power. This is
-#'         typically obtained from \code{\link{getSoftPower()}}.
+#'         typically obtained from [getSoftPower()].
 #' @param regions A \code{data.frame} of regions, typically after filtering with
-#'         \code{\link{filterRegions()}}. Must have the column \code{RegionID}
+#'         [filterRegions()]. Must have the column \code{RegionID}
 #'         and correspond to the regions in \code{meth}.
 #' @param maxBlockSize A \code{numeric(1)} specifying the maximum number of
 #'         regions in a block. If there are more than this number regions, then
@@ -300,21 +295,19 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
 #' @param verbose A \code{logical(1)} indicating whether messages should be
 #'         printed.
 #'
-#' @return A \code{list} with 11 elements. See \code{\link[WGCNA]{blockwiseModules()}}
+#' @return A \code{list} with 11 elements. See [WGCNA::blockwiseModules()]
 #'         for a description of these. Additional \code{regions} element is a
 #'         \code{data.frame} with the region locations, statistics, module
 #'         assignment, module membership, and hub region status.
 #'
 #' @seealso \itemize{
-#'         \item \code{\link{getRegionMeth()}} and \code{\link{adjustRegionMeth()}}
-#'                 to extract methylation data and then adjust it for the top
-#'                 principal components.
-#'         \item \code{\link{getSoftPower()}} and \code{\link{plotSoftPower()}}
-#'                 to estimate the best soft-thresholding power and visualize
-#'                 scale-free topology fit and connectivity.
-#'         \item \code{\link{plotRegionDendro()}} and \code{\link{getModuleBED()}}
-#'                 to visualize region similarity, genomic locations, and
-#'                 module assignments.
+#'         \item [getRegionMeth()] and [adjustRegionMeth()] to extract methylation
+#'                 data and then adjust it for the top principal components.
+#'         \item [getSoftPower()] and [plotSoftPower()] to estimate the best
+#'                 soft-thresholding power and visualize scale-free topology fit
+#'                 and connectivity.
+#'         \item [plotRegionDendro()] and [getModuleBED()] to visualize region
+#'                 similarity, genomic locations, and module assignments.
 #' }
 #'
 #' @examples \dontrun{

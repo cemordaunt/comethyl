@@ -49,8 +49,7 @@ matrix or between two vectors or matrices.
 }
 \details{
 The first input argument can be optionally transposed. The correlation
-calculations are performed by \code{WGCNA} functions \code{\link[WGCNA]{cor()}}
-and \code{\link[WGCNA]{bicor()}}.
+calculations are performed by \code{\link[WGCNA:cor]{WGCNA::cor()}} and \code{\link[WGCNA:bicor]{WGCNA::bicor()}}.
 }
 \examples{
 \dontrun{
@@ -86,11 +85,11 @@ plotHeatmap(MEs, rowDendro = sampleDendro, colDendro = moduleDendro,
 }
 \seealso{
 \itemize{
-\item \code{\link{getModules()}} to build a comethylation network and
-identify modules of comethylated regions.
-\item \code{\link{getDendro()}} and \code{\link{plotDendro()}} to
-generate and visualize dendrograms.
-\item \code{\link{plotHeatmap()}} to visualize correlations between
-samples and modules.
+\item \code{\link[=getModules]{getModules()}} to build a comethylation network and identify
+modules of comethylated regions.
+\item \code{\link[=getDendro]{getDendro()}} and \code{\link[=plotDendro]{plotDendro()}} to generate and visualize
+dendrograms.
+\item \code{\link[=plotHeatmap]{plotHeatmap()}} to visualize correlations between samples and
+modules.
 }
 }

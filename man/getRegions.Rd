@@ -20,14 +20,14 @@ getRegions(
 )
 }
 \arguments{
-\item{bs}{A \code{\link[bsseq:`BSseq-class`]{BSseq}} object.}
+\item{bs}{A \link[bsseq:BSseq-class]{BSseq} object.}
 
 \item{annotation}{A \code{character(1)} giving the built-in genomic
 annotation to use for defining regions. Shortcuts are available for
 \code{genes}, \code{promoters}, and \code{transcripts}. Get the
 entire list of possible annotations with
-\code{\link[annotatr]{builtin_annotations()}}, which also includes
-CpG islands, enhancers, and chromatin states.}
+\code{\link[annotatr:builtin_annotations]{annotatr::builtin_annotations()}}, which also includes CpG islands,
+enhancers, and chromatin states.}
 
 \item{genome}{A \code{character(1)} with the genome build to use for
 built-in annotations. Available builds include \code{hg38},
@@ -42,9 +42,9 @@ transcription start site to specify a promoter. Used for the
 of a transcription start site to specify a promoter. Used for the
 \code{promoters} built-in annotation.}
 
-\item{custom}{A \code{\link[GenomicRanges:`GRanges-class`]{GRanges}} object
-with a custom genomic annotation for defining regions. Construct this
-using \code{\link[GenomicRanges]{GRanges()}}.}
+\item{custom}{A \link[GenomicRanges:GRanges-class]{GRanges} object with a custom
+genomic annotation for defining regions. Construct this using
+\code{\link[GenomicRanges:GRanges-class]{GenomicRanges::GRanges()}}.}
 
 \item{maxGap}{A \code{numeric(1)} specifying the maximum number of bases
 between CpGs to be included in the same CpG cluster.}
@@ -69,10 +69,10 @@ standard deviation, and methylation mean and standard deviation.
 }
 \description{
 \code{getRegions()} generates a set of regions and some statistics based on
-the CpGs in a \code{\link[bsseq:`BSseq-class`]{BSseq}} object and then saves
-it as a tab-delimited text file. Regions can be defined based on CpG
-locations (for CpG clusters), built-in genomic annotations from
-\pkg{annotatr}, or a custom genomic annotation.
+the CpGs in a \link[bsseq:BSseq-class]{BSseq} object and then saves it as a
+tab-delimited text file. Regions can be defined based on CpG locations (for
+CpG clusters), built-in genomic annotations from \pkg{annotatr}, or a custom
+genomic annotation.
 }
 \details{
 These regions still need to be filtered for minimum coverage and methylation
@@ -104,11 +104,10 @@ plotSDstats(regions, maxQuantile = 0.99,
 }
 \seealso{
 \itemize{
-\item \code{\link{plotRegionStats()}}, \code{\link{plotSDstats()}},
-\code{\link{getRegionTotals()}}, and
-\code{\link{plotRegionTotals()}} for help visualizing region
+\item \code{\link[=plotRegionStats]{plotRegionStats()}}, \code{\link[=plotSDstats]{plotSDstats()}}, \code{\link[=getRegionTotals]{getRegionTotals()}}, and
+\code{\link[=plotRegionTotals]{plotRegionTotals()}} for help visualizing region
 characteristics and setting cutoffs for filtering.
-\item \code{\link{filterRegions()}} for filtering regions by minimum
-coverage and methylation standard deviation.
+\item \code{\link[=filterRegions]{filterRegions()}} for filtering regions by minimum coverage and
+methylation standard deviation.
 }
 }
