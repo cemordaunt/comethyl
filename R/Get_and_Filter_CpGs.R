@@ -154,7 +154,7 @@ getCpGtotals <- function(bs, cov = seq(0,10,1), perSample = seq(0.5,1,0.05),
                 message("[getCpGtotals] Calculating CpG totals at specified ",
                         "cov and perSample cutoffs")
         }
-        nSample <- (perSample * ncol(bs)) %>% ceiling()
+        nSample <- ceiling(perSample * ncol(bs))
         bsCov <- getCoverage(bs)
         nCpGs <- sapply(cov, FUN = .nCpGsByCov, bsCov = bsCov,
                         nSample = nSample)
