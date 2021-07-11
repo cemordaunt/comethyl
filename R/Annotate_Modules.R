@@ -111,7 +111,6 @@
 #' @import rGREAT
 #' @import stringr
 #' @import biomaRt
-#' @import annotatr
 #' @import utils
 #'
 #' @importFrom magrittr %>%
@@ -216,10 +215,10 @@ annotateModule <- function(regions, module = NULL, grey = FALSE,
                                      c("basicgenes", "genes_intergenic", "enhancers_fantom"),
                                      sep = "_")
                 regions_GeneReg <- suppressWarnings(suppressMessages(
-                        build_annotations(genome = genome, annotations = annotations))) %>%
+                        annotatr::build_annotations(genome = genome, annotations = annotations))) %>%
                         GenomeInfoDb::keepStandardChromosomes(pruning.mode = "coarse") %>%
-                        annotate_regions(regions = GR_regions, annotations = .,
-                                         ignore.strand = TRUE, quiet = TRUE) %>%
+                        annotatr::annotate_regions(regions = GR_regions, annotations = .,
+                                                   ignore.strand = TRUE, quiet = TRUE) %>%
                         as.data.frame()
                 colnames(regions_GeneReg)[colnames(regions_GeneReg) == "annot.type"] <- "gene_context"
                 pattern <- rep("", times = 5)
@@ -236,11 +235,11 @@ annotateModule <- function(regions, module = NULL, grey = FALSE,
                         message("[annotateModule] Getting CpG context from annotatr")
                 }
                 regions_CpGs <- suppressMessages(
-                        build_annotations(genome = genome,
-                                          annotations = paste(genome, "cpgs", sep = "_"))) %>%
+                        annotatr::build_annotations(genome = genome,
+                                                    annotations = paste(genome, "cpgs", sep = "_"))) %>%
                         GenomeInfoDb::keepStandardChromosomes(pruning.mode = "coarse") %>%
-                        annotate_regions(regions = GR_regions, annotations = .,
-                                         ignore.strand = TRUE, quiet = TRUE) %>%
+                        annotatr::annotate_regions(regions = GR_regions, annotations = .,
+                                                   ignore.strand = TRUE, quiet = TRUE) %>%
                         as.data.frame()
                 colnames(regions_CpGs)[colnames(regions_CpGs) == "annot.type"] <- "CpG_context"
                 pattern <- c("island", "shore", "shelf", "open sea")

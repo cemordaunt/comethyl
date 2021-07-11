@@ -6,11 +6,8 @@
 
 # Setup ####
 .libPaths("/share/lasallelab/programs/comethyl/R_3.6")
-AnnotationHub::setAnnotationHubOption("CACHE",
-                                      value = "/share/lasallelab/programs/comethyl/R_3.6")
-sapply(c("scales", "openxlsx", "rlist", "tidyverse", "ggdendro", "cowplot",
-         "annotatr", "rtracklayer", "bsseq", "dmrseq", "WGCNA", "sva", "rGREAT",
-         "R.devices", "biomaRt", "comethyl"), require, character.only = TRUE)
+AnnotationHub::setAnnotationHubOption("CACHE", value = "/share/lasallelab/programs/comethyl/R_3.6")
+library(comethyl)
 
 # Set Global Options ####
 options(stringsAsFactors = FALSE)

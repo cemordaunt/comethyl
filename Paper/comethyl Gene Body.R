@@ -6,9 +6,7 @@
 setwd("~/Documents/Programming/comethyl/Testing/Gene Bodies")
 .libPaths("/share/lasallelab/programs/comethyl/R_3.6")
 AnnotationHub::setAnnotationHubOption("CACHE", value = "/share/lasallelab/programs/comethyl/R_3.6")
-sapply(c("scales", "openxlsx", "rlist", "tidyverse", "ggdendro", "cowplot", "annotatr", "rtracklayer",
-         "bsseq", "dmrseq", "WGCNA", "sva", "rGREAT", "R.devices", "biomaRt"), require, character.only = TRUE)
-list.files("~/Documents/Programming/comethyl/R", full.names = TRUE) %>% lapply(source)
+library(comethyl)
 
 # Set Global Options ####
 options(stringsAsFactors = FALSE)

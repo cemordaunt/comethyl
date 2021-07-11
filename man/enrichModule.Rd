@@ -92,7 +92,7 @@ p-values, Potential values include \code{fdr}, \code{holm},
 of gene set regulatory domains with module regions to include that gene
 set in the results.}
 
-\item{pvalue_threshold}{A \code{numeric(1)} giving the maximum adjusted p-value
+\item{pvalue_threshold}{A \code{numeric(1)} giving the maximum p-value
 for enrichment to include a gene set in the results.}
 
 \item{save}{A \code{logical(1)} indicating whether to save the
@@ -141,8 +141,8 @@ ontologies of interest. The default ontologies include
 Initial enrichment results are filtered for terms with a minimum number of
 overlaps with the background set of regions, p-values are adjusted for multiple
 comparisons using the specified method, and then the results are filtered again
-for a minimum number of overlaps with the module(s) of interest and an
-adjusted p-value threshold. Finally, gene symbols are obtained for the
+for a minimum number of overlaps with the module(s) of interest and a
+p-value threshold. Finally, gene symbols are obtained for the
 significant gene sets, and the result is saved as a .txt file.
 }
 \examples{
