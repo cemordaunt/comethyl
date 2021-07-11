@@ -121,8 +121,8 @@ listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "da
 #' Initial enrichment results are filtered for terms with a minimum number of
 #' overlaps with the background set of regions, p-values are adjusted for multiple
 #' comparisons using the specified method, and then the results are filtered again
-#' for a minimum number of overlaps with the module(s) of interest and an
-#' adjusted p-value threshold. Finally, gene symbols are obtained for the
+#' for a minimum number of overlaps with the module(s) of interest and a
+#' p-value threshold. Finally, gene symbols are obtained for the
 #' significant gene sets, and the result is saved as a .txt file.
 #'
 #' @param regions A \code{data.frame} of regions with module assignments, typically
@@ -174,7 +174,7 @@ listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "da
 #' @param min_region_hits A \code{numeric(1)} giving the minimum number of overlaps
 #'         of gene set regulatory domains with module regions to include that gene
 #'         set in the results.
-#' @param pvalue_threshold A \code{numeric(1)} giving the maximum adjusted p-value
+#' @param pvalue_threshold A \code{numeric(1)} giving the maximum p-value
 #'         for enrichment to include a gene set in the results.
 #' @param save A \code{logical(1)} indicating whether to save the
 #'         \code{data.frame}.
