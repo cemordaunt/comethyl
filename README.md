@@ -18,5 +18,13 @@ install.packages(c("BiocManager", "remotes"))
 BiocManager::install("cemordaunt/comethyl")
 ```
 
+## Documentation
+Check out the vignettes and details on all of the functions at [https://cemordaunt.github.io/comethyl/](https://cemordaunt.github.io/comethyl/).
+
 ## Workflow
 ![Comethyl Workflow](man/figures/comethyl.png)
+
+## Acknowledgements
+Many thanks to Julia Mouat for creating the vignettes, and to both Ben Laufer and
+Janine LaSalle for very helpful discussions.
+
