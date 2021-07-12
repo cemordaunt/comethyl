@@ -14,7 +14,10 @@ and examining functional enrichments. Results are then visualized with
 high-quality, editable plots from \pkg{ggplot2}.
 }
 \seealso{
-GitHub: \url{https://github.com/cemordaunt/comethyl}
+\itemize{
+\item GitHub: \url{https://github.com/cemordaunt/comethyl}
+\item Documentation and vignettes: \url{https://cemordaunt.github.io/comethyl/}
+}
 }
 \author{
 Charles Mordaunt

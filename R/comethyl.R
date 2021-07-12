@@ -11,8 +11,10 @@
 #' @author
 #' Charles Mordaunt
 #'
-#' @seealso
-#' GitHub: \url{https://github.com/cemordaunt/comethyl}
+#' @seealso \itemize{
+#'         \item GitHub: \url{https://github.com/cemordaunt/comethyl}
+#'         \item Documentation and vignettes: \url{https://cemordaunt.github.io/comethyl/}
+#' }
 #'
 #' @docType package
 #' @name comethyl
