@@ -1,12 +1,16 @@
 Package: comethyl
 Title: An R Package for Weighted Region Comethylation Network Analysis
 Version: 1.0.0
-Authors@R: 
+Authors@R: c(
     person(given = "Charles",
            family = "Mordaunt",
            role = c("aut", "cre"),
            email = "mordauntcharles@gmail.com",
-           comment = c(ORCID = "0000-0002-3820-3298"))
+           comment = c(ORCID = "0000-0002-3820-3298")),
+    person(given = "Julia",
+           family = "Mouat",
+           role = "ctb",
+           email = "jmouat@ucdavis.edu"))
 Description: Comethyl builds upon the WGCNA package to identify and interpret modules of 
     comethylated regions from whole-genome bisulfite sequencing data. Regions are 
     defined from clusters of CpG sites or from genomic annotations, and then percent
