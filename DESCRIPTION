@@ -56,4 +56,5 @@ Imports:
     tidyr,
     utils,
     WGCNA
-
+URL: https://github.com/cemordaunt/comethyl
+BugReports: https://github.com/cemordaunt/comethyl/issues
