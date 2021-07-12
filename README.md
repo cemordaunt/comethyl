@@ -10,15 +10,17 @@ Interesting modules are identified and explored by comparing with sample traits 
 examining functional enrichments. Results are then visualized with high-quality,
 editable plots from ggplot2.
 
-<br>
-<p align="center">
-        <img src="https://github.com/cemordaunt/comethyl/blob/master/Images/comethyl.png" width="600">
-</p>
-
 ## Installation
-You can install comethyl from this GitHub repository with the code below.
+You can install comethyl from this repository with the code below.
 
 ```
 install.packages(c("BiocManager", "remotes"))
 BiocManager::install("cemordaunt/comethyl")
 ```
+
+## Workflow
+<br>
+<p align="center">
+        <img src="https://github.com/cemordaunt/comethyl/blob/master/Images/comethyl.png" width="600">
+</p>
+
