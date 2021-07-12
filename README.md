@@ -19,8 +19,4 @@ BiocManager::install("cemordaunt/comethyl")
 ```
 
 ## Workflow
-<br>
-<p align="center">
-        <img src="https://github.com/cemordaunt/comethyl/blob/master/Images/comethyl.png" width="600">
-</p>
-
+![Comethyl Workflow](Images/comethyl.png)
