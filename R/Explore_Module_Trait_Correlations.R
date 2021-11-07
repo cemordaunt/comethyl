@@ -7,10 +7,7 @@
 #'
 #' \code{getMEtraitCor()} is designed to be used in combination with
 #' [getModules()]. The correlation calculations are performed by
-#' [WGCNA::corAndPvalue()] and [WGCNA::bicorAndPvalue()]. P-values can
-#' be adjusted for multiple comparisons by several methods, including \code{fdr},
-#' \code{holm}, \code{hochberg}, \code{hommel}, \code{bonferroni}, \code{BH}, and
-#' \code{BY}.
+#' [WGCNA::corAndPvalue()] and [WGCNA::bicorAndPvalue()].
 #'
 #' @param MEs A \code{data.frame} of module eigennode values, where rows are
 #'         samples and columns are modules. The row names of \code{MEs} must
@@ -26,10 +23,6 @@
 #' @param robustY A \code{logical(1)} indicating whether to use robust calculation
 #'         for \code{y} for the \code{bicor} statistic. \code{FALSE} is recommended
 #'         if \code{y} is a binary variable.
-#' @param adjMethod A \code{character(1)} specifying the method for adjusting
-#'         p-values, Potential values include \code{fdr}, \code{holm},
-#'         \code{hochberg}, \code{hommel}, \code{bonferroni}, \code{BH},
-#'         \code{BY}, and \code{none}.
 #' @param save A \code{logical(1)} indicating whether to save the
 #'         \code{data.frame}.
 #' @param file A \code{character(1)} giving the file name (.txt) for the saved
@@ -73,12 +66,12 @@
 #'                traitOrder = traitDendro$order,
 #'                file = "ME_Trait_Correlation_Heatmap.pdf")
 #' plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order,
-#'                traitOrder = traitDendro$order, sigOnly = TRUE,
-#'                star.size = 11, star.nudge_y = -0.27,
-#'                legend.position = c(1.14, 0.745),
-#'                colColorMargins = c(-1,5.1,0.5,10.47),
-#'                file = "Sig_ME_Trait_Correlation_Heatmap.pdf",
-#'                width = 7, height = 3.5)
+#'                traitOrder = traitDendro$order, topOnly = TRUE,
+#'                label.type = "p", label.size = 4, label.nudge_y = 0,
+#'                legend.position = c(1.11, 0.795),
+#'                colColorMargins = c(-1,4.75,0.5,10.1),
+#'                file = "Top_ME_Trait_Correlation_Heatmap.pdf", width = 8.5,
+#'                height = 4.25)
 #' }
 #'
 #' @export
@@ -90,13 +83,10 @@
 #' @importFrom magrittr %>%
 
 getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"),
-                          maxPOutliers = 0.1, robustY = FALSE,
-                          adjMethod = c("fdr", "holm", "hochberg", "hommel",
-                                        "bonferroni", "BH", "BY", "none"),
-                          save = TRUE, file = "ME_Trait_Correlation_Stats.txt",
+                          maxPOutliers = 0.1, robustY = FALSE, save = TRUE,
+                          file = "ME_Trait_Correlation_Stats.txt",
                           verbose = TRUE){
         corType <- match.arg(corType)
-        adjMethod <- match.arg(adjMethod)
         if(verbose){
                 message("[getMEtraitCor] Testing associations between module eigennodes and sample traits using ",
                         corType, " correlation")
@@ -123,17 +113,12 @@ getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"),
                                 variable.name = "trait") %>%
                 reshape2::dcast(formula = module + trait ~ stat,
                                 value.var = "value")
-        if(verbose){
-                message("[getMEtraitCor] Adjusting p-values using the ",
-                        adjMethod, " method")
-        }
-        stats$adj_p <- stats::p.adjust(stats$p, method = adjMethod)
         if(corType == "bicor"){
                 stats <- stats[,c("module", "trait", "nObs", "bicor", "Z", "t",
-                                  "p", "adj_p")]
+                                  "p")]
         } else {
                 stats <- stats[,c("module", "trait", "nObs", "cor", "Z", "t",
-                                  "p", "adj_p")]
+                                  "p")]
         }
         if(save){
                 if(verbose){
@@ -152,11 +137,11 @@ getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"),
 #' and saves it as a .pdf.
 #'
 #' \code{plotMEtraitCor()} is designed to be used in combination with
-#' [getMEtraitCor()]. Stars are used to annotate significant correlations, as
-#' defined by the \code{adj_p} threshold. The heatmap can optionally be filtered
-#' to include only modules and traits with significant correlations. A
-#' \code{ggplot} object is produced and can be edited outside of this function
-#' if desired.
+#' [getMEtraitCor()]. Stars or p-values are used to annotate significant
+#' correlations, as defined by the p-value threshold. The heatmap can optionally
+#' be filtered to include only modules and traits with the most significant
+#' associations, ranked by p-value. A \code{ggplot} object is produced and can
+#' be edited outside of this function if desired.
 #'
 #' @param MEtraitCor A \code{data.frame} of correlation statistics for module-trait
 #'         pairs, typically generated by [getMEtraitCor()].
@@ -166,14 +151,18 @@ getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"),
 #' @param traitOrder A \code{numeric} specifying the order of traits in the
 #'         heatmap. This must be the same length as the number of unique traits
 #'         in \code{MEtraitCor}.
-#' @param sigOnly A \code{logical(1)} indicating whether to plot only modules and
-#'         traits with significant correlations.
-#' @param adj_p A \code{numeric(1)} giving the threshold for the adjusted p-value
-#'         to determine a significant correlation.
-#' @param star.size A \code{numeric(1)} specifying the size of the star for
+#' @param topOnly A \code{logical(1)} indicating whether to plot only modules and
+#'         traits with the most significant correlations, ranked by p-value.
+#' @param nTop A \code{numeric(1)} specifying the number of top module-trait
+#'         associations to include.
+#' @param p A \code{numeric(1)} giving the threshold for the p-value to assign
+#'         a significant correlation.
+#' @param label.type A \code{character(1)} giving the type of label (star or p)
+#'         to use to annotate significant correlations.
+#' @param label.size A \code{numeric(1)} specifying the size of the label text for
 #'         annotating significant correlations.
-#' @param star.nudge_y A \code{numeric(1)} giving the amount to adjust the position
-#'         of the star on the y-axis.
+#' @param label.nudge_y A \code{numeric(1)} giving the amount to adjust the position
+#'         of the label text on the y-axis.
 #' @param colors A \code{character} giving a vector of colors to use for the
 #'         gradient on the heatmap. The default uses [WGCNA::blueWhiteRed()]
 #'         to generate these colors.
@@ -235,12 +224,12 @@ getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"),
 #'                traitOrder = traitDendro$order,
 #'                file = "ME_Trait_Correlation_Heatmap.pdf")
 #' plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order,
-#'                traitOrder = traitDendro$order, sigOnly = TRUE,
-#'                star.size = 11, star.nudge_y = -0.27,
-#'                legend.position = c(1.14, 0.745),
-#'                colColorMargins = c(-1,5.1,0.5,10.47),
-#'                file = "Sig_ME_Trait_Correlation_Heatmap.pdf",
-#'                width = 7, height = 3.5)
+#'                traitOrder = traitDendro$order, topOnly = TRUE,
+#'                label.type = "p", label.size = 4, label.nudge_y = 0,
+#'                legend.position = c(1.11, 0.795),
+#'                colColorMargins = c(-1,4.75,0.5,10.1),
+#'                file = "Top_ME_Trait_Correlation_Heatmap.pdf", width = 8.5,
+#'                height = 4.25)
 #' }
 #'
 #' @export
@@ -254,14 +243,16 @@ getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"),
 plotMEtraitCor <- function(MEtraitCor,
                            moduleOrder = 1:length(unique(MEtraitCor$module)),
                            traitOrder = 1:length(unique(MEtraitCor$trait)),
-                           sigOnly = FALSE, adj_p = 0.05, star.size = 8,
-                           star.nudge_y = -0.38,
+                           topOnly = FALSE, nTop = 15, p = 0.05,
+                           label.type = c("star", "p"), label.size = 8,
+                           label.nudge_y = -0.38,
                            colors = blueWhiteRed(100, gamma = 0.9), limit = NULL,
                            axis.text.size = 12, legend.position = c(1.08, 0.915),
                            legend.text.size = 12, legend.title.size = 16,
                            colColorMargins = c(-0.7,4.21,1.2,11.07), save = TRUE,
                            file = "ME_Trait_Correlation_Heatmap.pdf", width = 11,
                            height = 9.5, verbose = TRUE){
+        label.type <- match.arg(label.type)
         if(verbose){
                 message("[plotMEtraitCor] Plotting ME trait correlation heatmap")
         }
@@ -269,17 +260,23 @@ plotMEtraitCor <- function(MEtraitCor,
                                     levels = levels(MEtraitCor$module)[moduleOrder])
         MEtraitCor$trait <- factor(MEtraitCor$trait,
                                    levels = levels(MEtraitCor$trait)[rev(traitOrder)])
-        MEtraitCor$Significant <- (MEtraitCor$adj_p < adj_p & !is.na(MEtraitCor$adj_p)) %>%
+        MEtraitCor$significant <- (MEtraitCor$p < p & !is.na(MEtraitCor$p)) %>%
                 factor(levels = c("TRUE", "FALSE"))
-        if(sigOnly){
-                sigModules <- MEtraitCor$module[MEtraitCor$Significant == "TRUE"] %>%
+        if(topOnly){
+                if(nrow(MEtraitCor) > nTop){
+                        MEtraitCor$top <- (MEtraitCor$p %in% sort(MEtraitCor$p)[1:nTop] &
+                                                   !is.na(MEtraitCor$p))
+                } else {
+                        MEtraitCor$top <- TRUE
+                }
+                topModules <- MEtraitCor$module[MEtraitCor$top == "TRUE"] %>%
                         unique() %>% as.character()
-                sigTraits <- MEtraitCor$trait[MEtraitCor$Significant == "TRUE"] %>%
+                topTraits <- MEtraitCor$trait[MEtraitCor$top == "TRUE"] %>%
                         unique() %>% as.character()
-                MEtraitCor <- subset(MEtraitCor, module %in% sigModules &
-                                             trait %in% sigTraits)
+                MEtraitCor <- subset(MEtraitCor, module %in% topModules &
+                                             trait %in% topTraits)
                 MEtraitCor$module <- factor(MEtraitCor$module,
-                                            levels = levels(MEtraitCor$module)[levels(MEtraitCor$module) %in% sigModules])
+                                            levels = levels(MEtraitCor$module)[levels(MEtraitCor$module) %in% topModules])
         }
         if("bicor" %in% colnames(MEtraitCor)){
                 corType <- "bicor"
@@ -297,9 +294,6 @@ plotMEtraitCor <- function(MEtraitCor,
         heatmap <- ggplot(data = MEtraitCor) +
                 geom_tile(aes(x = module, y = trait, color = corData,
                               fill = corData)) +
-                geom_text(aes(x = module, y = trait, alpha = Significant),
-                          label = "*", color = "black",
-                          size = star.size, nudge_y = star.nudge_y) +
                 scale_fill_gradientn(str_to_title(corType), colors = colors,
                                      limits = c(-limit, limit),
                                      aesthetics = c("color", "fill")) +
@@ -307,7 +301,7 @@ plotMEtraitCor <- function(MEtraitCor,
                 scale_y_discrete(expand = expansion(mult = 0.01)) +
                 scale_alpha_manual(breaks = c("TRUE", "FALSE"),
                                    values = c("TRUE" = 1, "FALSE" = 0),
-                                   guide = FALSE) +
+                                   guide = "none") +
                 theme_bw(base_size = 24) +
                 theme(axis.text.x = element_blank(),
                       axis.text.y = element_text(size = axis.text.size,
@@ -324,6 +318,18 @@ plotMEtraitCor <- function(MEtraitCor,
                       panel.grid = element_blank(),
                       plot.background = element_blank(),
                       plot.margin = unit(c(1,6,1,1), "lines"))
+        if(label.type == "p"){
+                heatmap <- heatmap +
+                        geom_text(aes(x = module, y = trait, alpha = significant,
+                                      label = format(p, digits = 1, scientific = TRUE)),
+                                  color = "black", size = label.size,
+                                  nudge_y = label.nudge_y)
+        } else {
+                heatmap <- heatmap +
+                        geom_text(aes(x = module, y = trait, alpha = significant),
+                                  label = "*", color = "black", size = label.size,
+                                  nudge_y = label.nudge_y)
+        }
         colColors <- ggplot(data = data.frame(x = 1:length(levels(MEtraitCor$module)),
                                               y = 0,
                                               color = levels(MEtraitCor$module))) +

@@ -425,7 +425,7 @@ plotSDstats <- function(regions, maxQuantile = 1, bins = 30, nBreaks = 4,
                 facet_wrap(vars(variable), nrow = 2, ncol = 2, scales = "free_x",
                            strip.position = "bottom") +
                 scale_fill_continuous(name = "Count", trans = "log10") +
-                scale_color_continuous(guide = FALSE, trans = "log10") +
+                scale_color_continuous(guide = "none", trans = "log10") +
                 scale_x_continuous(breaks = breaks_pretty(n = nBreaks),
                                    expand = expansion(mult = c(0.0062, 0.05))) +
                 scale_y_continuous(breaks = breaks_pretty(n = nBreaks),
