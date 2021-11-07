@@ -10,7 +10,6 @@ getMEtraitCor(
   corType = c("bicor", "pearson"),
   maxPOutliers = 0.1,
   robustY = FALSE,
-  adjMethod = c("fdr", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "none"),
   save = TRUE,
   file = "ME_Trait_Correlation_Stats.txt",
   verbose = TRUE
@@ -36,11 +35,6 @@ can be considered outliers on each side of the median for the
 for \code{y} for the \code{bicor} statistic. \code{FALSE} is recommended
 if \code{y} is a binary variable.}
 
-\item{adjMethod}{A \code{character(1)} specifying the method for adjusting
-p-values, Potential values include \code{fdr}, \code{holm},
-\code{hochberg}, \code{hommel}, \code{bonferroni}, \code{BH},
-\code{BY}, and \code{none}.}
-
 \item{save}{A \code{logical(1)} indicating whether to save the
 \code{data.frame}.}
 
@@ -63,10 +57,7 @@ methods.
 \details{
 \code{getMEtraitCor()} is designed to be used in combination with
 \code{\link[=getModules]{getModules()}}. The correlation calculations are performed by
-\code{\link[WGCNA:corAndPvalue]{WGCNA::corAndPvalue()}} and \code{\link[WGCNA:bicorAndPvalue]{WGCNA::bicorAndPvalue()}}. P-values can
-be adjusted for multiple comparisons by several methods, including \code{fdr},
-\code{holm}, \code{hochberg}, \code{hommel}, \code{bonferroni}, \code{BH}, and
-\code{BY}.
+\code{\link[WGCNA:corAndPvalue]{WGCNA::corAndPvalue()}} and \code{\link[WGCNA:bicorAndPvalue]{WGCNA::bicorAndPvalue()}}.
 }
 \examples{
 \dontrun{
@@ -93,12 +84,12 @@ plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order,
                traitOrder = traitDendro$order,
                file = "ME_Trait_Correlation_Heatmap.pdf")
 plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order,
-               traitOrder = traitDendro$order, sigOnly = TRUE,
-               star.size = 11, star.nudge_y = -0.27,
-               legend.position = c(1.14, 0.745),
-               colColorMargins = c(-1,5.1,0.5,10.47),
-               file = "Sig_ME_Trait_Correlation_Heatmap.pdf",
-               width = 7, height = 3.5)
+               traitOrder = traitDendro$order, topOnly = TRUE,
+               label.type = "p", label.size = 4, label.nudge_y = 0,
+               legend.position = c(1.11, 0.795),
+               colColorMargins = c(-1,4.75,0.5,10.1),
+               file = "Top_ME_Trait_Correlation_Heatmap.pdf", width = 8.5,
+               height = 4.25)
 }
 
 }

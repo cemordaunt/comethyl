@@ -8,10 +8,12 @@ plotMEtraitCor(
   MEtraitCor,
   moduleOrder = 1:length(unique(MEtraitCor$module)),
   traitOrder = 1:length(unique(MEtraitCor$trait)),
-  sigOnly = FALSE,
-  adj_p = 0.05,
-  star.size = 8,
-  star.nudge_y = -0.38,
+  topOnly = FALSE,
+  nTop = 15,
+  p = 0.05,
+  label.type = c("star", "p"),
+  label.size = 8,
+  label.nudge_y = -0.38,
   colors = blueWhiteRed(100, gamma = 0.9),
   limit = NULL,
   axis.text.size = 12,
@@ -38,17 +40,23 @@ in \code{MEtraitCor}.}
 heatmap. This must be the same length as the number of unique traits
 in \code{MEtraitCor}.}
 
-\item{sigOnly}{A \code{logical(1)} indicating whether to plot only modules and
-traits with significant correlations.}
+\item{topOnly}{A \code{logical(1)} indicating whether to plot only modules and
+traits with the most significant correlations, ranked by p-value.}
 
-\item{adj_p}{A \code{numeric(1)} giving the threshold for the adjusted p-value
-to determine a significant correlation.}
+\item{nTop}{A \code{numeric(1)} specifying the number of top module-trait
+associations to include.}
 
-\item{star.size}{A \code{numeric(1)} specifying the size of the star for
+\item{p}{A \code{numeric(1)} giving the threshold for the p-value to assign
+a significant correlation.}
+
+\item{label.type}{A \code{character(1)} giving the type of label (star or p)
+to use to annotate significant correlations.}
+
+\item{label.size}{A \code{numeric(1)} specifying the size of the label text for
 annotating significant correlations.}
 
-\item{star.nudge_y}{A \code{numeric(1)} giving the amount to adjust the position
-of the star on the y-axis.}
+\item{label.nudge_y}{A \code{numeric(1)} giving the amount to adjust the position
+of the label text on the y-axis.}
 
 \item{colors}{A \code{character} giving a vector of colors to use for the
 gradient on the heatmap. The default uses \code{\link[WGCNA:blueWhiteRed]{WGCNA::blueWhiteRed()}}
@@ -97,11 +105,11 @@ and saves it as a .pdf.
 }
 \details{
 \code{plotMEtraitCor()} is designed to be used in combination with
-\code{\link[=getMEtraitCor]{getMEtraitCor()}}. Stars are used to annotate significant correlations, as
-defined by the \code{adj_p} threshold. The heatmap can optionally be filtered
-to include only modules and traits with significant correlations. A
-\code{ggplot} object is produced and can be edited outside of this function
-if desired.
+\code{\link[=getMEtraitCor]{getMEtraitCor()}}. Stars or p-values are used to annotate significant
+correlations, as defined by the p-value threshold. The heatmap can optionally
+be filtered to include only modules and traits with the most significant
+associations, ranked by p-value. A \code{ggplot} object is produced and can
+be edited outside of this function if desired.
 }
 \examples{
 \dontrun{
@@ -128,12 +136,12 @@ plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order,
                traitOrder = traitDendro$order,
                file = "ME_Trait_Correlation_Heatmap.pdf")
 plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order,
-               traitOrder = traitDendro$order, sigOnly = TRUE,
-               star.size = 11, star.nudge_y = -0.27,
-               legend.position = c(1.14, 0.745),
-               colColorMargins = c(-1,5.1,0.5,10.47),
-               file = "Sig_ME_Trait_Correlation_Heatmap.pdf",
-               width = 7, height = 3.5)
+               traitOrder = traitDendro$order, topOnly = TRUE,
+               label.type = "p", label.size = 4, label.nudge_y = 0,
+               legend.position = c(1.11, 0.795),
+               colColorMargins = c(-1,4.75,0.5,10.1),
+               file = "Top_ME_Trait_Correlation_Heatmap.pdf", width = 8.5,
+               height = 4.25)
 }
 
 }
