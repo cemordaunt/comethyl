@@ -6,6 +6,8 @@
 # Setup ####
 .libPaths("/share/lasallelab/programs/comethyl/R_3.6")
 AnnotationHub::setAnnotationHubOption("CACHE", value = "/share/lasallelab/programs/comethyl/R_3.6")
+library(tidyverse)
+library(openxlsx)
 library(comethyl)
 
 # Set Global Options ####
