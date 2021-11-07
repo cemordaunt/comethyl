@@ -2,7 +2,6 @@
 
 # Comethyl Analysis Pipeline ---------------------------------------------------
 # Author: Charles Mordaunt
-# Under Development
 
 # Setup ####
 .libPaths("/share/lasallelab/programs/comethyl/R_3.6")
@@ -46,7 +45,7 @@ mod <- model.matrix(~1, data = pData(bs))
 methAdj <- adjustRegionMeth(meth, mod = mod,
                             file = "Adjusted_Region_Methylation.rds")
 getDendro(methAdj, distance = "euclidean") %>%
-        plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25,0.08))
+        plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25, 0.08))
 
 # Select Soft Power Threshold ####
 sft <- getSoftPower(methAdj, corType = "pearson", file = "Soft_Power.rds")
@@ -76,36 +75,36 @@ plotHeatmap(sampleCor, rowDendro = sampleDendro, colDendro = sampleDendro,
 
 plotHeatmap(MEs, rowDendro = sampleDendro, colDendro = moduleDendro,
             legend.title = "Module\nEigennode",
-            legend.position = c(0.37,0.89), file = "Sample_ME_Heatmap.pdf")
+            legend.position = c(0.37, 0.89), file = "Sample_ME_Heatmap.pdf")
 
 # Test Correlations between Module Eigennodes and Sample Traits ####
 MEtraitCor <- getMEtraitCor(MEs, colData = colData, corType = "bicor",
                             file = "ME_Trait_Correlation_Stats.txt")
 traitDendro <- getCor(MEs, y = colData, corType = "bicor", robustY = FALSE) %>%
         getDendro(transpose = TRUE)
-plotDendro(traitDendro, labelSize = 3.5, expandY = c(0.65,0.08),
+plotDendro(traitDendro, labelSize = 3.5, expandY = c(0.65, 0.08),
            file = "Trait_Dendrogram.pdf")
 plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order,
                traitOrder = traitDendro$order,
                file = "ME_Trait_Correlation_Heatmap.pdf")
 plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order,
-               traitOrder = traitDendro$order, sigOnly = TRUE, star.size = 11,
-               star.nudge_y = -0.27, legend.position = c(1.14, 0.745),
-               colColorMargins = c(-1,5.1,0.5,10.47),
-               file = "Sig_ME_Trait_Correlation_Heatmap.pdf", width = 7,
-               height = 3.5)
+               traitOrder = traitDendro$order, topOnly = TRUE, label.type = "p",
+               label.size = 4, label.nudge_y = 0, legend.position = c(1.11, 0.795),
+               colColorMargins = c(-1, 4.75, 0.5, 10.1),
+               file = "Top_ME_Trait_Correlation_Heatmap.pdf", width = 8.5,
+               height = 4.25)
 
 # Explore Significant ME-Trait Correlations ####
 # Plot Module Eigennodes vs Traits
 plotMEtraitDot(MEs$bisque4, trait = colData$Diagnosis_ASD,
                traitCode = c("TD" = 0, "ASD" = 1),
-               colors = c("TD" = "#3366CC", "ASD" = "#FF3366"), ylim = c(-0.2,0.2),
+               colors = c("TD" = "#3366CC", "ASD" = "#FF3366"), ylim = c(-0.2, 0.2),
                xlab = "Diagnosis", ylab = "Bisque 4 Module Eigennode",
                file = "bisque4_ME_Diagnosis_Dotplot.pdf")
-plotMEtraitScatter(MEs$paleturquoise, trait = colData$Gran, ylim = c(-0.15,0.15),
+plotMEtraitScatter(MEs$paleturquoise, trait = colData$Gran, ylim = c(-0.15, 0.15),
                    xlab = "Granulocytes", ylab = "Pale Turquoise Module Eigennode",
                    file = "paleturquoise_ME_Granulocytes_Scatterplot.pdf")
-plotMEtraitScatter(MEs$paleturquoise, trait = colData$Bcell, ylim = c(-0.15,0.15),
+plotMEtraitScatter(MEs$paleturquoise, trait = colData$Bcell, ylim = c(-0.15, 0.15),
                    xlab = "B-cells", ylab = "Pale Turquoise Module Eigennode",
                    file = "paleturquoise_ME_Bcells_Scatterplot.pdf")
 
@@ -118,11 +117,11 @@ plotMethTrait("bisque4", regions = regions, meth = meth,
               file = "bisque4_Module_Methylation_Diagnosis_Heatmap.pdf")
 plotMethTrait("paleturquoise", regions = regions, meth = meth,
               trait = colData$Gran, expandY = 0.04, trait.legend.title = "Granulocytes",
-              trait.legend.position = c(1.034,3.35),
+              trait.legend.position = c(1.034, 3.35),
               file = "paleturquoise_Module_Methylation_Granulocytes_Heatmap.pdf")
 plotMethTrait("paleturquoise", regions = regions, meth = meth,
               trait = colData$Bcell, expandY = 0.04,
-              trait.legend.title = "B-cells", trait.legend.position = c(1.004,3.35),
+              trait.legend.title = "B-cells", trait.legend.position = c(1.004, 3.35),
               file = "paleturquoise_Module_Methylation_Bcells_Heatmap.pdf")
 
 # Annotate Modules ####
