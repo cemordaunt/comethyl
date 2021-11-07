@@ -8,16 +8,15 @@ setwd("~/Documents/Programming/comethyl/Testing/Gene Bodies")
 AnnotationHub::setAnnotationHubOption("CACHE",
                                       value = "/share/lasallelab/programs/comethyl/R_3.6")
 library(tidyverse)
-library(openxlsx)
 library(comethyl)
 
 # Set Global Options ####
 options(stringsAsFactors = FALSE)
 Sys.setenv(R_THREADS = 1)
-enableWGCNAThreads(nThreads = 4)
+WGCNA::enableWGCNAThreads(nThreads = 4)
 
 # Load Previously Filtered BSseq Object ####
-colData <- read.xlsx("sample_info.xlsx", rowNames = TRUE)
+colData <- openxlsx::read.xlsx("sample_info.xlsx", rowNames = TRUE)
 bs <- readRDS("comethyl_test/Filtered_BSseq.rds")
 
 # Call Regions ####
