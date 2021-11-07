@@ -418,7 +418,7 @@ plotEnrichment <- function(enrichment, nTerms = 15, fill = "#132B43", xlim = NUL
         }
         enrichment$term <- factor(enrichment$term,
                                   levels = rev(unique(enrichment$term)))
-        scatterplot <- ggplot() +
+        barplot <- ggplot() +
                 geom_col(aes(x = term, y = log_p), data = enrichment, fill = fill) +
                 coord_flip(ylim = xlim) +
                 scale_y_continuous(breaks = breaks_pretty(n = nBreaks),
@@ -438,7 +438,7 @@ plotEnrichment <- function(enrichment, nTerms = 15, fill = "#132B43", xlim = NUL
         if(verbose){
                 message("[plotEnrichment] Saving file as ", file)
         }
-        ggsave(file, plot = scatterplot, dpi = 600, width = width,
-               height = height, units = "in")
+        ggsave(file, plot = barplot, dpi = 600, width = width, height = height,
+               units = "in")
 }
 
