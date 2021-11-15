@@ -1,6 +1,6 @@
 # comethyl Gene Body -------------------------------------------------------------------------------
 # Charles Mordaunt
-# 11/6/21
+# 11/14/21
 
 # Setup ####
 setwd("~/Documents/Programming/comethyl/Testing/Gene Bodies")
@@ -40,7 +40,7 @@ plotSDstats(regions, maxQuantile = 0.99, file = "Filtered_SD_Plots.pdf")
 
 # Adjust Methylation Data for PCs ####
 meth <- getRegionMeth(regions, bs = bs, file = "Region_Methylation.rds")
-mod <- model.matrix(~1, data = pData(bs))
+mod <- model.matrix(~1, data = bsseq::pData(bs))
 methAdj <- adjustRegionMeth(meth, mod = mod,
                             file = "Adjusted_Region_Methylation.rds") # Top 10 PCs
 getDendro(methAdj, distance = "euclidean") %>%
@@ -65,6 +65,8 @@ plotDendro(moduleDendro, labelSize = 5, nBreaks = 5,
 moduleCor <- getCor(MEs, corType = "bicor")
 plotHeatmap(moduleCor, rowDendro = moduleDendro, colDendro = moduleDendro,
             file = "Module_Correlation_Heatmap.pdf")
+moduleCorStats <- getMEtraitCor(MEs, colData = MEs, corType = "bicor", robustY = TRUE,
+                                file = "Module_Correlation_Stats.txt")
 
 sampleDendro <- getDendro(MEs, transpose = TRUE, distance = "bicor")
 plotDendro(sampleDendro, labelSize = 3, nBreaks = 5,

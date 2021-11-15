@@ -1,6 +1,6 @@
 # Comethyl CpG Clusters ----------------------------------------------------------------------------
 # Charles Mordaunt
-# 11/6/21
+# 11/14/21
 
 # Setup ####
 setwd("~/Documents/Programming/comethyl/Testing/Default")
@@ -13,7 +13,6 @@ library(comethyl)
 # Set Global Options ####
 options(stringsAsFactors = FALSE)
 Sys.setenv(R_THREADS = 1)
-WGCNA::enableWGCNAThreads(nThreads = 4)
 
 # Read Bismark CpG Reports ####
 colData <- openxlsx::read.xlsx("sample_info.xlsx", rowNames = TRUE)
@@ -43,7 +42,7 @@ plotSDstats(regions, maxQuantile = 0.99, file = "Filtered_SD_Plots.pdf")
 
 # Adjust Methylation Data for PCs ####
 meth <- getRegionMeth(regions, bs = bs, file = "Region_Methylation.rds")
-mod <- model.matrix(~1, data = pData(bs))
+mod <- model.matrix(~1, data = bsseq::pData(bs))
 methAdj <- adjustRegionMeth(meth, mod = mod,
                             file = "Adjusted_Region_Methylation.rds")
 getDendro(methAdj, distance = "euclidean") %>%
@@ -55,7 +54,7 @@ plotSoftPower(sft, file = "Soft_Power_Plots.pdf")
 
 # Get Comethylation Modules ####
 modules <- getModules(methAdj, power = sft$powerEstimate, regions = regions,
-                      corType = "pearson", file = "Modules.rds")
+                      corType = "pearson", nThreads = 1, file = "Modules.rds")
 plotRegionDendro(modules, file = "Region_Dendrograms.pdf")
 BED <- getModuleBED(modules$regions, file = "Modules.bed")
 
@@ -67,6 +66,8 @@ plotDendro(moduleDendro, labelSize = 4, nBreaks = 5,
 moduleCor <- getCor(MEs, corType = "bicor")
 plotHeatmap(moduleCor, rowDendro = moduleDendro, colDendro = moduleDendro,
             file = "Module_Correlation_Heatmap.pdf")
+moduleCorStats <- getMEtraitCor(MEs, colData = MEs, corType = "bicor", robustY = TRUE,
+                                file = "Module_Correlation_Stats.txt")
 
 sampleDendro <- getDendro(MEs, transpose = TRUE, distance = "bicor")
 plotDendro(sampleDendro, labelSize = 3, nBreaks = 5,
