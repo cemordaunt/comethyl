@@ -66,6 +66,9 @@ plotDendro(moduleDendro, labelSize = 4, nBreaks = 5,
 moduleCor <- getCor(MEs, corType = "bicor")
 plotHeatmap(moduleCor, rowDendro = moduleDendro, colDendro = moduleDendro,
             file = "Module_Correlation_Heatmap.pdf")
+moduleCorStats <- getMEtraitCor(MEs, colData = MEs, corType = "bicor",
+                                robustY = TRUE,
+                                file = "Module_Correlation_Stats.txt")
 
 # Examine Correlations between Samples
 sampleDendro <- getDendro(MEs, transpose = TRUE, distance = "bicor")
@@ -91,5 +94,7 @@ modules of comethylated regions.
 dendrograms.
 \item \code{\link[=plotHeatmap]{plotHeatmap()}} to visualize correlations between samples and
 modules.
+\item \code{\link[=getMEtraitCor]{getMEtraitCor()}} to calculate pairwise correlation
+coefficients and p-values between module eigennode values.
 }
 }

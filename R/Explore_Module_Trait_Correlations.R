@@ -7,7 +7,9 @@
 #'
 #' \code{getMEtraitCor()} is designed to be used in combination with
 #' [getModules()]. The correlation calculations are performed by
-#' [WGCNA::corAndPvalue()] and [WGCNA::bicorAndPvalue()].
+#' [WGCNA::corAndPvalue()] and [WGCNA::bicorAndPvalue()]. \code{getMEtraitCor()}
+#' can also be used to calculate pairwise correlation coefficients and p-values
+#' between module eigennode values (see examples).
 #'
 #' @param MEs A \code{data.frame} of module eigennode values, where rows are
 #'         samples and columns are modules. The row names of \code{MEs} must
@@ -52,6 +54,11 @@
 #' MEs <- modules$MEs
 #' MEtraitCor <- getMEtraitCor(MEs, colData = colData, corType = "bicor",
 #'                             file = "ME_Trait_Correlation_Stats.txt")
+#'
+#' # Examine Correlations between Modules
+#' moduleCorStats <- getMEtraitCor(MEs, colData = MEs, corType = "bicor",
+#'                                 robustY = TRUE,
+#'                                 file = "Module_Correlation_Stats.txt")
 #'
 #' # Examine Correlations between Sample Traits
 #' traitDendro <- getCor(MEs, y = colData, corType = "bicor",

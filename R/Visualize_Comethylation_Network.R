@@ -188,6 +188,8 @@ getModuleBED <- function(regions, grey = FALSE, save = TRUE, file = "Modules.bed
 #'                 dendrograms.
 #'         \item [plotHeatmap()] to visualize correlations between samples and
 #'                 modules.
+#'         \item [getMEtraitCor()] to calculate pairwise correlation
+#'                 coefficients and p-values between module eigennode values.
 #' }
 #'
 #' @examples \dontrun{
@@ -204,6 +206,9 @@ getModuleBED <- function(regions, grey = FALSE, save = TRUE, file = "Modules.bed
 #' moduleCor <- getCor(MEs, corType = "bicor")
 #' plotHeatmap(moduleCor, rowDendro = moduleDendro, colDendro = moduleDendro,
 #'             file = "Module_Correlation_Heatmap.pdf")
+#' moduleCorStats <- getMEtraitCor(MEs, colData = MEs, corType = "bicor",
+#'                                 robustY = TRUE,
+#'                                 file = "Module_Correlation_Stats.txt")
 #'
 #' # Examine Correlations between Samples
 #' sampleDendro <- getDendro(MEs, transpose = TRUE, distance = "bicor")
