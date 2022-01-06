@@ -1,6 +1,9 @@
 url: https://cemordaunt.github.io/comethyl/
 template:
   bootstrap: 5
+authors:
+  sidebar:
+    roles: [cre, aut, ctb]
 reference:
 - title: Package
   contents:
