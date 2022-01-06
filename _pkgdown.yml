@@ -1,3 +1,48 @@
+url: https://cemordaunt.github.io/comethyl/
 template:
   bootstrap: 5
-url: https://cemordaunt.github.io/comethyl/
+reference:
+- title: Package
+  contents:
+  - comethyl
+- title: Prepare Methylation Data
+  contents:
+  - adjustRegionMeth
+  - filterCpGs
+  - filterRegions
+  - getCpGs
+  - getCpGtotals
+  - getDendro
+  - getRegionMeth
+  - getRegionTotals
+  - getRegions
+  - plotCpGtotals
+  - plotDendro
+  - plotRegionStats
+  - plotRegionTotals
+  - plotSDstats
+- title: Construct Network
+  contents:
+  - getCor
+  - getModuleBED
+  - getModules
+  - getSoftPower
+  - plotHeatmap
+  - plotRegionDendro
+  - plotSoftPower
+- title: Explore Modules
+  contents:
+  - annotateModule
+  - enrichModule
+  - getGeneList
+  - getMEtraitCor
+  - listOntologies
+  - plotEnrichment
+  - plotMEtraitCor
+  - plotMEtraitDot
+  - plotMEtraitScatter
+  - plotMethTrait
+- title: Test Module Preservation
+  contents:
+  - getModulePreservation
+  - plotModulePreservation
