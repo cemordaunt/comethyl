@@ -1,11 +1,11 @@
-pandoc: 2.11.4
-pkgdown: 1.6.1
+pandoc: 2.14.0.3
+pkgdown: 2.0.1
 pkgdown_sha: ~
 articles:
   CpG_Cluster_Analysis: CpG_Cluster_Analysis.html
   Gene_Body_Analysis: Gene_Body_Analysis.html
-last_built: 2021-07-12T23:04Z
+last_built: 2022-01-06T21:51Z
 urls:
-  reference: https://cemordaunt.github.io/comethyl//reference
-  article: https://cemordaunt.github.io/comethyl//articles
+  reference: https://cemordaunt.github.io/comethyl/reference
+  article: https://cemordaunt.github.io/comethyl/articles
 

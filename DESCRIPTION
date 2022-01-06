@@ -1,6 +1,6 @@
 Package: comethyl
 Title: An R Package for Weighted Region Comethylation Network Analysis
-Version: 1.0.0
+Version: 1.1.0
 Authors@R: c(
     person(given = "Charles",
            family = "Mordaunt",
