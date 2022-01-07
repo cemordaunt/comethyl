@@ -19,7 +19,10 @@ BiocManager::install("cemordaunt/comethyl")
 ```
 
 ## Documentation
-Check out the vignettes and details on all of the functions at [https://cemordaunt.github.io/comethyl/](https://cemordaunt.github.io/comethyl/).
+Complete documentation for comethyl is available at [https://cemordaunt.github.io/comethyl/](https://cemordaunt.github.io/comethyl/).
+- [Function reference](https://cemordaunt.github.io/comethyl/reference/index.html)
+- [CpG cluster analysis vignette](https://cemordaunt.github.io/comethyl/articles/CpG_Cluster_Analysis.html)
+- [Gene body analysis vignette](https://cemordaunt.github.io/comethyl/articles/Gene_Body_Analysis.html)
 
 ## Workflow
 ![Comethyl Workflow](man/figures/comethyl.png)
