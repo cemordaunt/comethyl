@@ -1,7 +1,6 @@
 ---
 title: "CpG Cluster Analysis"
 author: "Charles Mordaunt and Julia Mouat"
-date: "`r Sys.Date()`"
 output: 
   prettydoc::html_pretty:
     theme: cayman
@@ -47,7 +46,7 @@ BiocManager::install("cemordaunt/comethyl")
 
 # Inputs
 
-**Bismark Cytosine Reports:** Following WGBS of your samples, the raw fastq files should be processed into CpG count matrices where biases have been removed. One available pipeline is CpG_Me (https://github.com/ben-laufer/CpG_Me), which performs read alignment and quality control of WGBS raw fastq files, and then the generates the Bismark Cytosine Reports used by Comethyl.
+**Bismark Cytosine Reports:** Following WGBS of your samples, the raw fastq files should be processed into CpG count matrices where biases have been removed. One available pipeline is CpG_Me (https://github.com/ben-laufer/CpG_Me), which performs read alignment and quality control of WGBS raw fastq files, and then generates the Bismark Cytosine Reports used by Comethyl.
 
 **Sample Trait Table** (```"sample_info.xlsx"```)**:** This is a data frame with samples (specifying CpG reports) as rows and sample traits of interest as columns. All values in the table must be numeric, though the data can be either categorical or continuous for any given trait. Sample traits can include all available information about potential variables of interest as well as potential confounding variables. In WGBS datasets, potential confounding variables include cell type proportions as well as technical variables including coverage, read duplication, read trimming, and global cytosine methylation levels. For human populations, metadata should include clinical, diagnostic, and demographic data, as well as sample collection characteristics, such as gestational age and birthweight for cord blood. For experimental studies in animal models or cell cultures, experimental variables should be included in the metadata for exploring module-trait relationships. The comethylation modules identified from the Bismark Cytosine Reports will be correlated with the traits in this table. Keep in mind that tests for multiple hypotheses (i.e. FDR correction) will depend on the number of traits you include in your Sample Trait Table. 
 
@@ -79,7 +78,7 @@ bs <- getCpGs(colData, file = "Unfiltered_BSseq.rds")
 ```
 
 ## Examine CpG Totals at Different Cutoffs
-`getCpGtotals` calculates the total number and percent of CpGs remaining in a BSseq object after filtering at different `cov` (coverage) and `perSample` cutoffs and then saves it as a tab-separated text file. The purpose of this function is to help determine cutoffs to maximize the number of CpGs with sufficient data after filtering. Typically, the numberof CpGs covered in 100% of samples decreases as the sample size increases, especially with low-coverage datasets. `plotCpGtotals()` plots the number of CpGs remaining after filtering by different combinations of `cov` and `perSample` in a line plot and then saves it as a PDF. `plotCpGtotals()` is designed to be used in combination with `getCpGtotals`. A ggplot is produced and can be further edited outside of this funciton if desired. 
+`getCpGtotals()` calculates the total number and percent of CpGs remaining in a BSseq object after filtering at different `cov` (coverage) and `perSample` cutoffs and then saves it as a tab-separated text file. The purpose of this function is to help determine cutoffs to maximize the number of CpGs with sufficient data after filtering. Typically, the number of CpGs covered in 100% of samples decreases as the sample size increases, especially with low-coverage datasets. `plotCpGtotals()` plots the number of CpGs remaining after filtering by different combinations of `cov` and `perSample` in a line plot and then saves it as a PDF. `plotCpGtotals()` is designed to be used in combination with `getCpGtotals()`. A ggplot is produced and can be further edited outside of this function if desired. 
 
 ```
 CpGtotals <- getCpGtotals(bs, file = "CpG_Totals.txt")
@@ -89,14 +88,14 @@ plotCpGtotals(CpGtotals, file = "CpG_Totals.pdf")
 ![Figure 1. CpG Totals](CpG Cluster Analysis/CpG_Totals.png)
 
 ## Filter BSobject
-`filterCpGs` subsets a BSseq object to include only those CpGs meeting `cov` and `perSample` cutoffs and then saves it as a .rds file. `filterCpGs` is designed to be used after `cov` and `perSample` arguments have been optimized by `getCpGtotals` and `plotcpGtotals`. 
+`filterCpGs()` subsets a BSseq object to include only those CpGs meeting `cov` and `perSample` cutoffs and then saves it as a .rds file. `filterCpGs()` is designed to be used after `cov` and `perSample` arguments have been optimized by `getCpGtotals()` and `plotCpGtotals()`. 
 
 ```
 bs <- filterCpGs(bs, cov = 2, perSample = 0.75, file = "Filtered_BSseq.rds")
 ```
 
 ## Call Regions
-`getregions` calculates region statistics from the filtered BSobjects and saves them as a tab-separated text file. `getregions` allows for selection of annotation and genome. `plotRegionStats` plots histograms of region statistics and saves the plots as a PDF. `plotSDstats` plots methylation standard deviation versus region statistics and saves the plots as a PDF. 
+`getRegions()` calculates region statistics from the filtered BSobject and saves them as a tab-separated text file. `getRegions()` allows for selection of annotation and genome. `plotRegionStats()` plots histograms of region statistics and saves the plots as a PDF. `plotSDstats()` plots methylation standard deviation versus region statistics and saves the plots as a PDF. 
 
 ```
 regions <- getRegions(bs, file = "Unfiltered_Regions.txt")
@@ -112,7 +111,7 @@ plotSDstats(regions, maxQuantile = 0.99, file = "Unfiltered_SD_Plots.pdf")
 ![Figure 3. Unfiltered SD Plots](CpG Cluster Analysis/Unfiltered_SD_Plots.png)
 
 ## Examine Region Totals at Different Cutoffs
-`getRegionTotals` calculates region totals at specified covMin and methSD cutoffs and saves as a tab-separated text file. Total CpGs are expected to decrease as the minimum coverage cutoff increases and SD cutoff increases. `plotRegionTotals` plots region totals with ggplot and saves as a PDF. 
+`getRegionTotals()` calculates region totals at specified covMin and methSD cutoffs and saves as a tab-separated text file. Total CpGs are expected to decrease as the minimum coverage cutoff increases and SD cutoff increases. `plotRegionTotals()` plots region totals and saves it as a PDF. 
 
 ```
 regionTotals <- getRegionTotals(regions, file = "Region_Totals.txt")
@@ -122,7 +121,7 @@ plotRegionTotals(regionTotals, file = "Region_Totals.pdf")
 ![Figure 4. Region Totals](CpG Cluster Analysis/Region_Totals.png)
 
 ## Filter Regions
-`filterRegions` subsets the unfiltered regions to only include those meeting `covMin` and `methSD` cutoffs and then saves it as a tab-separated text file. `filterRegions` is designed to be used after `covMin` and `methSD` functions have been optimized with `getRegionTotals` and `plotRegionTotals`. `plotRegionstats` plots total regions, total width, and total CpGs against SD cutoff, accounting for different minimum coverage cutoffs and saves them as a PDF. 
+`filterRegions()` subsets the unfiltered regions to only include those meeting `covMin` and `methSD` cutoffs and then saves it as a tab-separated text file. `filterRegions()` is designed to be used after `covMin` and `methSD` functions have been optimized with `getRegionTotals()` and `plotRegionTotals()`. `plotRegionStats()` plots total regions, total width, and total CpGs against SD cutoff, accounting for different minimum coverage cutoffs and saves the plots as a PDF. 
 
 ```
 regions <- filterRegions(regions, covMin = 10, methSD = 0.05, file = "Filtered_Regions.txt")
@@ -132,7 +131,7 @@ plotRegionStats(regions, maxQuantile = 0.99, file = "Filtered_Region_Plots.pdf")
 ![Figure 5. Filtered Region Plots](CpG Cluster Analysis/Filtered_Region_Plots.png)
 
 ## Adjust Methylation Data for Principal Components
-`getRegionMeth` calculates region methylation from BSseq object and saves it as a .rds. `model.matrix` creates a design matrix of the region methylation. `adjustRegionMeth` adjusts the region methylation for the top principal components and saves it as a .rds file. `getDendro` clusters the samples based on the adjusted region methylation using Euclidean, Pearson, or Bicor distances. `plotDendro` creates a dendrogram of samples from the `getDendro` function and saves it as a PDF. 
+`getRegionMeth()` calculates region methylation from a BSseq object and saves it as a .rds. `model.matrix()` creates a design matrix of the region methylation. `adjustRegionMeth()` adjusts the region methylation for the top principal components and saves it as a .rds file. `getDendro()` clusters the samples based on the adjusted region methylation using Euclidean, Pearson, or Bicor distances. `plotDendro()` creates a dendrogram of samples from the `getDendro()` function and saves it as a PDF. 
 
 ```
 meth <- getRegionMeth(regions, bs = bs, file = "Region_Methylation.rds")
@@ -144,7 +143,7 @@ getDendro(methAdj, distance = "euclidean") %>% plotDendro(file = "Sample_Dendrog
 ![Figure 6. Sample Dendrogram](CpG Cluster Analysis/Sample_Dendrogram.png)
 
 ## Select Soft Power Threshold
-`getSoftPower` analyzes scale-free topology with either Pearson or Bicor correlations to determine the best soft-thresholding power. This refers to the power to which all correlations are raised. Pearson correlation is mean-based, assumes that the methylation data follows a normal distribution, and is sensitive  to outliers. Bicor correlation is median-based and thus less sensitive to outliers, and is more robust than Pearson. `plotSoftPower` plots the soft power threshold against scale free topology fit and against connectivity. Typically, as the soft power threshold increases, fit increases and connectivity decreases. A soft power threshold should be selected where fit is 0.8 or higher. 
+`getSoftPower()` analyzes scale-free topology with either Pearson or Bicor correlations to determine the best soft-thresholding power. This refers to the power to which all correlations are raised. Pearson correlation is mean-based, assumes that the methylation data follows a normal distribution, and is sensitive to outliers. Bicor correlation is median-based and thus less sensitive to outliers, and is more robust than Pearson. `plotSoftPower()` plots the soft power threshold against scale free topology fit and against connectivity. Typically, as the soft power threshold increases, fit increases and connectivity decreases. A soft power threshold should be selected where fit is 0.8 or higher. 
 
 ```
 sft <- getSoftPower(methAdj, corType = "pearson", file = "Soft_Power.rds")
@@ -154,7 +153,7 @@ plotSoftPower(sft, file = "Soft_Power_Plots.pdf")
 ![Figure 7. Soft Power Plots](CpG Cluster Analysis/Soft_Power_Plots.png)
 
 ## Get Comethylation Modules
-`getModules` identifies comethylation modules using filtered regions, a chosen soft power threshold, and either Pearson or Bicor correlation. Regions are first formed into blocks close to but not exceeding the maximum block size. A full network analysis is then performed on each block to assign them to modules; modules are merged if they are highly correlated eigengenes. The modules are saved as a .rds file. This two-level clustering approach requires less computational memory and is significantly faster than performing full network analysis on each region. `plotRegionDendro` plots region dendrograms and modules for each block and saves as a PDF. `getModuleBED` creates a bed file of regions annotated with identified modules; regions in the unassigned grey module are excluded. 
+`getModules()` identifies comethylation modules using filtered regions, a chosen soft power threshold, and either Pearson or Bicor correlation. Regions are first formed into blocks close to but not exceeding the maximum block size. A full network analysis is then performed on each block to assign them to modules; modules are merged if their eigennodes are highly correlated. The modules are then saved as a .rds file. This two-level clustering approach requires less computational memory and is significantly faster than performing full network analysis on every region. `plotRegionDendro()` plots region dendrograms and modules for each block and saves as a PDF. `getModuleBED()` creates a bed file of regions annotated with identified modules; regions in the unassigned grey module are excluded. 
 
 ```
 modules <- getModules(methAdj, power = sft$powerEstimate, regions = regions, corType = "pearson", file = "Modules.rds")
@@ -165,7 +164,7 @@ BED <- getModuleBED(modules$regions, file = "Modules.bed")
 ![Figure 8. Region Dendrograms](CpG Cluster Analysis/Region_Dendrograms.png)
 
 ## Examine Correlations between Modules and Samples
-`moduleDendro <- getDendro` clusters modules based on eigennode values using Bicor or Pearson correlations, which are then plotted with `plotDendro` and saved as a PDF. `moduleCor <- getCor` calculates a correlation matrix for module eigennodes using Bicor or Pearson correlations, which are then plotted with `plotHeatmap` and saved as a PDF. 
+`getDendro(MEs)` clusters modules based on eigennode values using Bicor or Pearson correlations, which are then plotted with `plotDendro()` and saved as a PDF. `getCor(MEs)` calculates a correlation matrix for module eigennodes using Bicor or Pearson correlations, which are then plotted with `plotHeatmap()` and saved as a PDF. Module correlation statistics can also be calculated with `getMEtraitCor()`.
 
 ```
 MEs <- modules$MEs
@@ -178,11 +177,12 @@ plotDendro(moduleDendro, labelSize = 4, nBreaks = 5, file = "Module_ME_Dendrogra
 ```
 moduleCor <- getCor(MEs, corType = "bicor")
 plotHeatmap(moduleCor, rowDendro = moduleDendro, colDendro = moduleDendro, file = "Module_Correlation_Heatmap.pdf")
+moduleCorStats <- getMEtraitCor(MEs, colData = MEs, corType = "bicor", robustY = TRUE, file = "Module_Correlation_Stats.txt")
 ```
 
 ![Figure 10. Module Correlation Heatmap](CpG Cluster Analysis/Module_Correlation_Heatmap.png)
 
-`sampleDendro <- getDendro` clusters the samples based on module eignnode values using Bicor or Pearson correlations, which are then plotted with `plotDendro` and saved as a PDF. `sampleCor <- getCor` calculates a correlation matrix for samples based on module eigennode vales using Bicor or Pearson correlations, which are then plotted with `plotHeatmap` and saved as a PDF.
+`getDendro(MEs, transpose = TRUE)` clusters the samples based on module eigennode values using Bicor or Pearson correlations, which are then plotted with `plotDendro()` and saved as a PDF. `getCor(MEs, transpose = TRUE)` calculates a correlation matrix for samples based on module eigennode vales using Bicor or Pearson correlations, which are then plotted with `plotHeatmap()` and saved as a PDF.
 
 ```
 sampleDendro <- getDendro(MEs, transpose = TRUE, distance = "bicor")
@@ -198,18 +198,17 @@ plotHeatmap(sampleCor, rowDendro = sampleDendro, colDendro = sampleDendro, file 
 
 ![Figure 12. Sample Correlation Heatmap](CpG Cluster Analysis/Sample_Correlation_Heatmap.png)
 
-`plotHeatmap` plots samples against module eigennodes and saves as a PDF.
+`plotHeatmap()` plots samples against module eigennodes and saves it as a PDF.
 
 ```
-plotHeatmap(MEs, rowDendro = sampleDendro, colDendro = moduleDendro, legend.title = "Module\nEigennode",
-            legend.position = c(0.37,0.89), file = "Sample_ME_Heatmap.pdf")
+plotHeatmap(MEs, rowDendro = sampleDendro, colDendro = moduleDendro, legend.title = "Module\nEigennode", legend.position = c(0.37,0.89), file = "Sample_ME_Heatmap.pdf")
 ```
 
 ![Figure 13. Sample ME Heatmap](CpG Cluster Analysis/Sample_ME_Heatmap.png)
 
 ## Test Correlations between Module Eigennodes and Sample Traits
 
-`getMEtraitCor` test associations between module eigennodes and sample traits using Bicor or Pearson correlation and the results are saved as a tab-separated text file. `traitDendro <- getCor` calculates a correlation matrix for sample traits using Bicor or Pearson correlations, which are then plotted with `plotDendro` and saved as a PDF. `plotMEtraitCor` creates a heatmap of sample traits versus modules, which is saved as a PDF. Traits are ordered on the heatmap by similarity. Another heatmap is created and saved as a PDF by `plotMEtraitCor` to show only module eigennode - sample trait correlations that are significant at a specified adjusted p-value. 
+`getMEtraitCor()` tests associations between module eigennodes and sample traits using Bicor or Pearson correlation and the results are saved as a tab-separated text file. `getCor()` calculates a correlation matrix for sample traits using Bicor or Pearson correlations, which are clustered with `getDendro()`, and then plotted with `plotDendro()` and saved as a PDF. `plotMEtraitCor()` creates a heatmap of sample traits versus modules, which is saved as a PDF. Traits are ordered on the heatmap by similarity. Another heatmap is created and saved as a PDF by `plotMEtraitCor()` to show only module eigennode-sample trait correlations that are significant at a specified adjusted p-value. 
 
 ```
 MEtraitCor <- getMEtraitCor(MEs, colData = colData, corType = "bicor", file = "ME_Trait_Correlation_Stats.txt")
@@ -220,59 +219,48 @@ plotDendro(traitDendro, labelSize = 3.5, expandY = c(0.65,0.08), file = "Trait_D
 ![Figure 14. Trait Dendrogram](CpG Cluster Analysis/Trait_Dendrogram.png)
 
 ```
-plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order, traitOrder = traitDendro$order,
-               file = "ME_Trait_Correlation_Heatmap.pdf")
+plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order, traitOrder = traitDendro$order, file = "ME_Trait_Correlation_Heatmap.pdf")
 ```
 
 ![Figure 15. ME Trait Correlation Heatmap](CpG Cluster Analysis/ME_Trait_Correlation_Heatmap.png)
 
 ```
-plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order, traitOrder = traitDendro$order, sigOnly = TRUE, star.size = 11, star.nudge_y = -0.27, legend.position = c(1.14, 0.745), colColorMargins = c(-1,5.1,0.5,10.47), file = "Sig_ME_Trait_Correlation_Heatmap.pdf", width = 7, height = 3.5)
+plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order, traitOrder = traitDendro$order, topOnly = TRUE, label.type = "p", label.size = 4, label.nudge_y = 0, legend.position = c(1.11, 0.795), colColorMargins = c(-1,4.75,0.5,10.1), file = "Top_ME_Trait_Correlation_Heatmap.pdf", width = 8.5, height = 4.25)
 ```
 
-![Figure 16. Sig ME Trait Correlation Heatmap](CpG Cluster Analysis/Sig_ME_Trait_Correlation_Heatmap.png)
+![Figure 16. Top ME Trait Correlation Heatmap](CpG Cluster Analysis/Top_ME_Trait_Correlation_Heatmap.png)
 
 ## Explore Significant Module Eigennode - Trait Correlations
 ### Plot Module Eigennodes vs Traits
 
-`plotMEtraitDot` creates dotplots of module eigennodes by categorical traits and saves as a PDF; any module and any sample trait can be selected. `plotMEtraitScatter` creates scatterplots of module eigennodes by continuous traits and saves as a PDF; any module and any sample trait can be selected. 
+`plotMEtraitDot()` creates a dotplot of a module eigennode by a categorical trait and saves it as a PDF; any module and any sample trait can be selected. `plotMEtraitScatter()` creates a scatterplot of a module eigennode by a continuous trait and saves it as a PDF; any module and any sample trait can be selected. 
 
 ```
-plotMEtraitDot(MEs$bisque4, trait = colData$Diagnosis_ASD, traitCode = c("TD" = 0, "ASD" = 1),
-               colors = c("TD" = "#3366CC", "ASD" = "#FF3366"), ylim = c(-0.2,0.2), xlab = "Diagnosis",
-               ylab = "Bisque 4 Module Eigennode", file = "bisque4_ME_Diagnosis_Dotplot.pdf")
+plotMEtraitDot(MEs$bisque4, trait = colData$Diagnosis_ASD, traitCode = c("TD" = 0, "ASD" = 1), colors = c("TD" = "#3366CC", "ASD" = "#FF3366"), ylim = c(-0.2,0.2), xlab = "Diagnosis", ylab = "Bisque 4 Module Eigennode", file = "bisque4_ME_Diagnosis_Dotplot.pdf")
 ```
 
 ![Figure 17. Bisque4 ME Diagnosis Dotplot](CpG Cluster Analysis/bisque4_ME_Diagnosis_Dotplot.png)
 
 ```
-plotMEtraitScatter(MEs$paleturquoise, trait = colData$Gran, ylim = c(-0.15,0.15), xlab = "Granulocytes",
-                   ylab = "Pale Turquoise Module Eigennode", file = "paleturquoise_ME_Granulocytes_Scatterplot.pdf")
+plotMEtraitScatter(MEs$paleturquoise, trait = colData$Gran, ylim = c(-0.15,0.15), xlab = "Granulocytes", ylab = "Pale Turquoise Module Eigennode", file = "paleturquoise_ME_Granulocytes_Scatterplot.pdf")
 ```
 
 ![Figure 18. Pale Turquoise ME Granulocytes Scatterplot](CpG Cluster Analysis/paleturquoise_ME_Granulocytes_Scatterplot.png)
 
 ```
-plotMEtraitScatter(MEs$paleturquoise, trait = colData$Bcell, ylim = c(-0.15,0.15), xlab = "B-cells",
-                   ylab = "Pale Turquoise Module Eigennode", file = "paleturquoise_ME_Bcells_Scatterplot.pdf")
+plotMEtraitScatter(MEs$paleturquoise, trait = colData$Bcell, ylim = c(-0.15,0.15), xlab = "B-cells", ylab = "Pale Turquoise Module Eigennode", file = "paleturquoise_ME_Bcells_Scatterplot.pdf")
 ```
 
 ![Figure 19. Pale Turquoise ME B Cells Scatterplot](CpG Cluster Analysis/paleturquoise_ME_Bcells_Scatterplot.png)
 
 ### Plot Region Methylation vs Traits
-`plotMethTrait` plots relative methylation by a sample trait and saves the heatmap as a PDF. 
+`plotMethTrait()` plots relative methylation by a sample trait and saves the heatmap as a PDF. 
 
 ```
 regions <- modules$regions
-plotMethTrait("bisque4", regions = regions, meth = meth, trait = colData$Diagnosis_ASD, traitCode = c("TD" = 0, "ASD" = 1),
-              traitColors = c("TD" = "#3366CC", "ASD" = "#FF3366"), trait.legend.title = "Diagnosis",
-              file = "bisque4_Module_Methylation_Diagnosis_Heatmap.pdf")
-plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$Gran, expandY = 0.04,
-              trait.legend.title = "Granulocytes", trait.legend.position = c(1.034,3.35),
-              file = "paleturquoise_Module_Methylation_Granulocytes_Heatmap.pdf")
-plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$Bcell, expandY = 0.04,
-              trait.legend.title = "B-cells", trait.legend.position = c(1.004,3.35),
-              file = "paleturquoise_Module_Methylation_Bcells_Heatmap.pdf")
+plotMethTrait("bisque4", regions = regions, meth = meth, trait = colData$Diagnosis_ASD, traitCode = c("TD" = 0, "ASD" = 1), traitColors = c("TD" = "#3366CC", "ASD" = "#FF3366"), trait.legend.title = "Diagnosis", file = "bisque4_Module_Methylation_Diagnosis_Heatmap.pdf")
+plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$Gran, expandY = 0.04, trait.legend.title = "Granulocytes", trait.legend.position = c(1.034,3.35), file = "paleturquoise_Module_Methylation_Granulocytes_Heatmap.pdf")
+plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$Bcell, expandY = 0.04, trait.legend.title = "B-cells", trait.legend.position = c(1.004,3.35), file = "paleturquoise_Module_Methylation_Bcells_Heatmap.pdf")
 ```              
 
 ![Figure 20. Bisque4 Module Methylation Diagnosis Heatmap](CpG Cluster Analysis/bisque4_Module_Methylation_Diagnosis_Heatmap.png)
@@ -282,7 +270,7 @@ plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$B
 ![Figure 22. Pale Turquoise Module Methylation B-Cells Heatmap](CpG Cluster Analysis/paleturquoise_Module_Methylation_Bcells_Heatmap.png)
 
 ## Annotate Modules
-`annotateModule` annotates a module of choice with a genome selection. Genes are added to regions using GREAT v, gene info is added from BioMart, and gene context and CpG context is added from annotatr. The file is saved as a tab-separated text file. 
+`annotateModule()` annotates a module of choice with nearby gene and CpG island context. Genes are added to regions using GREAT, gene info is added from BioMart, and both gene and CpG context is added from annotatr. The file is saved as a tab-separated text file. 
 
 ```
 regionsAnno <- annotateModule(regions, module = c("bisque4", "paleturquoise"), genome = "hg38", file = "Annotated_bisque4_paleturquoise_Module_Regions.txt")
@@ -291,7 +279,7 @@ geneList_paleturquoise <- getGeneList(regionsAnno, module = "paleturquoise")
 ```
 
 ## Analyze Functional Enrichment
-`listOntologies` gets available ontologies for GREAT with the selected genome assembly. `enrichModule` analyzes functional enrichments for all regions assigned to the selected module and saves the result as a tab-separated text file. `plotEnrichment` plots the module enrichments from GREAT. 
+`listOntologies()` gets available ontologies for GREAT with the selected genome assembly. `enrichModule()` analyzes functional enrichments for all regions assigned to the selected module and saves the result as a tab-separated text file. `plotEnrichment()` plots the module enrichments from GREAT. 
 
 ```
 ontologies <- listOntologies("hg38", version = "4.0.4")
