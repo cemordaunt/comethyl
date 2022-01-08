@@ -1,7 +1,6 @@
 ---
 title: "Gene Body Analysis" 
 author: "Charles Mordaunt and Julia Mouat"
-date: "`r Sys.Date()`"
 output: 
   prettydoc::html_pretty:
     theme: cayman
@@ -24,14 +23,6 @@ knitr::opts_chunk$set(
 # Introduction
 
 Comethyl is a systems biology method for multivariate analysis of whole genome bisulfite sequencing (WGBS) data. Comethyl can be used to construct a weighted region comethylation network from user-defined regions, identify comethylation modules and the genomic regions that make up those modules, analyze functional enrichments, and investigate correlations between comethylation modules and sample traits of interest.
-
-# Installation
-You can install comethyl from this repository with the code below.
-
-```
-install.packages(c("BiocManager", "remotes"))
-BiocManager::install("cemordaunt/comethyl")
-```
 
 # Glossary of Concepts
 
