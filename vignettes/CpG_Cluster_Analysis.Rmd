@@ -44,7 +44,7 @@ Comethyl is a systems biology method for multivariate analysis of whole genome b
 
 # Usage
 
-The following example is from a dataset of 74 male cord blood samples from newborns who were later diagnosed with autism spectrum disorder (ASD) and those with typical development (TD). Comethylation modules were associated with 49 sample characteristics including diagnosis, cell types, sample sequencing information such as percent CpG methylation, and demographic data such as home ownership.
+The following example is from a dataset of 74 male cord blood samples from newborns who were later diagnosed with autism spectrum disorder (ASD) and those with typical development (TD). Comethylation modules were associated with 49 sample characteristics including diagnosis, cell types, sample sequencing information such as percent CpG methylation, and demographic data such as home ownership. Raw data is available on GEO ([GSE140730](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE140730)), see the [previous publication](https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-020-00785-8) for more details.
 
 ## Setup
 
@@ -87,7 +87,7 @@ bs <- filterCpGs(bs, cov = 2, perSample = 0.75, file = "Filtered_BSseq.rds")
 ```
 
 ## Call Regions
-`getRegions()` calculates region statistics from the filtered BSobject and saves them as a tab-separated text file. `getRegions()` allows for selection of annotation and genome. `plotRegionStats()` plots histograms of region statistics and saves the plots as a PDF. `plotSDstats()` plots methylation standard deviation versus region statistics and saves the plots as a PDF. 
+`getRegions()` calculates region statistics from the filtered BSobject and saves it as a tab-separated text file. `getRegions()` allows for selection of annotation and genome. `plotRegionStats()` plots histograms of region statistics and saves the plots as a PDF. `plotSDstats()` plots methylation standard deviation versus region statistics and saves the plots as a PDF. 
 
 ```
 regions <- getRegions(bs, file = "Unfiltered_Regions.txt")
@@ -199,8 +199,7 @@ plotHeatmap(MEs, rowDendro = sampleDendro, colDendro = moduleDendro, legend.titl
 ![Figure 13. Sample ME Heatmap](CpG Cluster Analysis/Sample_ME_Heatmap.png)
 
 ## Test Correlations between Module Eigennodes and Sample Traits
-
-`getMEtraitCor()` tests associations between module eigennodes and sample traits using Bicor or Pearson correlation and the results are saved as a tab-separated text file. `getCor()` calculates a correlation matrix for sample traits using Bicor or Pearson correlations, which are clustered with `getDendro()`, and then plotted with `plotDendro()` and saved as a PDF. `plotMEtraitCor()` creates a heatmap of sample traits versus modules, which is saved as a PDF. Traits are ordered on the heatmap by similarity. Another heatmap is created and saved as a PDF by `plotMEtraitCor()` to show only module eigennode-sample trait correlations that are significant at a specified adjusted p-value. 
+`getMEtraitCor()` tests associations between module eigennodes and sample traits using Bicor or Pearson correlation and the results are saved as a tab-separated text file. `getCor()` calculates a correlation matrix for sample traits using Bicor or Pearson correlations, which are clustered with `getDendro()`, and then plotted with `plotDendro()` and saved as a PDF. `plotMEtraitCor()` creates a heatmap of sample traits versus modules, which is saved as a PDF. Traits are ordered on the heatmap by similarity. Another heatmap is created and saved as a PDF by `plotMEtraitCor()` to show only module eigennode-sample trait correlations that are significant at a specified p-value. 
 
 ```
 MEtraitCor <- getMEtraitCor(MEs, colData = colData, corType = "bicor", file = "ME_Trait_Correlation_Stats.txt")
@@ -224,7 +223,6 @@ plotMEtraitCor(MEtraitCor, moduleOrder = moduleDendro$order, traitOrder = traitD
 
 ## Explore Significant Module Eigennode - Trait Correlations
 ### Plot Module Eigennodes vs Traits
-
 `plotMEtraitDot()` creates a dotplot of a module eigennode by a categorical trait and saves it as a PDF; any module and any sample trait can be selected. `plotMEtraitScatter()` creates a scatterplot of a module eigennode by a continuous trait and saves it as a PDF; any module and any sample trait can be selected. 
 
 ```
@@ -262,7 +260,7 @@ plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$B
 ![Figure 22. Pale Turquoise Module Methylation B-Cells Heatmap](CpG Cluster Analysis/paleturquoise_Module_Methylation_Bcells_Heatmap.png)
 
 ## Annotate Modules
-`annotateModule()` annotates a module of choice with nearby gene and CpG island context. Genes are added to regions using GREAT, gene info is added from BioMart, and both gene and CpG context is added from annotatr. The file is saved as a tab-separated text file. 
+`annotateModule()` annotates a module of choice with nearby gene and CpG island context. Genes are added to regions using GREAT, gene info is added from BioMart, and both gene and CpG island context is added from annotatr. The file is saved as a tab-separated text file. 
 
 ```
 regionsAnno <- annotateModule(regions, module = c("bisque4", "paleturquoise"), genome = "hg38", file = "Annotated_bisque4_paleturquoise_Module_Regions.txt")
