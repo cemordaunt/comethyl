@@ -28,17 +28,17 @@ Comethyl is a systems biology method for multivariate analysis of whole genome b
 
 | Term | Definition |
 |:-----|:-----------|
-| Comethylation network | A weighted network in which nodes correspond to DNA methylation and edges correspond to correlations between genes. |
+| Comethylation network | A weighted network in which nodes correspond to genomic regions and edges correspond to correlations between region DNA methylation. |
 | Module | A group of genomic regions with correlated DNA methylation. |
-| Module Eigennode | The weighted average methylation value and the first principal component of a module |
-| Connectivity | The correlation between genes in the comethylation network. The higher the connectivity, the stronger the correlation between genes. |
-| Fit | The R-squared value of the network. This is inversely correlated to connectivity. |
-| Soft Power Threshold | The power to which all correlations are raised. This is inversely correlated to connectivity and impacts the number of modules formed. |
-| Hub gene | The gene with the highest connectivity in a module. |
+| Module Eigennode | The first principal component of a module, can be thought of as a weighted average of methylation values. |
+| Connectivity | The sum of the correlations between a region and all other regions in the comethylation network. |
+| Fit | The R-squared value assessing how well the network meets the criteria for scale-free topology. |
+| Soft Power Threshold | The power to which all correlations are raised when constructing the weighted network. |
+| Hub Region | The region in a module whose methylation is most highly correlated with the module eigennode. |
 
 # Inputs
 
-**Bismark Cytosine Reports:** Following WGBS of your samples, the raw fastq files should be processed into CpG count matrices where biases have been removed. One available pipeline is CpG_Me (https://github.com/ben-laufer/CpG_Me), which performs read alignment and quality control of WGBS raw fastq files, and then generates the Bismark Cytosine Reports used by Comethyl.
+**Bismark Cytosine Reports:** Following WGBS of your samples, the raw fastq files should be processed into CpG count matrices where biases have been removed. One available pipeline is [CpG_Me](https://github.com/ben-laufer/CpG_Me), which performs read alignment and quality control of WGBS raw fastq files, and then generates the Bismark Cytosine Reports used by Comethyl.
 
 **Sample Trait Table** (```"sample_info.xlsx"```)**:** This is a data frame with samples (specifying CpG reports) as rows and sample traits of interest as columns. All values in the table must be numeric, though the data can be either categorical or continuous for any given trait. Sample traits can include all available information about potential variables of interest as well as potential confounding variables. In WGBS datasets, potential confounding variables include cell type proportions as well as technical variables including coverage, read duplication, read trimming, and global cytosine methylation levels. For human populations, metadata should include clinical, diagnostic, and demographic data, as well as sample collection characteristics, such as gestational age and birthweight for cord blood. For experimental studies in animal models or cell cultures, experimental variables should be included in the metadata for exploring module-trait relationships. The comethylation modules identified from the Bismark Cytosine Reports will be correlated with the traits in this table. Keep in mind that tests for multiple hypotheses (i.e. FDR correction) will depend on the number of traits you include in your Sample Trait Table. 
 
