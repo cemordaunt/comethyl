@@ -4,6 +4,17 @@ template:
 authors:
   sidebar:
     roles: [cre, aut, ctb]
+navbar:
+  structure:
+    left:  [intro, reference, article1, article2]
+    right: [search, github]
+  components:
+    article1:
+      text: CpG Cluster Analysis
+      href: articles/CpG_Cluster_Analysis.html
+    article2:
+      text: Gene Body Analysis
+      href: articles/Gene_Body_Analysis.html
 reference:
 - title: Package
   contents:

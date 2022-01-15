@@ -36,14 +36,16 @@
     <div id="navbar" class="collapse navbar-collapse ms-2">
       <ul class="navbar-nav me-auto">
 <li class="nav-item">
+  <a class="nav-link" href="../articles/comethyl.html">Get started</a>
+</li>
+<li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
-<li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/CpG_Cluster_Analysis.html">CpG Cluster Analysis</a>
-    <a class="dropdown-item" href="../articles/Gene_Body_Analysis.html">Gene Body Analysis</a>
-  </div>
+<li class="active nav-item">
+  <a class="nav-link" href="../articles/CpG_Cluster_Analysis.html">CpG Cluster Analysis</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../articles/Gene_Body_Analysis.html">Gene Body Analysis</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -76,65 +78,13 @@
 
     
     
-<div class="section level1">
-<h1 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
-</h1>
-<p>Comethyl is a systems biology method for multivariate analysis of whole genome bisulfite sequencing (WGBS) data. Comethyl can be used to construct a weighted region comethylation network from user-defined regions, identify comethylation modules and the genomic regions that make up those modules, analyze functional enrichments, and investigate correlations between comethylation modules and sample traits of interest.</p>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p>In this vignette, we use Comethyl to construct a weighted region comethylation network from WGBS data using clusters of CpGs grouped by genomic location. We identify modules of comethylated regions, investigate correlations with sample traits, and analyze functional enrichments.</p>
+<p>The data set includes 74 male cord blood samples from newborns who were later diagnosed with autism spectrum disorder (ASD) and those with typical development (TD). Comethylation modules were associated with 49 sample characteristics including diagnosis, cell types, sample sequencing information such as percent CpG methylation, and demographic data such as home ownership. The goal of this analysis was to explore interactions between the methylome and sample traits prior to diagnosis with ASD.</p>
+<p>Raw data is available on GEO (<a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE140730" class="external-link">GSE140730</a>), see the <a href="https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-020-00785-8" class="external-link">previous publication</a> for more details.</p>
 </div>
-<div class="section level1">
-<h1 id="glossary-of-concepts">Glossary of Concepts<a class="anchor" aria-label="anchor" href="#glossary-of-concepts"></a>
-</h1>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="66%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Term</th>
-<th align="left">Definition</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Comethylation network</td>
-<td align="left">A weighted network in which nodes correspond to genomic regions and edges correspond to correlations between region DNA methylation.</td>
-</tr>
-<tr class="even">
-<td align="left">Module</td>
-<td align="left">A group of genomic regions with correlated DNA methylation.</td>
-</tr>
-<tr class="odd">
-<td align="left">Module Eigennode</td>
-<td align="left">The first principal component of a module, can be thought of as a weighted average of methylation values.</td>
-</tr>
-<tr class="even">
-<td align="left">Connectivity</td>
-<td align="left">The sum of the correlations between a region and all other regions in the comethylation network.</td>
-</tr>
-<tr class="odd">
-<td align="left">Fit</td>
-<td align="left">The R-squared value assessing how well the network meets the criteria for scale-free topology.</td>
-</tr>
-<tr class="even">
-<td align="left">Soft Power Threshold</td>
-<td align="left">The power to which all correlations are raised when constructing the weighted network.</td>
-</tr>
-<tr class="odd">
-<td align="left">Hub Region</td>
-<td align="left">The region in a module whose methylation is most highly correlated with the module eigennode.</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section level1">
-<h1 id="inputs">Inputs<a class="anchor" aria-label="anchor" href="#inputs"></a>
-</h1>
-<p><strong>Bismark Cytosine Reports:</strong> Following WGBS of your samples, the raw fastq files should be processed into CpG count matrices where biases have been removed. One available pipeline is <a href="https://github.com/ben-laufer/CpG_Me" class="external-link">CpG_Me</a>, which performs read alignment and quality control of WGBS raw fastq files, and then generates the Bismark Cytosine Reports used by Comethyl.</p>
-<p><strong>Sample Trait Table</strong> (<code>"sample_info.xlsx"</code>)<strong>:</strong> This is a data frame with samples (specifying CpG reports) as rows and sample traits of interest as columns. All values in the table must be numeric, though the data can be either categorical or continuous for any given trait. Sample traits can include all available information about potential variables of interest as well as potential confounding variables. In WGBS datasets, potential confounding variables include cell type proportions as well as technical variables including coverage, read duplication, read trimming, and global cytosine methylation levels. For human populations, metadata should include clinical, diagnostic, and demographic data, as well as sample collection characteristics, such as gestational age and birthweight for cord blood. For experimental studies in animal models or cell cultures, experimental variables should be included in the metadata for exploring module-trait relationships. The comethylation modules identified from the Bismark Cytosine Reports will be correlated with the traits in this table. Keep in mind that tests for multiple hypotheses (i.e. FDR correction) will depend on the number of traits you include in your Sample Trait Table.</p>
-</div>
-<div class="section level1">
-<h1 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
-</h1>
-<p>The following example is from a dataset of 74 male cord blood samples from newborns who were later diagnosed with autism spectrum disorder (ASD) and those with typical development (TD). Comethylation modules were associated with 49 sample characteristics including diagnosis, cell types, sample sequencing information such as percent CpG methylation, and demographic data such as home ownership. Raw data is available on GEO (<a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE140730" class="external-link">GSE140730</a>), see the <a href="https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-020-00785-8" class="external-link">previous publication</a> for more details.</p>
 <div class="section level2">
 <h2 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
 </h2>
@@ -351,7 +301,6 @@
 </div>
 <div class="figure">
 <img src="CpG%20Cluster%20Analysis/paleturquoise_Module_Enrichment_Plot.png" alt=""><p class="caption">Figure 24. Pale Turquoise Module Enrichment Plot</p>
-</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

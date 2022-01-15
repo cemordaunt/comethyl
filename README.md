@@ -11,15 +11,18 @@ examining functional enrichments. Results are then visualized with high-quality,
 editable plots from ggplot2.
 
 ## Installation
-You can install comethyl from this repository with the code below.
+You can install Comethyl from this repository and load it into your R session with the code below.
 
 ```
 install.packages(c("BiocManager", "remotes"))
 BiocManager::install("cemordaunt/comethyl")
+library(comethyl)
 ```
 
 ## Documentation
 Complete documentation for comethyl is available at [https://cemordaunt.github.io/comethyl/](https://cemordaunt.github.io/comethyl/).
+
+- [Introduction to Comethyl](https://cemordaunt.github.io/comethyl/articles/comethyl.html)
 
 - [Function reference](https://cemordaunt.github.io/comethyl/reference/index.html)
 

@@ -48,14 +48,16 @@
     <div id="navbar" class="collapse navbar-collapse ms-2">
       <ul class="navbar-nav me-auto">
 <li class="nav-item">
+  <a class="nav-link" href="articles/comethyl.html">Get started</a>
+</li>
+<li class="nav-item">
   <a class="nav-link" href="reference/index.html">Reference</a>
 </li>
-<li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="articles/CpG_Cluster_Analysis.html">CpG Cluster Analysis</a>
-    <a class="dropdown-item" href="articles/Gene_Body_Analysis.html">Gene Body Analysis</a>
-  </div>
+<li class="nav-item">
+  <a class="nav-link" href="articles/CpG_Cluster_Analysis.html">CpG Cluster Analysis</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="articles/Gene_Body_Analysis.html">Gene Body Analysis</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -85,15 +87,17 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install comethyl from this repository with the code below.</p>
+<p>You can install Comethyl from this repository and load it into your R session with the code below.</p>
 <pre><code><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, <span class="st">"remotes"</span><span class="op">)</span><span class="op">)</span>
-<span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cemordaunt/comethyl"</span><span class="op">)</span></code></pre>
+<span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"cemordaunt/comethyl"</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cemordaunt/comethyl" class="external-link">comethyl</a></span><span class="op">)</span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
 </h2>
 <p>Complete documentation for comethyl is available at <a href="https://cemordaunt.github.io/comethyl/">https://cemordaunt.github.io/comethyl/</a>.</p>
 <ul>
+<li><p><a href="https://cemordaunt.github.io/comethyl/articles/comethyl.html">Introduction to Comethyl</a></p></li>
 <li><p><a href="https://cemordaunt.github.io/comethyl/reference/index.html">Function reference</a></p></li>
 <li><p><a href="https://cemordaunt.github.io/comethyl/articles/CpG_Cluster_Analysis.html">CpG cluster analysis vignette</a></p></li>
 <li><p><a href="https://cemordaunt.github.io/comethyl/articles/Gene_Body_Analysis.html">Gene body analysis vignette</a></p></li>
