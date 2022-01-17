@@ -33,6 +33,11 @@ Complete documentation for comethyl is available at [https://cemordaunt.github.i
 ## Workflow
 ![Comethyl Workflow](man/figures/comethyl.png)
 
+## Citing Comethyl
+If you use Comethyl in your work, please cite our *Briefings in Bioinformatics* [publication](https://academic.oup.com/bib/advance-article/doi/10.1093/bib/bbab554/6509051):
+
+Mordaunt CE, Mouat JS, Schmidt RJ, and LaSalle JM. (2022) Comethyl: a network-based methylome approach to investigate the multivariate nature of health and disease. *Briefings in Bioinformatics* bbab554.
+
 ## Acknowledgements
 Many thanks to Julia Mouat for creating the vignettes, and to both Ben Laufer and
 Janine LaSalle for very helpful discussions.

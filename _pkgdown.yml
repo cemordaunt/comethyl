@@ -15,6 +15,13 @@ navbar:
     article2:
       text: Gene Body Analysis
       href: articles/Gene_Body_Analysis.html
+home:
+  sidebar:
+    structure: [links, license, community, custom, authors, dev]
+    components:
+      custom:
+        title: Citation
+        text: Comethyl [Publication](https://academic.oup.com/bib/advance-article/doi/10.1093/bib/bbab554/6509051)
 reference:
 - title: Package
   contents:
