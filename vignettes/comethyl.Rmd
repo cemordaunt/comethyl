@@ -60,6 +60,14 @@ BiocManager::install("cemordaunt/comethyl")
 library(comethyl)
 ```
 
+## Memory Usage
+
+Comethyl performs a large number of correlation calculations when constructing the network, and these can take up a large amount of memory for an extended period of time. Memory usage and time should be taken into account when running ```getSoftPower()``` and ```getModules()```. 
+
+Because ```getSoftPower()``` uses an exponentially increasing amount of RAM as the number of regions increase, care should be taken to filter the number of regions so that only the most informative regions are considered. For reference, up to 250,000 regions are typically able to run on a large node with 500GB of RAM. Smaller region sets typically require much less memory to run. It's also not recommended to use multiple threads with large region sets.
+
+With default system BLAS libraries, ```getModules()``` can take multiple days to run, but this can be sped up considerably if R is configured with a fast BLAS library such as [OpenBLAS](https://www.openblas.net). In testing, ```getModules()``` took 85 hours to run on a set of 250,000 regions with a default BLAS, but only 6 hours with OpenBLAS. ```getSoftPower()``` was also sped up from 3 hours to 2 hours with OpenBLAS. More information on configuring R with OpenBLAS and similar libraries can be found in the [R Installation Manual](https://cran.r-project.org/doc/manuals/r-patched/R-admin.html#BLAS).
+
 ## See Also
 
 - [Function reference](https://cemordaunt.github.io/comethyl/reference/index.html)
