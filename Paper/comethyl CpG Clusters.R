@@ -13,6 +13,7 @@ library(comethyl)
 # Set Global Options ####
 options(stringsAsFactors = FALSE)
 Sys.setenv(R_THREADS = 1)
+disableWGCNAthreads()
 
 # Read Bismark CpG Reports ####
 colData <- openxlsx::read.xlsx("sample_info.xlsx", rowNames = TRUE)
