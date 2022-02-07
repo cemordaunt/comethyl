@@ -786,6 +786,7 @@ plotMethTrait <- function(module, regions, meth, trait, discrete = NULL,
                 }
         }
         meth <- meth[RegionIDs,order(trait)]
+        meth <- meth * 100
         meth <- (meth - DelayedMatrixStats::rowMeans2(meth)) %>% reshape2::melt()
         if(is.null(limit)){
                 limit <- max(abs(meth$value))

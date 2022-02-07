@@ -117,25 +117,25 @@ plotMEtraitScatter(MEs$greenyellow, trait = colData$CD8T, ylim = c(-0.25,0.25),
 
 # Plot Region Methylation vs Traits
 regions <- modules$regions
-plotMethTrait("greenyellow", regions = regions, meth = meth*100,
+plotMethTrait("greenyellow", regions = regions, meth = meth,
               trait = colData$home_ownership, expandY = 0.04,
               traitCode = c("No" = 0, "Yes" = 1),
               traitColors = c("No" = "#3366CC", "Yes" = "#FF3366"),
               trait.legend.title = "Home Ownership",
               trait.legend.position = c(1.05,4.39), traitMargins = c(0,6,1,4.6),
               file = "greenyellow_Module_Methylation_Home_Ownership_Heatmap.pdf")
-plotMethTrait("greenyellow", regions = regions, meth = meth*100,
+plotMethTrait("greenyellow", regions = regions, meth = meth,
               trait = colData$Gran, expandY = 0.04,
               trait.legend.title = "Granulocytes",
               trait.legend.position = c(1.034,3.35), traitMargins = c(0,6,1,4.6),
               file = "greenyellow_Module_Methylation_Granulocytes_Heatmap.pdf")
-plotMethTrait("greenyellow", regions = regions, meth = meth*100,
+plotMethTrait("greenyellow", regions = regions, meth = meth,
               trait = colData$CD4T, expandY = 0.04,
               trait.legend.title = "CD4+ T-Cells",
               trait.legend.position = c(1.038,3.35),
               traitMargins = c(0,6,1,4.6),
               file = "greenyellow_Module_Methylation_CD4T_Heatmap.pdf")
-plotMethTrait("greenyellow", regions = regions, meth = meth*100,
+plotMethTrait("greenyellow", regions = regions, meth = meth,
               trait = colData$CD8T, expandY = 0.04,
               trait.legend.title = "CD8+ T-Cells",
               trait.legend.position = c(1.038,3.35), traitMargins = c(0,6,1,4.6),

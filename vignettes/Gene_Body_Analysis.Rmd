@@ -230,8 +230,8 @@ Next we dig further into the data and plot the raw methylation values against a 
 
 ```
 regions <- modules$regions
-plotMethTrait("greenyellow", regions = regions, meth = meth*100, trait = colData$Gran, expandY = 0.04, trait.legend.title = "Granulocytes", trait.legend.position = c(1.034,3.35), traitMargins = c(0,6,1,4.6), file = "greenyellow_Module_Methylation_Granulocytes_Heatmap.pdf")
-plotMethTrait("greenyellow", regions = regions, meth = meth, trait = colData$home_ownership, traitCode = c("No" = 0, "Yes" = 1), traitColors = c("No" = "#3366CC", "Yes" = "#FF3366"), trait.legend.title = "Home Ownership", trait.legend.position = c(1.05,4.39), file = "greenyellow_Module_Methylation_Home_Ownership_Heatmap.pdf")
+plotMethTrait("greenyellow", regions = regions, meth = meth, trait = colData$Gran, expandY = 0.04, trait.legend.title = "Granulocytes", trait.legend.position = c(1.034,3.35), traitMargins = c(0,6,1,4.6), file = "greenyellow_Module_Methylation_Granulocytes_Heatmap.pdf")
+plotMethTrait("greenyellow", regions = regions, meth = meth, trait = colData$home_ownership, expandY = 0.04, traitCode = c("No" = 0, "Yes" = 1), traitColors = c("No" = "#3366CC", "Yes" = "#FF3366"), trait.legend.title = "Home Ownership", trait.legend.position = c(1.05,4.39), traitMargins = c(0,6,1,4.6), file = "greenyellow_Module_Methylation_Home_Ownership_Heatmap.pdf")
 ```  
 
 ![Figure 19. Green Yellow Module Methylation Granulocytes Heatmap](Gene Body Analysis/greenyellow_Module_Methylation_Granulocytes_Heatmap.png)
