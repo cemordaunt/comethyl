@@ -30,6 +30,8 @@ Complete documentation for comethyl is available at [https://cemordaunt.github.i
 
 - [Gene body analysis vignette](https://cemordaunt.github.io/comethyl/articles/Gene_Body_Analysis.html)
 
+- [Module preservation vignette](https://cemordaunt.github.io/comethyl/articles/Module_Preservation.html)
+
 ## Workflow
 ![Comethyl Workflow](man/figures/comethyl.png)
 

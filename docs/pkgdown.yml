@@ -4,8 +4,9 @@ pkgdown_sha: ~
 articles:
   CpG_Cluster_Analysis: CpG_Cluster_Analysis.html
   Gene_Body_Analysis: Gene_Body_Analysis.html
+  Module_Preservation: Module_Preservation.html
   comethyl: comethyl.html
-last_built: 2022-02-07T02:28Z
+last_built: 2022-02-08T03:38Z
 urls:
   reference: https://cemordaunt.github.io/comethyl/reference
   article: https://cemordaunt.github.io/comethyl/articles

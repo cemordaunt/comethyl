@@ -76,3 +76,5 @@ With default system BLAS libraries, `getModules()` can take multiple days to run
 
 - [Gene body analysis vignette](https://cemordaunt.github.io/comethyl/articles/Gene_Body_Analysis.html)
 
+- [Module preservation vignette](https://cemordaunt.github.io/comethyl/articles/Module_Preservation.html)
+

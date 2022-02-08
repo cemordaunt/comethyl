@@ -238,13 +238,19 @@ Next we dig further into the data and plot the raw methylation values against a 
 ```
 regions <- modules$regions
 plotMethTrait("bisque4", regions = regions, meth = meth, trait = colData$Diagnosis_ASD, traitCode = c("TD" = 0, "ASD" = 1), traitColors = c("TD" = "#3366CC", "ASD" = "#FF3366"), trait.legend.title = "Diagnosis", file = "bisque4_Module_Methylation_Diagnosis_Heatmap.pdf")
-plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$Gran, expandY = 0.04, trait.legend.title = "Granulocytes", trait.legend.position = c(1.034,3.35), file = "paleturquoise_Module_Methylation_Granulocytes_Heatmap.pdf")
-plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$Bcell, expandY = 0.04, trait.legend.title = "B-cells", trait.legend.position = c(1.004,3.35), file = "paleturquoise_Module_Methylation_Bcells_Heatmap.pdf")
 ```              
 
 ![Figure 20. Bisque4 Module Methylation Diagnosis Heatmap](CpG Cluster Analysis/bisque4_Module_Methylation_Diagnosis_Heatmap.png)
 
+```
+plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$Gran, expandY = 0.04, trait.legend.title = "Granulocytes", trait.legend.position = c(1.034,3.35), file = "paleturquoise_Module_Methylation_Granulocytes_Heatmap.pdf")
+```              
+
 ![Figure 21. Pale Turquoise Module Methylation Granulocytes Heatmap](CpG Cluster Analysis/paleturquoise_Module_Methylation_Granulocytes_Heatmap.png)
+
+```
+plotMethTrait("paleturquoise", regions = regions, meth = meth, trait = colData$Bcell, expandY = 0.04, trait.legend.title = "B-cells", trait.legend.position = c(1.004,3.35), file = "paleturquoise_Module_Methylation_Bcells_Heatmap.pdf")
+```              
 
 ![Figure 22. Pale Turquoise Module Methylation B-Cells Heatmap](CpG Cluster Analysis/paleturquoise_Module_Methylation_Bcells_Heatmap.png)
 
@@ -266,11 +272,14 @@ Using this approach, we see that the bisque 4 module associated with ASD diagnos
 ontologies <- listOntologies("hg38", version = "4.0.4")
 enrich_bisque4 <- enrichModule(regions, module = "bisque4", genome = "hg38", file = "bisque4_Module_Enrichment.txt")
 plotEnrichment(enrich_bisque4, file = "bisque4_Module_Enrichment_Plot.pdf")
-enrich_paleturquoise <- enrichModule(regions, module = "paleturquoise", genome = "hg38", file = "paleturquoise_Module_Enrichment.txt")
-plotEnrichment(enrich_paleturquoise, axis.text.y.size = 14, width = 10, file = "paleturquoise_Module_Enrichment_Plot.pdf")
 ```
 
 ![Figure 23. Bisque4 Module Enrichment Plot](CpG Cluster Analysis/bisque4_Module_Enrichment_Plot.png)
+
+```
+enrich_paleturquoise <- enrichModule(regions, module = "paleturquoise", genome = "hg38", file = "paleturquoise_Module_Enrichment.txt")
+plotEnrichment(enrich_paleturquoise, axis.text.y.size = 14, width = 10, file = "paleturquoise_Module_Enrichment_Plot.pdf")
+```
 
 ![Figure 24. Pale Turquoise Module Enrichment Plot](CpG Cluster Analysis/paleturquoise_Module_Enrichment_Plot.png)
 

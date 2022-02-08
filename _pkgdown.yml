@@ -6,7 +6,7 @@ authors:
     roles: [cre, aut, ctb]
 navbar:
   structure:
-    left:  [intro, reference, article1, article2]
+    left:  [intro, reference, article1, article2, article3]
     right: [search, github]
   components:
     article1:
@@ -15,6 +15,9 @@ navbar:
     article2:
       text: Gene Body Analysis
       href: articles/Gene_Body_Analysis.html
+    article3:
+      text: Module Preservation
+      href: articles/Module_Preservation.html
 home:
   sidebar:
     structure: [links, license, community, custom, authors, dev]
