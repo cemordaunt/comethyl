@@ -182,7 +182,8 @@ getRegions <- function(bs, annotation = NULL,
         regions <- regions[,c(colnames,
                               colnames(regions)[!colnames(regions) %in% colnames &
                                                         !colnames(regions) %in%
-                                                        c("idxStart", "idxEnd", "cluster")])]
+                                                        c("idxStart", "idxEnd",
+                                                          "cluster")])]
         if(save){
                 if(verbose){
                         message("[getRegions] Saving file as ", file)
@@ -201,15 +202,16 @@ getRegions <- function(bs, annotation = NULL,
 #' coverage, mean methylation, and methylation standard deviation.
 #'
 #' It's recommended to examine region characteristics before and after filtering.
-#' The vertical line on each histogram indicates the median value for that feature.
-#' A \code{ggplot} object is produced and can be edited outside of this function
-#' if desired.
+#' The vertical line on each histogram indicates the median value for that
+#' feature. A \code{ggplot} object is produced and can be edited outside of this
+#' function if desired.
 #'
 #' @param regions A \code{data.frame} output from [getRegions()] giving the set
 #'         of regions and statistics for each region.
 #' @param maxQuantile A \code{numeric(1)} giving the maximum quantile of each
 #'         feature to plot.
-#' @param bins A \code{numeric(1)} specifying the number of bins in each histogram.
+#' @param bins A \code{numeric(1)} specifying the number of bins in each
+#'         histogram.
 #' @param histCol A \code{character(1)} giving the color of the histogram.
 #' @param lineCol A \code{character(1)} giving the color of the vertical median
 #'         line.
@@ -264,16 +266,17 @@ getRegions <- function(bs, annotation = NULL,
 #' @importFrom scales breaks_pretty
 #' @importFrom stats quantile
 
-plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132B43",
-                            lineCol = "red", nBreaks = 4, save = TRUE,
-                            file = "Region_Plots.pdf", width = 11, height = 8.5,
-                            verbose = TRUE){
+plotRegionStats <- function(regions, maxQuantile = 1, bins = 30,
+                            histCol = "#132B43", lineCol = "red", nBreaks = 4,
+                            save = TRUE, file = "Region_Plots.pdf", width = 11,
+                            height = 8.5, verbose = TRUE){
         if(verbose){
                 message("[plotRegionStats] Plotting histograms of region statistics")
         }
         variables <- c("width", "n", "covMin", "covMean", "methMean", "methSD")
         medians <- data.frame(variable = factor(variables, levels = variables),
-                              value = sapply(regions[,variables], FUN = stats::median))
+                              value = sapply(regions[,variables],
+                                             FUN = stats::median))
         if(maxQuantile < 1){
                 if(verbose){
                         message("[plotRegionStats] Limiting x-axis to values in bottom ",
@@ -295,7 +298,8 @@ plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132
         gg <- gg +
                 geom_histogram(aes(x = value), bins = bins, fill = histCol,
                                color = histCol, na.rm = TRUE) +
-                geom_vline(data = medians, aes(xintercept = value), color = lineCol) +
+                geom_vline(data = medians, aes(xintercept = value),
+                           color = lineCol) +
                 facet_wrap(vars(variable), nrow = 2, ncol = 3, scales = "free",
                            strip.position = "bottom") +
                 scale_x_continuous(breaks = breaks_pretty(n = nBreaks)) +
@@ -304,13 +308,15 @@ plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132
                 theme(axis.text.x = element_text(size = 12, color = "black"),
                       axis.text.y = element_blank(),
                       axis.ticks.x = element_line(size = 1.25, color = "black"),
-                      axis.ticks.y = element_blank(), axis.title = element_blank(),
-                      legend.position = "none",
+                      axis.ticks.y = element_blank(),
+                      axis.title = element_blank(), legend.position = "none",
                       panel.border = element_rect(color = "black", size = 1.25),
-                      panel.grid = element_blank(), panel.spacing.x = unit(0.6, "lines"),
+                      panel.grid = element_blank(),
+                      panel.spacing.x = unit(0.6, "lines"),
                       panel.spacing.y = unit(0.8, "lines"),
                       plot.margin = unit(c(1,1,0.3,0.6), "lines"),
-                      strip.background = element_blank(), strip.placement = "outside",
+                      strip.background = element_blank(),
+                      strip.placement = "outside",
                       strip.switch.pad.wrap = unit(0, "lines"),
                       strip.text.x = element_text(size = 16))
         if(save){
@@ -360,9 +366,9 @@ plotRegionStats <- function(regions, maxQuantile = 1, bins = 30, histCol = "#132
 #'
 #' @seealso \itemize{
 #'         \item [getRegions()] to generate the set of regions.
-#'         \item [plotRegionStats()], [getRegionTotals()], and [plotRegionTotals()]
-#'                 for more help visualizing region characteristics and setting
-#'                 cutoffs for filtering.
+#'         \item [plotRegionStats()], [getRegionTotals()], and
+#'                 [plotRegionTotals()] for more help visualizing region
+#'                 characteristics and setting cutoffs for filtering.
 #'         \item [filterRegions()] for filtering regions by minimum coverage and
 #'                 methylation standard deviation.
 #' }
@@ -525,9 +531,9 @@ plotSDstats <- function(regions, maxQuantile = 1, bins = 30, nBreaks = 4,
 #'
 #' @importFrom magrittr %>%
 
-getRegionTotals <- function(regions, covMin = seq(0,20,2), methSD = seq(0,0.1,0.01),
-                            save = TRUE, file = "Region_Totals.txt",
-                            verbose = TRUE){
+getRegionTotals <- function(regions, covMin = seq(0,20,2),
+                            methSD = seq(0,0.1,0.01), save = TRUE,
+                            file = "Region_Totals.txt", verbose = TRUE){
         if(verbose){
                 message("[getRegionTotals] Calculating region totals at specified covMin and methSD cutoffs")
         }
@@ -689,8 +695,8 @@ plotRegionTotals <- function(regionTotals, nBreaks = 4,
 #'
 #' @param regions A \code{data.frame} output from [getRegions()] giving the set
 #'         of regions and statistics for each region.
-#' @param covMin A \code{numeric(1)} specifying the minimum number of reads at CpGs
-#'         in a region in any sample
+#' @param covMin A \code{numeric(1)} specifying the minimum number of reads at
+#'         CpGs in a region in any sample
 #' @param methSD A \code{numeric(1)} specifying the minimum methylation standard
 #'         deviation in a region
 #' @param save A \code{logical(1)} indicating whether to save the

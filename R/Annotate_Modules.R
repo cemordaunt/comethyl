@@ -12,11 +12,11 @@
 #' \pkg{rGREAT} package, which allows for different annotation rules and versions
 #' of GREAT. The default \code{basalPlusExt} annotation rule associates a gene
 #' with a region if the region is within the basal regulatory domain of the gene
-#' (5 kb upstream and 1 kb downstream of the TSS) or if it is within 1 Mb upstream
-#' or downstream of the TSS and not in the basal regulatory domain of another gene.
-#' Other rules include \code{twoClosest} and \code{oneClosest}, which effectively
-#' assign the two nearest genes or one nearest genes, respectively. See
-#' [rGREAT::submitGreatJob()] for more details.
+#' (5 kb upstream and 1 kb downstream of the TSS) or if it is within 1 Mb
+#' upstream or downstream of the TSS and not in the basal regulatory domain of
+#' another gene. Other rules include \code{twoClosest} and \code{oneClosest},
+#' which effectively assign the two nearest genes or one nearest genes,
+#' respectively. See [rGREAT::submitGreatJob()] for more details.
 #'
 #' GREAT supports different genomes depending on the version:
 #' \describe{
@@ -27,12 +27,12 @@
 #'
 #' Gene information is provided by the \pkg{biomaRt} package, which adds the gene
 #' description along with Ensembl and NCBI Entrez gene IDs. Regulatory context
-#' is added by the \pkg{annotatr} package. This provides positional context of the
-#' region relative to nearby genes, enhancers, and CpG islands. Note that
+#' is added by the \pkg{annotatr} package. This provides positional context of
+#' the region relative to nearby genes, enhancers, and CpG islands. Note that
 #' \pkg{annotatr} does not support the \code{hg18} or \code{danRer7} genomes.
 #'
-#' @param regions A \code{data.frame} of regions with module assignments, typically
-#'         obtained from [getModules()].
+#' @param regions A \code{data.frame} of regions with module assignments,
+#'         typically obtained from [getModules()].
 #' @param module A \code{character} giving the name of one or more modules to
 #'         annotate. If null, all modules will be annotated.
 #' @param grey A \code{logical(1)} specifying whether or not to include the grey
@@ -62,9 +62,9 @@
 #'         downstream of the TSS (in kb) to define the maximum extension of the
 #'         regulatory domain in the \code{oneClosest} rule.
 #' @param version A \code{character(1)} specifying the version of GREAT to use
-#'         for gene annotation. Possible values include \code{4.0.4}, \code{3.0.0},
-#'         and \code{2.0.2}. Different versions of GREAT support different
-#'         genomes. See \code{Details}.
+#'         for gene annotation. Possible values include \code{4.0.4},
+#'         \code{3.0.0}, and \code{2.0.2}. Different versions of GREAT support
+#'         different genomes. See \code{Details}.
 #' @param save A \code{logical(1)} indicating whether to save the
 #'         \code{data.frame}.
 #' @param file A \code{character(1)} giving the file name (.txt) for the saved
@@ -116,13 +116,14 @@
 #' @importFrom magrittr %>%
 
 annotateModule <- function(regions, module = NULL, grey = FALSE,
-                           genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "danRer7"),
+                           genome = c("hg38", "hg19", "hg18", "mm10", "mm9",
+                                      "danRer7"),
                            includeCuratedRegDoms = FALSE,
                            rule = c("basalPlusExt", "twoClosest", "oneClosest"),
                            adv_upstream = 5, adv_downstream = 1, adv_span = 1000,
                            adv_twoDistance = 1000, adv_oneDistance = 1000,
                            version = c("4.0.4", "3.0.0", "2.0.2"), save = TRUE,
-                           file = "Annotated_Module_Regions.txt", verbose =  TRUE){
+                           file = "Annotated_Module_Regions.txt", verbose = TRUE){
         if(!is.null(module)){
                 if(verbose){
                         message("[annotateModule] Filtering for regions in ",
@@ -130,7 +131,7 @@ annotateModule <- function(regions, module = NULL, grey = FALSE,
                 }
                 regions <- regions[regions$module %in% module,]
         }
-        if(!grey){
+        if("grey" %in% regions$module & !grey){
                 if(verbose){
                         message("[annotateModule] Excluding regions in grey (unassigned) module")
                 }
@@ -157,7 +158,8 @@ annotateModule <- function(regions, module = NULL, grey = FALSE,
         job <- submitGreatJob(GR_regions, species = genome,
                               includeCuratedRegDoms = includeCuratedRegDoms,
                               rule = rule, adv_upstream = adv_upstream,
-                              adv_downstream = adv_downstream, adv_span = adv_span,
+                              adv_downstream = adv_downstream,
+                              adv_span = adv_span,
                               adv_twoDistance = adv_twoDistance,
                               adv_oneDistance = adv_oneDistance,
                               request_interval = 0, version = version)
@@ -196,8 +198,8 @@ annotateModule <- function(regions, module = NULL, grey = FALSE,
                                                             pattern = fixed(" ["), n = 2)[,1] %>%
                 str_remove_all(",")
         regions_annotated <- merge(x = regions_genes, y = genes_annotated,
-                                   by = "gene_symbol", all.x = TRUE, all.y = FALSE,
-                                   sort = FALSE) %>%
+                                   by = "gene_symbol", all.x = TRUE,
+                                   all.y = FALSE, sort = FALSE) %>%
                 unique() %>%
                 stats::aggregate(formula = cbind(gene_symbol, distance_to_TSS,
                                                  gene_description, gene_ensemblID,
@@ -215,10 +217,13 @@ annotateModule <- function(regions, module = NULL, grey = FALSE,
                                      c("basicgenes", "genes_intergenic", "enhancers_fantom"),
                                      sep = "_")
                 regions_GeneReg <- suppressWarnings(suppressMessages(
-                        annotatr::build_annotations(genome = genome, annotations = annotations))) %>%
+                        annotatr::build_annotations(genome = genome,
+                                                    annotations = annotations))) %>%
                         GenomeInfoDb::keepStandardChromosomes(pruning.mode = "coarse") %>%
-                        annotatr::annotate_regions(regions = GR_regions, annotations = .,
-                                                   ignore.strand = TRUE, quiet = TRUE) %>%
+                        annotatr::annotate_regions(regions = GR_regions,
+                                                   annotations = .,
+                                                   ignore.strand = TRUE,
+                                                   quiet = TRUE) %>%
                         as.data.frame()
                 colnames(regions_GeneReg)[colnames(regions_GeneReg) == "annot.type"] <- "gene_context"
                 pattern <- rep("", times = 5)
@@ -227,7 +232,8 @@ annotateModule <- function(regions, module = NULL, grey = FALSE,
                                                                 pattern = pattern)
                 regions_annotated <- stats::aggregate(formula = gene_context ~ RegionID,
                                                       data = regions_GeneReg,
-                                                      FUN = function(x) paste(unique(x), collapse = ", "),
+                                                      FUN = function(x) paste(unique(x),
+                                                                              collapse = ", "),
                                                       simplify = TRUE) %>%
                         merge(x = regions_annotated, y = ., by = "RegionID",
                               all.x = TRUE, all.y = FALSE, sort = FALSE)
@@ -236,20 +242,25 @@ annotateModule <- function(regions, module = NULL, grey = FALSE,
                 }
                 regions_CpGs <- suppressMessages(
                         annotatr::build_annotations(genome = genome,
-                                                    annotations = paste(genome, "cpgs", sep = "_"))) %>%
+                                                    annotations = paste(genome, "cpgs",
+                                                                        sep = "_"))) %>%
                         GenomeInfoDb::keepStandardChromosomes(pruning.mode = "coarse") %>%
-                        annotatr::annotate_regions(regions = GR_regions, annotations = .,
-                                                   ignore.strand = TRUE, quiet = TRUE) %>%
+                        annotatr::annotate_regions(regions = GR_regions,
+                                                   annotations = .,
+                                                   ignore.strand = TRUE,
+                                                   quiet = TRUE) %>%
                         as.data.frame()
                 colnames(regions_CpGs)[colnames(regions_CpGs) == "annot.type"] <- "CpG_context"
                 pattern <- c("island", "shore", "shelf", "open sea")
-                names(pattern) <- paste(genome, "cpg", c("islands", "shores", "shelves", "inter"),
+                names(pattern) <- paste(genome, "cpg", c("islands", "shores",
+                                                         "shelves", "inter"),
                                         sep = "_")
                 regions_CpGs$CpG_context <- str_replace_all(regions_CpGs$CpG_context,
                                                             pattern = pattern)
                 regions_annotated <- stats::aggregate(formula = CpG_context ~ RegionID,
                                                       data = regions_CpGs,
-                                                      FUN = function(x) paste(unique(x), collapse = ", "),
+                                                      FUN = function(x) paste(unique(x),
+                                                                              collapse = ", "),
                                                       simplify = TRUE) %>%
                         merge(x = regions_annotated, y = ., by = "RegionID",
                               all.x = TRUE, all.y = FALSE, sort = FALSE)

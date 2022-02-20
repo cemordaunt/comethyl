@@ -1,7 +1,8 @@
 #' Plot Region Dendrograms
 #'
 #' \code{plotRegionDendro()} extracts plotting data from a \code{modules} list,
-#' plots a region dendrogram with module assignments, and then saves it as a .pdf.
+#' plots a region dendrogram with module assignments, and then saves it as a
+#' .pdf.
 #'
 #' \code{plotRegionDendro()} is designed to be used in combination with
 #' [getModules()]. This function does not produce a \code{ggplot} object, but
@@ -46,8 +47,9 @@
 #' @import WGCNA
 #' @import grDevices
 
-plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pdf",
-                             width = 11, height = 4.25, verbose = TRUE){
+plotRegionDendro <- function(modules, save = TRUE,
+                             file = "Region_Dendrograms.pdf", width = 11,
+                             height = 4.25, verbose = TRUE){
         if(verbose){
                 message("[plotRegionDendro] Plotting region dendrograms and modules for each block")
         }
@@ -63,7 +65,8 @@ plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pd
         }
         invisible(mapply(FUN = plotDendroAndColors, dendro = modules$dendrograms,
                          colors = blockColors, main = blockNames,
-                         MoreArgs = list(groupLabels = "Modules", dendroLabels = FALSE,
+                         MoreArgs = list(groupLabels = "Modules",
+                                         dendroLabels = FALSE,
                                          marAll = c(1.5,5,3,1.5), saveMar = FALSE,
                                          cex.lab = 1.2, cex.colorLabels = 1.2,
                                          autoColorHeight = FALSE, lwd = 0.8,
@@ -84,10 +87,10 @@ plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pd
 #' assigned module, and is colored by the module color. "Grey" (unassigned)
 #' regions are excluded by default, but can be optionally included.
 #'
-#' @param regions A \code{data.frame} of regions with module assignments, typically
-#'         obtained from [getModules()].
-#' @param grey A \code{logical(1)} specifying whether to include "grey" (unassigned)
-#'         regions in the BED file.
+#' @param regions A \code{data.frame} of regions with module assignments,
+#'         typically obtained from [getModules()].
+#' @param grey A \code{logical(1)} specifying whether to include "grey"
+#'         (unassigned) regions in the BED file.
 #' @param save A \code{logical(1)} indicating whether to save the BED file.
 #' @param file A \code{character(1)} giving the file name (.BED).
 #' @param verbose A \code{logical(1)} indicating whether messages should be
@@ -121,8 +124,8 @@ plotRegionDendro <- function(modules, save = TRUE, file = "Region_Dendrograms.pd
 #'
 #' @importFrom magrittr %>%
 
-getModuleBED <- function(regions, grey = FALSE, save = TRUE, file = "Modules.bed",
-                         verbose = TRUE){
+getModuleBED <- function(regions, grey = FALSE, save = TRUE,
+                         file = "Modules.bed", verbose = TRUE){
         if(!"module" %in% colnames(regions)){
                 stop("[getModuleBED] Regions must have module annotation")
         }
@@ -136,9 +139,11 @@ getModuleBED <- function(regions, grey = FALSE, save = TRUE, file = "Modules.bed
                 regions <- regions[!regions$module == "grey",]
         }
         regions$RegionID <- paste(regions$RegionID, regions$module, sep = "_")
-        regions$rgb <- col2rgb(regions$module) %>% apply(2, paste, collapse = ",")
+        regions$rgb <- col2rgb(regions$module) %>%
+                apply(2, paste, collapse = ",")
         BED <- cbind(regions[c("chr", "start", "end", "RegionID")], score = 0,
-                     strand = ".", thickStart = 0, thickEnd = 0, rgb = regions$rgb)
+                     strand = ".", thickStart = 0, thickEnd = 0,
+                     rgb = regions$rgb)
         if(save){
                 if(verbose){
                         message("[getModuleBED] Saving file as ", file)
@@ -154,28 +159,28 @@ getModuleBED <- function(regions, grey = FALSE, save = TRUE, file = "Modules.bed
 
 #' Calculate Correlations
 #'
-#' \code{getCor()} calculates correlation coefficients using either \code{pearson}
-#' or \code{bicor} methods. Calculations can be done between columns of a single
-#' matrix or between two vectors or matrices.
+#' \code{getCor()} calculates correlation coefficients using either
+#' \code{pearson} or \code{bicor} methods. Calculations can be done between
+#' columns of a single matrix or between two vectors or matrices.
 #'
 #' The first input argument can be optionally transposed. The correlation
 #' calculations are performed by [WGCNA::cor()] and [WGCNA::bicor()].
 #'
-#' @param x A \code{numeric vector} or \code{matrix}. \code{x} must be a \code{matrix}
-#'         if \code{y} is null.
+#' @param x A \code{numeric vector} or \code{matrix}. \code{x} must be a
+#'         \code{matrix} if \code{y} is null.
 #' @param y A \code{numeric vector} or \code{matrix}. If null, correlations will
 #'         be calculated for columns of \code{x}.
 #' @param transpose A \code{logical(1)} specifying whether to transpose the
 #'         \code{matrix}.
 #' @param corType A \code{character(1)} indicating which correlation statistic
-#'         to use in the calculation. Potential values include \code{pearson} and
-#'         \code{bicor}.
+#'         to use in the calculation. Potential values include \code{pearson}
+#'         and \code{bicor}.
 #' @param maxPOutliers A \code{numeric(1)} specifying the maximum percentile that
 #'         can be considered outliers on each side of the median for the
 #'         \code{bicor} statistic.
-#' @param robustY A \code{logical(1)} indicating whether to use robust calculation
-#'         for \code{y} for the \code{bicor} statistic. \code{FALSE} is recommended
-#'         if \code{y} is a binary variable.
+#' @param robustY A \code{logical(1)} indicating whether to use robust
+#'         calculation for \code{y} for the \code{bicor} statistic. \code{FALSE}
+#'         is recommended if \code{y} is a binary variable.
 #' @param verbose A \code{logical(1)} indicating whether messages should be
 #'         printed.
 #'
@@ -229,8 +234,9 @@ getModuleBED <- function(regions, grey = FALSE, save = TRUE, file = "Modules.bed
 #'
 #' @import WGCNA
 
-getCor <- function(x, y = NULL, transpose = FALSE, corType = c("bicor", "pearson"),
-                   maxPOutliers = 0.1, robustY = TRUE, verbose = TRUE){
+getCor <- function(x, y = NULL, transpose = FALSE,
+                   corType = c("bicor", "pearson"), maxPOutliers = 0.1,
+                   robustY = TRUE, verbose = TRUE){
         if(transpose){
                 if(verbose){
                         message("[getCor] Transposing data")
@@ -248,7 +254,8 @@ getCor <- function(x, y = NULL, transpose = FALSE, corType = c("bicor", "pearson
                              pearsonFallback = "none")
         } else {
                 if(corType == "pearson"){
-                        cor <- WGCNA::cor(x, y = y, use = "pairwise.complete.obs")
+                        cor <- WGCNA::cor(x, y = y,
+                                          use = "pairwise.complete.obs")
                 } else {
                         stop("[getCor] corType must be either bicor or pearson")
                 }
@@ -258,10 +265,10 @@ getCor <- function(x, y = NULL, transpose = FALSE, corType = c("bicor", "pearson
 
 #' Plot a Heatmap with Dendrograms
 #'
-#' \code{plotHeatmap()} takes a \code{numeric matrix} and two dendrograms, plots them,
-#' and then saves it all as a .pdf. The row names and column names of \code{x}
-#' must include the same set of values as the labels of \code{rowDendro} and
-#' \code{colDendro}, respectively.
+#' \code{plotHeatmap()} takes a \code{numeric matrix} and two dendrograms, plots
+#' them, and then saves it all as a .pdf. The row names and column names of
+#' \code{x} must include the same set of values as the labels of \code{rowDendro}
+#' and \code{colDendro}, respectively.
 #'
 #' \code{plotHeatmap()} is designed to be used in combination with [getCor()]
 #' and [getDendro()]. The function will check to see if module color names are
@@ -284,8 +291,8 @@ getCor <- function(x, y = NULL, transpose = FALSE, corType = c("bicor", "pearson
 #' @param legend.title A \code{character(1)} with the title of the legend.
 #' @param legend.title.size A \code{numeric(1)} giving the size of the text for
 #'         the legend title.
-#' @param legend.text.size A \code{numeric(1)} specifying the size of the text for
-#'         the legend axis.
+#' @param legend.text.size A \code{numeric(1)} specifying the size of the text
+#'         for the legend axis.
 #' @param legend.position A \code{numeric(2)} with the position of the legend,
 #'         as x-axis, y-axis. May also be a \code{character(1)} indicating "none",
 #'         "left", "right", "bottom", or "top".
@@ -382,8 +389,10 @@ plotHeatmap <- function(x, rowDendro, colDendro,
         hmMarginL <- ifelse(rowModules, yes = 2, no = -1)
         hmMarginB <- ifelse(colModules, yes = 2, no = -1)
         heatmap <- ggplot(data = x) +
-                geom_tile(aes(x = variable, y = rowID, color = value, fill = value)) +
-                scale_fill_gradientn(legend.title, colors = colors, limits = limits,
+                geom_tile(aes(x = variable, y = rowID, color = value,
+                              fill = value)) +
+                scale_fill_gradientn(legend.title, colors = colors,
+                                     limits = limits,
                                      aesthetics = c("color", "fill")) +
                 theme_bw(base_size = 24) +
                 theme(axis.text.x = element_text(size = axis.text.size,
@@ -395,7 +404,8 @@ plotHeatmap <- function(x, rowDendro, colDendro,
                       axis.title = element_blank(), legend.position = "none",
                       panel.background = element_blank(),
                       panel.border = element_rect(color = "black", size = 1.25),
-                      panel.grid = element_blank(), plot.background = element_blank(),
+                      panel.grid = element_blank(),
+                      plot.background = element_blank(),
                       plot.margin = unit(c(0,1,hmMarginB,hmMarginL), "lines"))
         legend <- get_legend(heatmap + theme(legend.position = legend.position,
                                              legend.background = element_blank(),
@@ -418,9 +428,11 @@ plotHeatmap <- function(x, rowDendro, colDendro,
                 if(verbose){
                         message("[plotHeatmap] Using colors in row names for y-axis labels")
                 }
-                rowColors <- ggplot(data = data.frame(x = 0, y = 1:length(levels(x$rowID)),
+                rowColors <- ggplot(data = data.frame(x = 0,
+                                                      y = 1:length(levels(x$rowID)),
                                                       color = levels(x$rowID))) +
-                        geom_tile(aes(x = x, y = y, color = color, fill = color)) +
+                        geom_tile(aes(x = x, y = y, color = color,
+                                      fill = color)) +
                         scale_fill_identity(aesthetics = c("color", "fill")) +
                         theme_void() +
                         theme(legend.position = "none",
@@ -433,8 +445,10 @@ plotHeatmap <- function(x, rowDendro, colDendro,
                         message("[plotHeatmap] Using colors in column names for x-axis labels")
                 }
                 colColors <- ggplot(data = data.frame(x = 1:length(levels(x$variable)),
-                                                      y = 0, color = levels(x$variable))) +
-                        geom_tile(aes(x = x, y = y, color = color, fill = color)) +
+                                                      y = 0,
+                                                      color = levels(x$variable))) +
+                        geom_tile(aes(x = x, y = y, color = color,
+                                      fill = color)) +
                         scale_fill_identity(aesthetics = c("color", "fill")) +
                         theme_void() +
                         theme(legend.position = "none",

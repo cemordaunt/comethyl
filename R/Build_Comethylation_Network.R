@@ -42,8 +42,9 @@
 #'         centralization, and heterogeneity.
 #'
 #' @seealso \itemize{
-#'         \item [getRegionMeth()] and [adjustRegionMeth()] to extract methylation
-#'                 data and then adjust it for the top principal components.
+#'         \item [getRegionMeth()] and [adjustRegionMeth()] to extract
+#'                 methylation data and then adjust it for the top principal
+#'                 components.
 #'         \item [plotSoftPower()] to visualize fit and connectivity for soft
 #'                 power estimation.
 #'         \item [getModules()] to build a comethylation network and identify
@@ -73,14 +74,16 @@
 #'
 #' @import WGCNA
 
-getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor"),
-                         maxPOutliers = 0.1, RsquaredCut = 0.8, blockSize = 40000,
+getSoftPower <- function(meth, powerVector = 1:20,
+                         corType = c("pearson", "bicor"), maxPOutliers = 0.1,
+                         RsquaredCut = 0.8, blockSize = 40000,
                          gcInterval = blockSize - 1, save = TRUE,
                          file = "Soft_Power.rds", verbose = TRUE){
         corType <- match.arg(corType)
         if(verbose){
                 message("[getSoftPower] Analyzing scale-free topology with ",
-                        corType, " correlation to estimate best soft-thresholding power")
+                        corType,
+                        " correlation to estimate best soft-thresholding power")
                 verboseNum <- 1
         } else {
                 verboseNum <- 0
@@ -114,8 +117,8 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
                 sft$powerEstimate <- sft$fitIndices$Power[fit == max(fit)]
         }
         if(verbose){
-                message("[getSoftPower] At soft power threshold = ", sft$powerEstimate,
-                        ", fit = ",
+                message("[getSoftPower] At soft power threshold = ",
+                        sft$powerEstimate, ", fit = ",
                         round(sft$fitIndices$SFT.R.sq[sft$fitIndices$Power == sft$powerEstimate], 3),
                         " and mean connectivity = ",
                         round(sft$fitIndices$mean.k.[sft$fitIndices$Power == sft$powerEstimate], 1))
@@ -131,13 +134,13 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
 
 #' Plot Soft Power Fit and Connectivity
 #'
-#' \code{plotSoftPower()} visualizes scale-free topology fit and mean connectivity
-#' for multiple soft power thresholds as a scatterplot, and then saves it as a
-#' .pdf.
+#' \code{plotSoftPower()} visualizes scale-free topology fit and mean
+#' connectivity for multiple soft power thresholds as a scatterplot, and then
+#' saves it as a .pdf.
 #'
 #' \code{plotSoftPower()} is designed to be used in combination with
-#' [getSoftPower()]. A \code{ggplot} object is produced and can be edited outside
-#' of this function if desired.
+#' [getSoftPower()]. A \code{ggplot} object is produced and can be edited
+#' outside of this function if desired.
 #'
 #' @param sft A \code{list} produced by [getSoftPower()] with two elements:
 #'         \code{powerEstimate} and \code{fitIndices}.
@@ -159,8 +162,9 @@ getSoftPower <- function(meth, powerVector = 1:20, corType = c("pearson", "bicor
 #' @return A \code{ggplot} object.
 #'
 #' @seealso \itemize{
-#'         \item [getRegionMeth()] and [adjustRegionMeth()] to extract methylation
-#'                 data and then adjust it for the top principal components.
+#'         \item [getRegionMeth()] and [adjustRegionMeth()] to extract
+#'                 methylation data and then adjust it for the top principal
+#'                 components.
 #'         \item [getSoftPower()] to calculate the best soft-thresholding power
 #'                 and fit indices for scale-free topology.
 #'         \item [getModules()] to build a comethylation network and identify
@@ -215,8 +219,10 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
         gg <- gg +
                 geom_vline(aes(xintercept = powerEstimate), color = lineCol) +
                 geom_text(aes(x = powerEstimate, y = powerEstimateY,
-                              label = powerEstimate), color = lineCol, nudge_x = -1) +
-                geom_point(aes(x = power, y = value), color = pointCol, size = 1.2) +
+                              label = powerEstimate),
+                          color = lineCol, nudge_x = -1) +
+                geom_point(aes(x = power, y = value),
+                           color = pointCol, size = 1.2) +
                 facet_wrap(vars(variable), nrow = 1, ncol = 2, scales = "free_y",
                            strip.position = "left", labeller = label_parsed) +
                 xlab("Soft Power Threshold") +
@@ -233,7 +239,8 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
                       panel.spacing.x = unit(0.3, "lines"),
                       panel.spacing.y = unit(0.8, "lines"),
                       plot.margin = unit(c(1,1,0.7,0.2), "lines"),
-                      strip.background = element_blank(), strip.placement = "outside",
+                      strip.background = element_blank(),
+                      strip.placement = "outside",
                       strip.switch.pad.wrap = unit(0, "lines"),
                       strip.text.x = element_text(size = 16))
         if(save){
@@ -250,13 +257,14 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
 #'
 #' \code{getModules()} builds a comethylation network, identifies comethylated
 #' modules, outputs a \code{list} with region module assignments, eigennode
-#' values, dendrograms, and module membership, and then saves this as a .rds file.
+#' values, dendrograms, and module membership, and then saves this as a .rds
+#' file.
 #'
 #' Comethylation networks are built and modules are identified by
 #' [WGCNA::blockwiseModules()], with \code{corType} set to either
-#' \code{pearson} or \code{bicor}. Calculations are performed for a signed network
-#' in blocks of regions of maximum size \code{maxBlockSize} (default = 40000).
-#' If there are more than \code{maxBlocksize} regions, then regions are
+#' \code{pearson} or \code{bicor}. Calculations are performed for a signed
+#' network in blocks of regions of maximum size \code{maxBlockSize} (default =
+#' 40000). If there are more than \code{maxBlocksize} regions, then regions are
 #' pre-clustered into blocks using projective K-means clustering. Region
 #' correlations are performed within each block and regions are clustered with
 #' average linkage hierarchical clustering. Modules are then identified with a
@@ -264,7 +272,8 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
 #' More information is given in the documentation for [WGCNA::blockwiseModules()].
 #'
 #' @param meth A \code{numeric matrix}, where each row is a sample and each
-#'         column is a region. This is typically obtained from [adjustRegionMeth()].
+#'         column is a region. This is typically obtained from
+#'         [adjustRegionMeth()].
 #' @param power A \code{numeric(1)} giving the soft-thresholding power. This is
 #'         typically obtained from [getSoftPower()].
 #' @param regions A \code{data.frame} of regions, typically after filtering with
@@ -301,8 +310,9 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
 #'         assignment, module membership, and hub region status.
 #'
 #' @seealso \itemize{
-#'         \item [getRegionMeth()] and [adjustRegionMeth()] to extract methylation
-#'                 data and then adjust it for the top principal components.
+#'         \item [getRegionMeth()] and [adjustRegionMeth()] to extract
+#'                 methylation data and then adjust it for the top principal
+#'                 components.
 #'         \item [getSoftPower()] and [plotSoftPower()] to estimate the best
 #'                 soft-thresholding power and visualize scale-free topology fit
 #'                 and connectivity.
@@ -363,7 +373,8 @@ getModules <- function(meth, power, regions, maxBlockSize = 40000,
                 verboseNum <- 0
         }
         modules <- blockwiseModules(meth, checkMissingData = FALSE,
-                                    maxBlockSize = maxBlockSize, corType = corType,
+                                    maxBlockSize = maxBlockSize,
+                                    corType = corType,
                                     maxPOutliers = maxPOutliers, power = power,
                                     networkType = "signed", TOMtype = "signed",
                                     deepSplit = deepSplit,
@@ -386,7 +397,8 @@ getModules <- function(meth, power, regions, maxBlockSize = 40000,
                                     maxPOutliers = maxPOutliers,
                                     nThreads = nThreads)
         }
-        regions$module <- modules$colors[match(regions$RegionID, names(modules$colors))]
+        regions$module <- modules$colors[match(regions$RegionID,
+                                               names(modules$colors))]
         regions <- lapply(unique(regions$module), function(x){
                 regions <- regions[regions$module == x,]
                 regions$membership <- membership[regions$RegionID, x]
@@ -394,7 +406,8 @@ getModules <- function(meth, power, regions, maxBlockSize = 40000,
                 return(regions)
         })
         regions <- rlist::list.rbind(regions) %>%
-                .[order(as.integer(str_remove_all(.$RegionID, pattern = "Region_"))),]
+                .[order(as.integer(str_remove_all(.$RegionID,
+                                                  pattern = "Region_"))),]
         modules$regions <- regions
         if(save){
                 if(verbose){

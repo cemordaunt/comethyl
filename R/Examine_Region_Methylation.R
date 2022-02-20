@@ -9,8 +9,8 @@
 #' or smoothed methylation.
 #'
 #' @param regions A \code{data.frame} of regions, typically after filtering with
-#'         [filterRegions()]. Must have the columns \code{chr}, \code{start}, and
-#'         \code{end}.
+#'         [filterRegions()]. Must have the columns \code{chr}, \code{start},
+#'         and \code{end}.
 #' @param bs A [BSseq][bsseq::BSseq-class] object, typically after filtering
 #'         with [filterCpGs()].
 #' @param type A \code{character(1)} specifying the type of methylation values
@@ -156,8 +156,8 @@ adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
 #'
 #' \code{getDendro()} computes the distance between the rows of a matrix and
 #' performs hierarchical clustering. Possible distance measures include
-#' \code{euclidean}, \code{pearson}, and \code{bicor}. The function also optionally
-#' transposes the matrix.
+#' \code{euclidean}, \code{pearson}, and \code{bicor}. The function also
+#' optionally transposes the matrix.
 #'
 #' Euclidean distance is calculated by [stats::dist()], where
 #' \code{method = "euclidean"}, while Pearson correlation and biweight
@@ -170,7 +170,8 @@ adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
 #' @param transpose A \code{logical(1)} specifying whether to transpose the
 #'         \code{matrix}.
 #' @param distance A \code{character(1)} indicating which distance measure to use.
-#'         Possible values include \code{euclidean}, \code{pearson}, and \code{bicor}.
+#'         Possible values include \code{euclidean}, \code{pearson}, and
+#'         \code{bicor}.
 #' @param maxPOutliers A \code{numeric(1)} specifying the maximum percentile that
 #'         can be considered outliers on each side of the median for the
 #'         \code{bicor} statistic.
@@ -322,9 +323,9 @@ getDendro <- function(x, transpose = FALSE,
 #' @importFrom scales breaks_pretty
 
 plotDendro <- function(dendro, label = TRUE, labelSize = 2.5,
-                       expandX = c(0.03,0.03), expandY = c(0.3,0.08), nBreaks = 4,
-                       save = TRUE, file = "Dendrogram.pdf", width = 11,
-                       height = 4.25, verbose = TRUE){
+                       expandX = c(0.03,0.03), expandY = c(0.3,0.08),
+                       nBreaks = 4, save = TRUE, file = "Dendrogram.pdf",
+                       width = 11, height = 4.25, verbose = TRUE){
         if(verbose){
                 message("[plotDendro] Plotting dendrogram")
         }
@@ -348,7 +349,8 @@ plotDendro <- function(dendro, label = TRUE, labelSize = 2.5,
                 theme_dendro() +
                 theme(plot.margin = unit(c(1,1,0,1), "lines"),
                       panel.background = element_rect(color = "black",
-                                                      fill = "white", size = 1.1),
+                                                      fill = "white",
+                                                      size = 1.1),
                       axis.ticks.y = element_line(),
                       axis.text.y = element_text(size = 12, color = "black"),
                       axis.title.y = element_text(size = 16, angle = 90,

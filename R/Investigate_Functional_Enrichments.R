@@ -4,10 +4,10 @@
 #' ontologies for functional enrichment analysis by GREAT for a specified version
 #' and genome build.
 #'
-#' \code{listOntologies()} generates the possible ontologies to use for functional
-#' enrichment analysis in [enrichModule()]. Supported ontologies may change over
-#' time, so this function queries GREAT using the \pkg{rGREAT} package to get the
-#' ones currently available.
+#' \code{listOntologies()} generates the possible ontologies to use for
+#' functional enrichment analysis in [enrichModule()]. Supported ontologies may
+#' change over time, so this function queries GREAT using the \pkg{rGREAT}
+#' package to get the ones currently available.
 #'
 #' GREAT supports different genomes depending on the version:
 #' \describe{
@@ -65,7 +65,8 @@
 #'
 #' @importFrom magrittr %>%
 
-listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "danRer7"),
+listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9",
+                                      "danRer7"),
                            version = c("4.0.4", "3.0.0", "2.0.2"),
                            verbose =  TRUE){
         genome <- match.arg(genome)
@@ -89,10 +90,10 @@ listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "da
 
 #' Analyze Module Functional Enrichment with GREAT
 #'
-#' \code{enrichModule()} takes a \code{data.frame} of regions with module assignments,
-#' filters it for the module(s) of interest, and submits it to GREAT for functional
-#' enrichment analysis compared to gene sets in the specified ontologies. The
-#' results are then processed and saved as a .txt file.
+#' \code{enrichModule()} takes a \code{data.frame} of regions with module
+#' assignments, filters it for the module(s) of interest, and submits it to
+#' GREAT for functional enrichment analysis compared to gene sets in the
+#' specified ontologies. The results are then processed and saved as a .txt file.
 #'
 #' Submission to GREAT is performed by the \pkg{rGREAT} package, which allows
 #' for different annotation rules and versions of GREAT. The default
@@ -117,16 +118,17 @@ listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "da
 #' with the regulatory domains of genes annotated to functional gene sets of the
 #' ontologies of interest. The default ontologies include
 #' \code{GO Molecular Function}, \code{GO Biological Process},
-#' \code{GO Cellular Component}, \code{Mouse Phenotype}, and \code{Human Phenotype}.
-#' Initial enrichment results are filtered for terms with a minimum number of
-#' overlaps with the background set of regions, p-values are adjusted for multiple
-#' comparisons using the specified method, and then the results are filtered again
-#' for a minimum number of overlaps with the module(s) of interest and a
-#' p-value threshold. Finally, gene symbols are obtained for the
-#' significant gene sets, and the result is saved as a .txt file.
+#' \code{GO Cellular Component}, \code{Mouse Phenotype}, and
+#' \code{Human Phenotype}. Initial enrichment results are filtered for terms
+#' with a minimum number of overlaps with the background set of regions,
+#' p-values are adjusted for multiple comparisons using the specified method,
+#' and then the results are filtered again for a minimum number of overlaps with
+#' the module(s) of interest and a p-value threshold. Finally, gene symbols are
+#' obtained for the significant gene sets, and the result is saved as a .txt
+#' file.
 #'
-#' @param regions A \code{data.frame} of regions with module assignments, typically
-#'         obtained from [getModules()].
+#' @param regions A \code{data.frame} of regions with module assignments,
+#'         typically obtained from [getModules()].
 #' @param module A \code{character} giving the name of one or more modules to
 #'         analyze functional enrichment. If null, all modules will be analyzed,
 #'         except the grey (unassigned) module.
@@ -155,25 +157,25 @@ listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "da
 #'         downstream of the TSS (in kb) to define the maximum extension of the
 #'         regulatory domain in the \code{oneClosest} rule.
 #' @param version A \code{character(1)} specifying the version of GREAT to use
-#'         for gene annotation. Possible values include \code{4.0.4}, \code{3.0.0},
-#'         and \code{2.0.2}. Different versions of GREAT support different
-#'         genomes. See \code{Details}.
+#'         for gene annotation. Possible values include \code{4.0.4},
+#'         \code{3.0.0}, and \code{2.0.2}. Different versions of GREAT support
+#'         different genomes. See \code{Details}.
 #' @param ontologies A \code{character} giving the ontology databases to query.
 #'         Default ontologies include \code{GO Molecular Function},
 #'         \code{GO Biological Process}, \code{GO Cellular Component},
 #'         \code{Mouse Phenotype}, and \code{Human Phenotype}. All possible
 #'         ontologies can be obtained with [listOntologies()].
-#' @param min_background_region_hits A \code{numeric(1)} giving the minimum number
-#'         of overlaps of gene set regulatory domains with background regions
-#'         to include that gene set in the results. This affects the results used
-#'         when adjusting p-values for multiple comparisons.
+#' @param min_background_region_hits A \code{numeric(1)} giving the minimum
+#'         number of overlaps of gene set regulatory domains with background
+#'         regions to include that gene set in the results. This affects the
+#'         results used when adjusting p-values for multiple comparisons.
 #' @param adjMethod A \code{character(1)} specifying the method for adjusting
 #'         p-values, Potential values include \code{fdr}, \code{holm},
 #'         \code{hochberg}, \code{hommel}, \code{bonferroni}, \code{BH},
 #'         \code{BY}, and \code{none}.
-#' @param min_region_hits A \code{numeric(1)} giving the minimum number of overlaps
-#'         of gene set regulatory domains with module regions to include that gene
-#'         set in the results.
+#' @param min_region_hits A \code{numeric(1)} giving the minimum number of
+#'         overlaps of gene set regulatory domains with module regions to
+#'         include that gene set in the results.
 #' @param pvalue_threshold A \code{numeric(1)} giving the maximum p-value
 #'         for enrichment to include a gene set in the results.
 #' @param save A \code{logical(1)} indicating whether to save the
@@ -226,15 +228,17 @@ listOntologies <- function(genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "da
 #' @importFrom magrittr %>%
 
 enrichModule <- function(regions, module = NULL,
-                         genome = c("hg38", "hg19", "hg18", "mm10", "mm9", "danRer7"),
+                         genome = c("hg38", "hg19", "hg18", "mm10", "mm9",
+                                    "danRer7"),
                          includeCuratedRegDoms = FALSE,
                          rule = c("basalPlusExt", "twoClosest", "oneClosest"),
                          adv_upstream = 5, adv_downstream = 1, adv_span = 1000,
                          adv_twoDistance = 1000, adv_oneDistance = 1000,
                          version = c("4.0.4", "3.0.0", "2.0.2"),
-                         ontologies = c("GO Molecular Function", "GO Biological Process",
-                                        "GO Cellular Component", "Mouse Phenotype",
-                                        "Human Phenotype"),
+                         ontologies = c("GO Molecular Function",
+                                        "GO Biological Process",
+                                        "GO Cellular Component",
+                                        "Mouse Phenotype", "Human Phenotype"),
                          min_background_region_hits = 5,
                          adjMethod = c("fdr", "holm", "hochberg", "hommel",
                                        "bonferroni", "BH", "BY", "none"),
@@ -268,7 +272,8 @@ enrichModule <- function(regions, module = NULL,
                         genome, " genome assembly and the ", rule, " rule")
         }
         if(genome == "danRer7"){
-                ontologies <- ontologies[!ontologies %in% c("Mouse Phenotype", "Human Phenotype")]
+                ontologies <- ontologies[!ontologies %in% c("Mouse Phenotype",
+                                                            "Human Phenotype")]
         }
         gr <- with(moduleRegions,
                    GRanges(chr, ranges = IRanges::IRanges(start, end = end)))
@@ -277,10 +282,11 @@ enrichModule <- function(regions, module = NULL,
         job <- submitGreatJob(gr, bg = bg, species = genome,
                               includeCuratedRegDoms = includeCuratedRegDoms,
                               rule = rule, adv_upstream = adv_upstream,
-                              adv_downstream = adv_downstream, adv_span = adv_span,
+                              adv_downstream = adv_downstream,
+                              adv_span = adv_span,
                               adv_twoDistance = adv_twoDistance,
-                              adv_oneDistance = adv_oneDistance, request_interval = 0,
-                              version = version)
+                              adv_oneDistance = adv_oneDistance,
+                              request_interval = 0, version = version)
         if(verbose){
                 message("[enrichModule] Getting results and adjusting p-values using the ",
                         adjMethod, " method")
@@ -309,8 +315,8 @@ enrichModule <- function(regions, module = NULL,
         }
         results$genes <- mapply(function(x,y){
                 R.devices::suppressGraphics(
-                        plotRegionGeneAssociationGraphs(job, type = 1, ontology = x,
-                                                        termID = y,
+                        plotRegionGeneAssociationGraphs(job, type = 1,
+                                                        ontology = x, termID = y,
                                                         request_interval = 0,
                                                         max_tries = 10000,
                                                         verbose = FALSE)) %>%
@@ -318,12 +324,14 @@ enrichModule <- function(regions, module = NULL,
         }, x = results$ontology, y = results$ID, USE.NAMES = FALSE)
         results <- results[order(results$p), c("ID", "term", "ontology",
                                                "background_region_hits",
-                                               "expected_region_hits", "region_hits",
-                                               "fold_enrichment", "region_coverage",
-                                               "term_region_coverage", "gene_hits",
-                                               "genes", "background_gene_hits",
-                                               "term_genes", "p", "log_p", "adj_p",
-                                               "log_adj_p")]
+                                               "expected_region_hits",
+                                               "region_hits", "fold_enrichment",
+                                               "region_coverage",
+                                               "term_region_coverage",
+                                               "gene_hits", "genes",
+                                               "background_gene_hits",
+                                               "term_genes", "p", "log_p",
+                                               "adj_p", "log_adj_p")]
         if(save){
                 if(verbose){
                         message("[enrichModule] Saving file as ", file)
@@ -404,8 +412,8 @@ enrichModule <- function(regions, module = NULL,
 #'
 #' @importFrom scales breaks_pretty
 
-plotEnrichment <- function(enrichment, nTerms = 15, fill = "#132B43", xlim = NULL,
-                           nBreaks = 4, axis.title.x.size = 20,
+plotEnrichment <- function(enrichment, nTerms = 15, fill = "#132B43",
+                           xlim = NULL, nBreaks = 4, axis.title.x.size = 20,
                            axis.text.x.size = 16, axis.text.y.size = 16,
                            save = TRUE, file = "Module_Enrichment_Plot.pdf",
                            width = 8, height = 6, verbose = TRUE){
@@ -419,7 +427,8 @@ plotEnrichment <- function(enrichment, nTerms = 15, fill = "#132B43", xlim = NUL
         enrichment$term <- factor(enrichment$term,
                                   levels = rev(unique(enrichment$term)))
         barplot <- ggplot() +
-                geom_col(aes(x = term, y = log_p), data = enrichment, fill = fill) +
+                geom_col(aes(x = term, y = log_p), data = enrichment,
+                         fill = fill) +
                 coord_flip(ylim = xlim) +
                 scale_y_continuous(breaks = breaks_pretty(n = nBreaks),
                                    expand = expansion(c(0.004, 0.03))) +
@@ -429,8 +438,10 @@ plotEnrichment <- function(enrichment, nTerms = 15, fill = "#132B43", xlim = NUL
                       axis.ticks = element_line(size = 1.25),
                       panel.grid.minor = element_blank(),
                       strip.background = element_blank(),
-                      axis.text.x = element_text(color = "black", size = axis.text.x.size),
-                      axis.text.y = element_text(color = "black", size = axis.text.y.size),
+                      axis.text.x = element_text(color = "black",
+                                                 size = axis.text.x.size),
+                      axis.text.y = element_text(color = "black",
+                                                 size = axis.text.y.size),
                       axis.title.x = element_text(size = axis.title.x.size),
                       axis.title.y = element_blank(),
                       plot.margin = unit(c(1,1,0.5,1), "lines")) +
