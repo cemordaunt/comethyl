@@ -35,12 +35,12 @@ library(comethyl)
 ```    
 
 ## Set Global Options
-`enableWGCNAthreads()` allows parallel calculations with the specified number of threads. If the number of threads is not provided, the default is the number of processors online.
+`WGCNA::enableWGCNAthreads()` allows parallel calculations with the specified number of threads for all functions using `WGCNA::cor()` and `WGCNA::bicor()`. If the number of threads is not provided, the default is the number of processors online.
 
 ```
 options(stringsAsFactors = FALSE)
 Sys.setenv(R_THREADS = 1)
-enableWGCNAThreads(nThreads = 4)
+WGCNA::enableWGCNAThreads(nThreads = 4)
 ```
 
 ## Read Bismark CpG Reports

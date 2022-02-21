@@ -97,10 +97,10 @@
 <div class="section level2">
 <h2 id="set-global-options">Set Global Options<a class="anchor" aria-label="anchor" href="#set-global-options"></a>
 </h2>
-<p><code>disableWGCNAthreads()</code> prevents multi-threading for WGCNA calculations, including all functions using <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor()</a></code> and <code>bicor()</code>. This is recommended for large sets of regions (&gt; 150,000). For smaller region sets, use <code>enableWGCNAthreads()</code> to allow for parallel calculations with the specified number of threads. If the number of threads is not provided, the default is the number of processors online.</p>
+<p><code>WGCNA::disableWGCNAthreads()</code> prevents multi-threading for WGCNA calculations, including all functions using <code><a href="https://rdrr.io/pkg/WGCNA/man/cor.html" class="external-link">WGCNA::cor()</a></code> and <code><a href="https://rdrr.io/pkg/WGCNA/man/bicor.html" class="external-link">WGCNA::bicor()</a></code>. This is recommended for large sets of regions (&gt; 150,000). For smaller region sets, use <code>WGCNA::enableWGCNAthreads()</code> to allow for parallel calculations with the specified number of threads. If the number of threads is not provided, the default is the number of processors online.</p>
 <pre><code><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>R_THREADS <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
-<span class="fu">disableWGCNAThreads</span><span class="op">(</span><span class="op">)</span></code></pre>
+<span class="fu">WGCNA</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/WGCNA/man/allowWGCNAThreads.html" class="external-link">disableWGCNAThreads</a></span><span class="op">(</span><span class="op">)</span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="read-bismark-cpg-reports">Read Bismark CpG Reports<a class="anchor" aria-label="anchor" href="#read-bismark-cpg-reports"></a>

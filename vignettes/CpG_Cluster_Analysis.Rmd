@@ -35,12 +35,12 @@ library(comethyl)
 ```    
 
 ## Set Global Options
-`disableWGCNAthreads()` prevents multi-threading for WGCNA calculations, including all functions using `cor()` and `bicor()`. This is recommended for large sets of regions (> 150,000). For smaller region sets, use `enableWGCNAthreads()` to allow for parallel calculations with the specified number of threads. If the number of threads is not provided, the default is the number of processors online. 
+`WGCNA::disableWGCNAthreads()` prevents multi-threading for WGCNA calculations, including all functions using `WGCNA::cor()` and `WGCNA::bicor()`. This is recommended for large sets of regions (> 150,000). For smaller region sets, use `WGCNA::enableWGCNAthreads()` to allow for parallel calculations with the specified number of threads. If the number of threads is not provided, the default is the number of processors online. 
 
 ```
 options(stringsAsFactors = FALSE)
 Sys.setenv(R_THREADS = 1)
-disableWGCNAThreads()
+WGCNA::disableWGCNAThreads()
 ```
 
 ## Read Bismark CpG Reports
