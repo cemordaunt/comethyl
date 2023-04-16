@@ -36,7 +36,8 @@ None, produces a plot as a side effect.
 }
 \description{
 \code{plotRegionDendro()} extracts plotting data from a \code{modules} list,
-plots a region dendrogram with module assignments, and then saves it as a .pdf.
+plots a region dendrogram with module assignments, and then saves it as a
+.pdf.
 }
 \details{
 \code{plotRegionDendro()} is designed to be used in combination with

@@ -19,7 +19,8 @@ getDendro(
 \code{matrix}.}
 
 \item{distance}{A \code{character(1)} indicating which distance measure to use.
-Possible values include \code{euclidean}, \code{pearson}, and \code{bicor}.}
+Possible values include \code{euclidean}, \code{pearson}, and
+\code{bicor}.}
 
 \item{maxPOutliers}{A \code{numeric(1)} specifying the maximum percentile that
 can be considered outliers on each side of the median for the
@@ -34,8 +35,8 @@ An \link[stats:hclust]{stats::hclust} object that describes the clustering tree.
 \description{
 \code{getDendro()} computes the distance between the rows of a matrix and
 performs hierarchical clustering. Possible distance measures include
-\code{euclidean}, \code{pearson}, and \code{bicor}. The function also optionally
-transposes the matrix.
+\code{euclidean}, \code{pearson}, and \code{bicor}. The function also
+optionally transposes the matrix.
 }
 \details{
 Euclidean distance is calculated by \code{\link[stats:dist]{stats::dist()}}, where

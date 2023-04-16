@@ -46,14 +46,14 @@ printed.}
 A \code{ggplot} object.
 }
 \description{
-\code{plotSoftPower()} visualizes scale-free topology fit and mean connectivity
-for multiple soft power thresholds as a scatterplot, and then saves it as a
-.pdf.
+\code{plotSoftPower()} visualizes scale-free topology fit and mean
+connectivity for multiple soft power thresholds as a scatterplot, and then
+saves it as a .pdf.
 }
 \details{
 \code{plotSoftPower()} is designed to be used in combination with
-\code{\link[=getSoftPower]{getSoftPower()}}. A \code{ggplot} object is produced and can be edited outside
-of this function if desired.
+\code{\link[=getSoftPower]{getSoftPower()}}. A \code{ggplot} object is produced and can be edited
+outside of this function if desired.
 }
 \examples{
 \dontrun{
@@ -63,7 +63,8 @@ meth <- getRegionMeth(regions, bs = bs, file = "Region_Methylation.rds")
 
 # Adjust Methylation Data for PCs
 mod <- model.matrix(~1, data = pData(bs))
-methAdj <- adjustRegionMeth(meth, mod = mod,
+PCs <- getPCs(meth, mod = mod, file = "Top_Principal_Components.rds")
+methAdj <- adjustRegionMeth(meth, PCs = PCs,
                             file = "Adjusted_Region_Methylation.rds")
 
 # Select Soft Power Threshold
@@ -78,8 +79,9 @@ modules <- getModules(methAdj, power = sft$powerEstimate, regions = regions,
 }
 \seealso{
 \itemize{
-\item \code{\link[=getRegionMeth]{getRegionMeth()}} and \code{\link[=adjustRegionMeth]{adjustRegionMeth()}} to extract methylation
-data and then adjust it for the top principal components.
+\item \code{\link[=getRegionMeth]{getRegionMeth()}}, \code{\link[=getPCs]{getPCs()}}, and \code{\link[=adjustRegionMeth]{adjustRegionMeth()}} to
+extract methylation data and then adjust it for the top
+principal components.
 \item \code{\link[=getSoftPower]{getSoftPower()}} to calculate the best soft-thresholding power
 and fit indices for scale-free topology.
 \item \code{\link[=getModules]{getModules()}} to build a comethylation network and identify

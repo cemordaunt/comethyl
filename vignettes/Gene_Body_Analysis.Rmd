@@ -109,12 +109,13 @@ plotRegionStats(regions, maxQuantile = 0.99, file = "Filtered_Region_Plots.pdf")
 ![Figure 5. Filtered Region Plots](Gene Body Analysis/Filtered_Region_Plots.png)
 
 ## Adjust Methylation Data for Principal Components
-`getRegionMeth()` calculates region methylation from a BSseq object and saves it as a .rds. `model.matrix()` creates a design matrix for our set of samples. `adjustRegionMeth()` adjusts the region methylation for the top principal components and saves it as a .rds file. `getDendro()` clusters the samples based on the adjusted region methylation using Euclidean distance, while `plotDendro()` plots the dendrogram. We can use this dendrogram to see if there are any outlier samples or samples clustering separately due to batch effects.
+`getRegionMeth()` calculates region methylation from a BSseq object and saves it as a .rds. `model.matrix()` creates a design matrix for our set of samples. `getPCs()` calculates the top principal components, and then `adjustRegionMeth()` adjusts the region methylation for the top PCs and saves it as a .rds file. `getDendro()` clusters the samples based on the adjusted region methylation using Euclidean distance, while `plotDendro()` plots the dendrogram. We can use this dendrogram to see if there are any outlier samples or samples clustering separately due to batch effects.
 
 ```
 meth <- getRegionMeth(regions, bs = bs, file = "Region_Methylation.rds")
 mod <- model.matrix(~1, data = pData(bs))
-methAdj <- adjustRegionMeth(meth, mod = mod, file = "Adjusted_Region_Methylation.rds")
+PCs <- getPCs(meth, mod = mod, file = "Top_Principal_Components.rds")
+methAdj <- adjustRegionMeth(meth, PCs = PCs, file = "Adjusted_Region_Methylation.rds")
 getDendro(methAdj, distance = "euclidean") %>% 
 plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25,0.08))
 ```

@@ -31,10 +31,10 @@ ontologies for functional enrichment analysis by GREAT for a specified version
 and genome build.
 }
 \details{
-\code{listOntologies()} generates the possible ontologies to use for functional
-enrichment analysis in \code{\link[=enrichModule]{enrichModule()}}. Supported ontologies may change over
-time, so this function queries GREAT using the \pkg{rGREAT} package to get the
-ones currently available.
+\code{listOntologies()} generates the possible ontologies to use for
+functional enrichment analysis in \code{\link[=enrichModule]{enrichModule()}}. Supported ontologies may
+change over time, so this function queries GREAT using the \pkg{rGREAT}
+package to get the ones currently available.
 
 GREAT supports different genomes depending on the version:
 \describe{

@@ -42,9 +42,9 @@
 #'         centralization, and heterogeneity.
 #'
 #' @seealso \itemize{
-#'         \item [getRegionMeth()] and [adjustRegionMeth()] to extract
-#'                 methylation data and then adjust it for the top principal
-#'                 components.
+#'         \item [getRegionMeth()], [getPCs()], and [adjustRegionMeth()] to
+#'                 extract methylation data and then adjust it for the top
+#'                 principal components.
 #'         \item [plotSoftPower()] to visualize fit and connectivity for soft
 #'                 power estimation.
 #'         \item [getModules()] to build a comethylation network and identify
@@ -58,7 +58,8 @@
 #'
 #' # Adjust Methylation Data for PCs
 #' mod <- model.matrix(~1, data = pData(bs))
-#' methAdj <- adjustRegionMeth(meth, mod = mod,
+#' PCs <- getPCs(meth, mod = mod, file = "Top_Principal_Components.rds")
+#' methAdj <- adjustRegionMeth(meth, PCs = PCs,
 #'                             file = "Adjusted_Region_Methylation.rds")
 #'
 #' # Select Soft Power Threshold
@@ -162,9 +163,9 @@ getSoftPower <- function(meth, powerVector = 1:20,
 #' @return A \code{ggplot} object.
 #'
 #' @seealso \itemize{
-#'         \item [getRegionMeth()] and [adjustRegionMeth()] to extract
-#'                 methylation data and then adjust it for the top principal
-#'                 components.
+#'         \item [getRegionMeth()], [getPCs()], and [adjustRegionMeth()] to
+#'                 extract methylation data and then adjust it for the top
+#'                 principal components.
 #'         \item [getSoftPower()] to calculate the best soft-thresholding power
 #'                 and fit indices for scale-free topology.
 #'         \item [getModules()] to build a comethylation network and identify
@@ -178,7 +179,8 @@ getSoftPower <- function(meth, powerVector = 1:20,
 #'
 #' # Adjust Methylation Data for PCs
 #' mod <- model.matrix(~1, data = pData(bs))
-#' methAdj <- adjustRegionMeth(meth, mod = mod,
+#' PCs <- getPCs(meth, mod = mod, file = "Top_Principal_Components.rds")
+#' methAdj <- adjustRegionMeth(meth, PCs = PCs,
 #'                             file = "Adjusted_Region_Methylation.rds")
 #'
 #' # Select Soft Power Threshold
@@ -310,9 +312,9 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
 #'         assignment, module membership, and hub region status.
 #'
 #' @seealso \itemize{
-#'         \item [getRegionMeth()] and [adjustRegionMeth()] to extract
-#'                 methylation data and then adjust it for the top principal
-#'                 components.
+#'         \item [getRegionMeth()], [getPCs()], and [adjustRegionMeth()] to
+#'                 extract methylation data and then adjust it for the top
+#'                 principal components.
 #'         \item [getSoftPower()] and [plotSoftPower()] to estimate the best
 #'                 soft-thresholding power and visualize scale-free topology fit
 #'                 and connectivity.
@@ -327,7 +329,8 @@ plotSoftPower <- function(sft, pointCol = "#132B43", lineCol = "red", nBreaks = 
 #'
 #' # Adjust Methylation Data for PCs
 #' mod <- model.matrix(~1, data = pData(bs))
-#' methAdj <- adjustRegionMeth(meth, mod = mod,
+#' PCs <- getPCs(meth, mod = mod, file = "Top_Principal_Components.rds")
+#' methAdj <- adjustRegionMeth(meth, PCs = PCs,
 #'                             file = "Adjusted_Region_Methylation.rds")
 #'
 #' # Select Soft Power Threshold

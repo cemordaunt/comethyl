@@ -17,8 +17,8 @@ filterRegions(
 \item{regions}{A \code{data.frame} output from \code{\link[=getRegions]{getRegions()}} giving the set
 of regions and statistics for each region.}
 
-\item{covMin}{A \code{numeric(1)} specifying the minimum number of reads at CpGs
-in a region in any sample}
+\item{covMin}{A \code{numeric(1)} specifying the minimum number of reads at
+CpGs in a region in any sample}
 
 \item{methSD}{A \code{numeric(1)} specifying the minimum methylation standard
 deviation in a region}

@@ -43,7 +43,8 @@ plotSDstats(regions, maxQuantile = 0.99, file = "Filtered_SD_Plots.pdf")
 # Adjust Methylation Data for PCs ####
 meth <- getRegionMeth(regions, bs = bs, file = "Region_Methylation.rds")
 mod <- model.matrix(~1, data = pData(bs))
-methAdj <- adjustRegionMeth(meth, mod = mod,
+PCs <- getPCs(meth, mod = mod, file = "Top_Principal_Components.rds")
+methAdj <- adjustRegionMeth(meth, PCs = PCs,
                             file = "Adjusted_Region_Methylation.rds")
 getDendro(methAdj, distance = "euclidean") %>%
         plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25, 0.08))

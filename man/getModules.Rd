@@ -22,7 +22,8 @@ getModules(
 }
 \arguments{
 \item{meth}{A \code{numeric matrix}, where each row is a sample and each
-column is a region. This is typically obtained from \code{\link[=adjustRegionMeth]{adjustRegionMeth()}}.}
+column is a region. This is typically obtained from
+\code{\link[=adjustRegionMeth]{adjustRegionMeth()}}.}
 
 \item{power}{A \code{numeric(1)} giving the soft-thresholding power. This is
 typically obtained from \code{\link[=getSoftPower]{getSoftPower()}}.}
@@ -74,14 +75,15 @@ assignment, module membership, and hub region status.
 \description{
 \code{getModules()} builds a comethylation network, identifies comethylated
 modules, outputs a \code{list} with region module assignments, eigennode
-values, dendrograms, and module membership, and then saves this as a .rds file.
+values, dendrograms, and module membership, and then saves this as a .rds
+file.
 }
 \details{
 Comethylation networks are built and modules are identified by
 \code{\link[WGCNA:blockwiseModules]{WGCNA::blockwiseModules()}}, with \code{corType} set to either
-\code{pearson} or \code{bicor}. Calculations are performed for a signed network
-in blocks of regions of maximum size \code{maxBlockSize} (default = 40000).
-If there are more than \code{maxBlocksize} regions, then regions are
+\code{pearson} or \code{bicor}. Calculations are performed for a signed
+network in blocks of regions of maximum size \code{maxBlockSize} (default =
+40000). If there are more than \code{maxBlocksize} regions, then regions are
 pre-clustered into blocks using projective K-means clustering. Region
 correlations are performed within each block and regions are clustered with
 average linkage hierarchical clustering. Modules are then identified with a
@@ -96,7 +98,8 @@ meth <- getRegionMeth(regions, bs = bs, file = "Region_Methylation.rds")
 
 # Adjust Methylation Data for PCs
 mod <- model.matrix(~1, data = pData(bs))
-methAdj <- adjustRegionMeth(meth, mod = mod,
+PCs <- getPCs(meth, mod = mod, file = "Top_Principal_Components.rds")
+methAdj <- adjustRegionMeth(meth, PCs = PCs,
                             file = "Adjusted_Region_Methylation.rds")
 
 # Select Soft Power Threshold
@@ -115,8 +118,9 @@ BED <- getModuleBED(modules$regions, file = "Modules.bed")
 }
 \seealso{
 \itemize{
-\item \code{\link[=getRegionMeth]{getRegionMeth()}} and \code{\link[=adjustRegionMeth]{adjustRegionMeth()}} to extract methylation
-data and then adjust it for the top principal components.
+\item \code{\link[=getRegionMeth]{getRegionMeth()}}, \code{\link[=getPCs]{getPCs()}}, and \code{\link[=adjustRegionMeth]{adjustRegionMeth()}} to
+extract methylation data and then adjust it for the top
+principal components.
 \item \code{\link[=getSoftPower]{getSoftPower()}} and \code{\link[=plotSoftPower]{plotSoftPower()}} to estimate the best
 soft-thresholding power and visualize scale-free topology fit
 and connectivity.

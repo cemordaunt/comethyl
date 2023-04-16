@@ -13,11 +13,11 @@ getModuleBED(
 )
 }
 \arguments{
-\item{regions}{A \code{data.frame} of regions with module assignments, typically
-obtained from \code{\link[=getModules]{getModules()}}.}
+\item{regions}{A \code{data.frame} of regions with module assignments,
+typically obtained from \code{\link[=getModules]{getModules()}}.}
 
-\item{grey}{A \code{logical(1)} specifying whether to include "grey" (unassigned)
-regions in the BED file.}
+\item{grey}{A \code{logical(1)} specifying whether to include "grey"
+(unassigned) regions in the BED file.}
 
 \item{save}{A \code{logical(1)} indicating whether to save the BED file.}
 

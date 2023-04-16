@@ -25,8 +25,8 @@
 #'         is a sample.
 #'
 #' @seealso \itemize{
-#'         \item [adjustRegionMeth()] to adjust methylation for the top principal
-#'                 components.
+#'         \item [getPCs()] and [adjustRegionMeth()] to adjust methylation for
+#'                 the top principal components.
 #'         \item [getDendro()] and [plotDendro()] to generate and visualize
 #'                 dendrograms.
 #' }
@@ -36,9 +36,10 @@
 #' # Get Methylation Data
 #' meth <- getRegionMeth(regions, bs = bs, file = "Region_Methylation.rds")
 #'
-#' # Adjust Methylation Data for PCs
+#' # Adjust Methylation Data for Top PCs
 #' mod <- model.matrix(~1, data = pData(bs))
-#' methAdj <- adjustRegionMeth(meth, mod = mod,
+#' PCs <- getPCs(meth, mod = mod, file = "Top_Principal_Components.rds")
+#' methAdj <- adjustRegionMeth(meth, PCs = PCs,
 #'                             file = "Adjusted_Region_Methylation.rds")
 #'
 #' # Assess Sample Similarity
@@ -68,14 +69,16 @@ getRegionMeth <- function(regions, bs, type = c("raw", "smooth"), save = TRUE,
         return(meth)
 }
 
-#' Adjust Methylation Data for Principal Components
+#' Calculate Top Principal Components
 #'
-#' \code{adjustRegionMeth()} adjusts region methylation data for the top
-#' principal components, transposes it, and then saves it as a .rds file.
+#' \code{getPCs()} calculates the top principal components for region
+#' methylation data, and then saves it as a .rds file.
 #'
-#' \code{adjustRegionMeth()} uses [sva::sva_network()] to regress out the top
-#' principal components. More information on the function and approach is given
-#' in the documentation and publications related to the \pkg{sva} package.
+#' \code{getPCs()} uses [sva::num.sv()] to identify the number of top
+#' principal components and then [svd()] to calculate them. This is the same
+#' approach used by [sva::sva_network()]. More information on the function and
+#' approach is given in the documentation and publications related to the
+#' \pkg{sva} package.
 #'
 #' @param meth A \code{numeric matrix}, where each row is a region and each
 #'         column is a sample. This is typically obtained from [getRegionMeth()].
@@ -88,10 +91,108 @@ getRegionMeth <- function(regions, bs, type = c("raw", "smooth"), save = TRUE,
 #'         printed.
 #'
 #' @return A \code{numeric matrix}, where each row is a sample and each column
+#'         is a principal component.
+#'
+#' @seealso \itemize{
+#'         \item [getRegionMeth()] to extract region methylation values.
+#'         \item [adjustRegionMeth()] to adjust region methylation values using
+#'                 these top PCs.
+#'         \item [getMEtraitCor()] to compare these top PCs to sample traits.
+#'         \item [getDendro()] and [plotDendro()] to generate and visualize
+#'                 dendrograms.
+#'         \item [getSoftPower()] and [plotSoftPower()] to estimate the best
+#'                 soft-thresholding power and visualize scale-free topology fit
+#'                 and connectivity.
+#'         \item [getModules()] to build a comethylation network and identify
+#'                 modules of comethylated regions.
+#' }
+#'
+#' @examples \dontrun{
+#'
+#' # Get Methylation Data
+#' meth <- getRegionMeth(regions, bs = bs, file = "Region_Methylation.rds")
+#'
+#' # Adjust Methylation Data for Top PCs
+#' mod <- model.matrix(~1, data = pData(bs))
+#' PCs <- getPCs(meth, mod = mod, file = "Top_Principal_Components.rds")
+#' methAdj <- adjustRegionMeth(meth, PCs = PCs,
+#'                             file = "Adjusted_Region_Methylation.rds")
+#'
+#' # Compare Top PCs to Sample Traits
+#' MEtraitCor <- getMEtraitCor(PCs, colData = colData, corType = "bicor",
+#'                             file = "PC_Trait_Correlation_Stats.txt")
+#'
+#' # Assess Sample Similarity
+#' getDendro(methAdj, distance = "euclidean") %>%
+#'           plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25,0.08))
+#'
+#' # Select Soft Power Threshold
+#' sft <- getSoftPower(methAdj, corType = "pearson", file = "Soft_Power.rds")
+#' plotSoftPower(sft, file = "Soft_Power_Plots.pdf")
+#'
+#' # Get Comethylation Modules
+#' modules <- getModules(methAdj, power = sft$powerEstimate, regions = regions,
+#'                       corType = "pearson", file = "Modules.rds")
+#' }
+#'
+#' @export
+#'
+#' @import sva
+
+getPCs <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
+                   save = TRUE,
+                   file = "Top_Principal_Components.rds",
+                   verbose = TRUE){
+        if(verbose){
+                message("[getPCs] Determining number of top principal components")
+        }
+        n.pc <- num.sv(meth, mod = mod, method = "be", seed = 5)
+        if(verbose){
+                message("[getPCs] Calculating top ", n.pc,
+                        " principal components")
+        }
+        meth_t <- t(meth)
+        ss <- svd(meth_t - colMeans(meth_t))
+        PCs <- ss$u[, 1:n.pc]
+        dimnames(PCs) <- list(dimnames(meth_t)[[1]], paste0("PC_", 1:n.pc))
+        if(save){
+                if(verbose){
+                        message("[getPCs] Saving file as ", file)
+                }
+                saveRDS(PCs, file = file)
+        }
+        return(PCs)
+}
+
+#' Adjust Methylation Data for Principal Components
+#'
+#' \code{adjustRegionMeth()} adjusts region methylation data for the top
+#' principal components, transposes it, and then saves it as a .rds file.
+#'
+#' \code{adjustRegionMeth()} regresses out the top principal components
+#' generated by [getPCs()]. This is the same approach as taken by
+#' [sva::sva_network()]. More information on the function and approach is given
+#' in the documentation and publications related to the \pkg{sva} package.
+#'
+#' @param meth A \code{numeric matrix}, where each row is a region and each
+#'         column is a sample. This is typically obtained from [getRegionMeth()].
+#' @param PCs A \code{numeric matrix}, where each row is a sample and each
+#'         column is a principal component. This is typically obtained from
+#'         [getPCs()].
+#' @param save A \code{logical(1)} indicating whether to save the \code{matrix}.
+#' @param file A \code{character(1)} giving the file name (.rds) for the saved
+#'         \code{matrix}.
+#' @param verbose A \code{logical(1)} indicating whether messages should be
+#'         printed.
+#'
+#' @return A \code{numeric matrix}, where each row is a sample and each column
 #'         is a region.
 #'
 #' @seealso \itemize{
 #'         \item [getRegionMeth()] to extract region methylation values.
+#'         \item [getPCs()] to calculate top principal components for region
+#'                 methylation values.
+#'         \item [getMEtraitCor()] to compare these top PCs to sample traits.
 #'         \item [getDendro()] and [plotDendro()] to generate and visualize
 #'                 dendrograms.
 #'         \item [getSoftPower()] and [plotSoftPower()] to estimate the best
@@ -108,8 +209,13 @@ getRegionMeth <- function(regions, bs, type = c("raw", "smooth"), save = TRUE,
 #'
 #' # Adjust Methylation Data for PCs
 #' mod <- model.matrix(~1, data = pData(bs))
-#' methAdj <- adjustRegionMeth(meth, mod = mod,
+#' PCs <- getPCs(meth, mod = mod, file = "Top_Principal_Components.rds")
+#' methAdj <- adjustRegionMeth(meth, PCs = PCs,
 #'                             file = "Adjusted_Region_Methylation.rds")
+#'
+#' # Compare Top PCs to Sample Traits
+#' MEtraitCor <- getMEtraitCor(PCs, colData = colData, corType = "bicor",
+#'                             file = "PC_Trait_Correlation_Stats.txt")
 #'
 #' # Assess Sample Similarity
 #' getDendro(methAdj, distance = "euclidean") %>%
@@ -125,24 +231,18 @@ getRegionMeth <- function(regions, bs, type = c("raw", "smooth"), save = TRUE,
 #' }
 #'
 #' @export
-#'
-#' @import sva
-#'
-#' @importFrom magrittr %>%
 
-adjustRegionMeth <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
-                             save = TRUE,
+adjustRegionMeth <- function(meth, PCs, save = TRUE,
                              file = "Adjusted_Region_Methylation.rds",
                              verbose = TRUE){
         if(verbose){
-                message("[adjustRegionMeth] Determining number of principal components to adjust for")
+                message("[adjustRegionMeth] Adjusting region methylation for the top principal components")
         }
-        n.pc <- num.sv(meth, mod = mod, seed = 5)
-        if(verbose){
-                message("[adjustRegionMeth] Adjusting region methylation for the top ",
-                        n.pc, " principal components")
+        meth_t <- t(meth)
+        methAdj <- meth_t
+        for(i in seq_len(dim(meth_t)[2])){
+                methAdj[, i] <- lm(meth_t[, i] ~ PCs)$residuals
         }
-        methAdj <- sva_network(meth, n.pc = n.pc) %>% t()
         if(save){
                 if(verbose){
                         message("[adjustRegionMeth] Saving file as ", file)

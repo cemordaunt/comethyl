@@ -50,8 +50,8 @@ both axes.}
 \item{legend.title.size}{A \code{numeric(1)} giving the size of the text for
 the legend title.}
 
-\item{legend.text.size}{A \code{numeric(1)} specifying the size of the text for
-the legend axis.}
+\item{legend.text.size}{A \code{numeric(1)} specifying the size of the text
+for the legend axis.}
 
 \item{legend.position}{A \code{numeric(2)} with the position of the legend,
 as x-axis, y-axis. May also be a \code{character(1)} indicating "none",
@@ -87,10 +87,10 @@ printed.}
 A \code{ggplot} object.
 }
 \description{
-\code{plotHeatmap()} takes a \code{numeric matrix} and two dendrograms, plots them,
-and then saves it all as a .pdf. The row names and column names of \code{x}
-must include the same set of values as the labels of \code{rowDendro} and
-\code{colDendro}, respectively.
+\code{plotHeatmap()} takes a \code{numeric matrix} and two dendrograms, plots
+them, and then saves it all as a .pdf. The row names and column names of
+\code{x} must include the same set of values as the labels of \code{rowDendro}
+and \code{colDendro}, respectively.
 }
 \details{
 \code{plotHeatmap()} is designed to be used in combination with \code{\link[=getCor]{getCor()}}

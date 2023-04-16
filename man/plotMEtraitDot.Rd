@@ -28,8 +28,8 @@ plotMEtraitDot(
 )
 }
 \arguments{
-\item{ME}{A \code{numeric} of module eigennode values. \code{ME} must be in the
-same order as \code{trait}.}
+\item{ME}{A \code{numeric} of module eigennode values. \code{ME} must be in
+the same order as \code{trait}.}
 
 \item{trait}{A \code{numeric} of categorical sample trait values.}
 
@@ -48,7 +48,8 @@ function.}
 
 \item{binwidth}{A \code{numeric(1)} specifying the maximum bin width.}
 
-\item{stackratio}{A \code{numeric(1)} indicating how far apart to stack the dots.}
+\item{stackratio}{A \code{numeric(1)} indicating how far apart to stack the
+dots.}
 
 \item{dotsize}{A \code{numeric(1)} giving the size of the dots relative to
 \code{binwidth}.}

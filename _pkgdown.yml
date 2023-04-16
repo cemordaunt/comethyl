@@ -37,6 +37,7 @@ reference:
   - getCpGs
   - getCpGtotals
   - getDendro
+  - getPCs
   - getRegionMeth
   - getRegionTotals
   - getRegions

@@ -79,7 +79,8 @@ meth <- getRegionMeth(regions, bs = bs, file = "Region_Methylation.rds")
 
 # Adjust Methylation Data for PCs
 mod <- model.matrix(~1, data = pData(bs))
-methAdj <- adjustRegionMeth(meth, mod = mod,
+PCs <- getPCs(meth, mod = mod, file = "Top_Principal_Components.rds")
+methAdj <- adjustRegionMeth(meth, PCs = PCs,
                             file = "Adjusted_Region_Methylation.rds")
 
 # Select Soft Power Threshold
@@ -94,8 +95,9 @@ modules <- getModules(methAdj, power = sft$powerEstimate, regions = regions,
 }
 \seealso{
 \itemize{
-\item \code{\link[=getRegionMeth]{getRegionMeth()}} and \code{\link[=adjustRegionMeth]{adjustRegionMeth()}} to extract methylation
-data and then adjust it for the top principal components.
+\item \code{\link[=getRegionMeth]{getRegionMeth()}}, \code{\link[=getPCs]{getPCs()}}, and \code{\link[=adjustRegionMeth]{adjustRegionMeth()}} to
+extract methylation data and then adjust it for the top
+principal components.
 \item \code{\link[=plotSoftPower]{plotSoftPower()}} to visualize fit and connectivity for soft
 power estimation.
 \item \code{\link[=getModules]{getModules()}} to build a comethylation network and identify

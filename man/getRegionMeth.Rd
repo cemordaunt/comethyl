@@ -15,8 +15,8 @@ getRegionMeth(
 }
 \arguments{
 \item{regions}{A \code{data.frame} of regions, typically after filtering with
-\code{\link[=filterRegions]{filterRegions()}}. Must have the columns \code{chr}, \code{start}, and
-\code{end}.}
+\code{\link[=filterRegions]{filterRegions()}}. Must have the columns \code{chr}, \code{start},
+and \code{end}.}
 
 \item{bs}{A \link[bsseq:BSseq-class]{BSseq} object, typically after filtering
 with \code{\link[=filterCpGs]{filterCpGs()}}.}
@@ -52,9 +52,10 @@ or smoothed methylation.
 # Get Methylation Data
 meth <- getRegionMeth(regions, bs = bs, file = "Region_Methylation.rds")
 
-# Adjust Methylation Data for PCs
+# Adjust Methylation Data for Top PCs
 mod <- model.matrix(~1, data = pData(bs))
-methAdj <- adjustRegionMeth(meth, mod = mod,
+PCs <- getPCs(meth, mod = mod, file = "Top_Principal_Components.rds")
+methAdj <- adjustRegionMeth(meth, PCs = PCs,
                             file = "Adjusted_Region_Methylation.rds")
 
 # Assess Sample Similarity
@@ -65,8 +66,8 @@ getDendro(methAdj, distance = "euclidean") \%>\%
 }
 \seealso{
 \itemize{
-\item \code{\link[=adjustRegionMeth]{adjustRegionMeth()}} to adjust methylation for the top principal
-components.
+\item \code{\link[=getPCs]{getPCs()}} and \code{\link[=adjustRegionMeth]{adjustRegionMeth()}} to adjust methylation for
+the top principal components.
 \item \code{\link[=getDendro]{getDendro()}} and \code{\link[=plotDendro]{plotDendro()}} to generate and visualize
 dendrograms.
 }

@@ -25,7 +25,8 @@ of regions and statistics for each region.}
 \item{maxQuantile}{A \code{numeric(1)} giving the maximum quantile of each
 feature to plot.}
 
-\item{bins}{A \code{numeric(1)} specifying the number of bins in each histogram.}
+\item{bins}{A \code{numeric(1)} specifying the number of bins in each
+histogram.}
 
 \item{histCol}{A \code{character(1)} giving the color of the histogram.}
 
@@ -59,9 +60,9 @@ coverage, mean methylation, and methylation standard deviation.
 }
 \details{
 It's recommended to examine region characteristics before and after filtering.
-The vertical line on each histogram indicates the median value for that feature.
-A \code{ggplot} object is produced and can be edited outside of this function
-if desired.
+The vertical line on each histogram indicates the median value for that
+feature. A \code{ggplot} object is produced and can be edited outside of this
+function if desired.
 }
 \examples{
 \dontrun{

@@ -28,8 +28,8 @@ enrichModule(
 )
 }
 \arguments{
-\item{regions}{A \code{data.frame} of regions with module assignments, typically
-obtained from \code{\link[=getModules]{getModules()}}.}
+\item{regions}{A \code{data.frame} of regions with module assignments,
+typically obtained from \code{\link[=getModules]{getModules()}}.}
 
 \item{module}{A \code{character} giving the name of one or more modules to
 analyze functional enrichment. If null, all modules will be analyzed,
@@ -68,9 +68,9 @@ downstream of the TSS (in kb) to define the maximum extension of the
 regulatory domain in the \code{oneClosest} rule.}
 
 \item{version}{A \code{character(1)} specifying the version of GREAT to use
-for gene annotation. Possible values include \code{4.0.4}, \code{3.0.0},
-and \code{2.0.2}. Different versions of GREAT support different
-genomes. See \code{Details}.}
+for gene annotation. Possible values include \code{4.0.4},
+\code{3.0.0}, and \code{2.0.2}. Different versions of GREAT support
+different genomes. See \code{Details}.}
 
 \item{ontologies}{A \code{character} giving the ontology databases to query.
 Default ontologies include \code{GO Molecular Function},
@@ -78,19 +78,19 @@ Default ontologies include \code{GO Molecular Function},
 \code{Mouse Phenotype}, and \code{Human Phenotype}. All possible
 ontologies can be obtained with \code{\link[=listOntologies]{listOntologies()}}.}
 
-\item{min_background_region_hits}{A \code{numeric(1)} giving the minimum number
-of overlaps of gene set regulatory domains with background regions
-to include that gene set in the results. This affects the results used
-when adjusting p-values for multiple comparisons.}
+\item{min_background_region_hits}{A \code{numeric(1)} giving the minimum
+number of overlaps of gene set regulatory domains with background
+regions to include that gene set in the results. This affects the
+results used when adjusting p-values for multiple comparisons.}
 
 \item{adjMethod}{A \code{character(1)} specifying the method for adjusting
 p-values, Potential values include \code{fdr}, \code{holm},
 \code{hochberg}, \code{hommel}, \code{bonferroni}, \code{BH},
 \code{BY}, and \code{none}.}
 
-\item{min_region_hits}{A \code{numeric(1)} giving the minimum number of overlaps
-of gene set regulatory domains with module regions to include that gene
-set in the results.}
+\item{min_region_hits}{A \code{numeric(1)} giving the minimum number of
+overlaps of gene set regulatory domains with module regions to
+include that gene set in the results.}
 
 \item{pvalue_threshold}{A \code{numeric(1)} giving the maximum p-value
 for enrichment to include a gene set in the results.}
@@ -108,10 +108,10 @@ printed.}
 A \code{data.frame} of functional enrichment results.
 }
 \description{
-\code{enrichModule()} takes a \code{data.frame} of regions with module assignments,
-filters it for the module(s) of interest, and submits it to GREAT for functional
-enrichment analysis compared to gene sets in the specified ontologies. The
-results are then processed and saved as a .txt file.
+\code{enrichModule()} takes a \code{data.frame} of regions with module
+assignments, filters it for the module(s) of interest, and submits it to
+GREAT for functional enrichment analysis compared to gene sets in the
+specified ontologies. The results are then processed and saved as a .txt file.
 }
 \details{
 Submission to GREAT is performed by the \pkg{rGREAT} package, which allows
@@ -137,13 +137,14 @@ including the grey (unassigned) module. These regions are compared for overlap
 with the regulatory domains of genes annotated to functional gene sets of the
 ontologies of interest. The default ontologies include
 \code{GO Molecular Function}, \code{GO Biological Process},
-\code{GO Cellular Component}, \code{Mouse Phenotype}, and \code{Human Phenotype}.
-Initial enrichment results are filtered for terms with a minimum number of
-overlaps with the background set of regions, p-values are adjusted for multiple
-comparisons using the specified method, and then the results are filtered again
-for a minimum number of overlaps with the module(s) of interest and a
-p-value threshold. Finally, gene symbols are obtained for the
-significant gene sets, and the result is saved as a .txt file.
+\code{GO Cellular Component}, \code{Mouse Phenotype}, and
+\code{Human Phenotype}. Initial enrichment results are filtered for terms
+with a minimum number of overlaps with the background set of regions,
+p-values are adjusted for multiple comparisons using the specified method,
+and then the results are filtered again for a minimum number of overlaps with
+the module(s) of interest and a p-value threshold. Finally, gene symbols are
+obtained for the significant gene sets, and the result is saved as a .txt
+file.
 }
 \examples{
 \dontrun{

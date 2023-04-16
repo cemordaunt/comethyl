@@ -34,8 +34,8 @@ plotMethTrait(
 \arguments{
 \item{module}{A \code{character(1)} giving the name of the module to plot.}
 
-\item{regions}{A \code{data.frame} of regions with module assignments, typically
-obtained from \code{\link[=getModules]{getModules()}}.}
+\item{regions}{A \code{data.frame} of regions with module assignments,
+typically obtained from \code{\link[=getModules]{getModules()}}.}
 
 \item{meth}{A \code{numeric matrix}, where each row is a region and each
 column is a sample. This is typically obtained from \code{\link[=getRegionMeth]{getRegionMeth()}}.}
@@ -60,8 +60,8 @@ to generate these colors.}
 heatmap color scale.}
 
 \item{expandY}{A \code{numeric} specifying the multiplicative range expansion
-factors. Can be given as the symmetric lower and upper limit expansions
-or separately as a \code{vector} of length 2.}
+factors. Can be given as the symmetric lower and upper limit
+expansions or separately as a \code{vector} of length 2.}
 
 \item{axis.text.size}{A \code{numeric(1)} giving the size of the text on the
 y-axis.}

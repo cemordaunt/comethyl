@@ -15,8 +15,8 @@ getCor(
 )
 }
 \arguments{
-\item{x}{A \code{numeric vector} or \code{matrix}. \code{x} must be a \code{matrix}
-if \code{y} is null.}
+\item{x}{A \code{numeric vector} or \code{matrix}. \code{x} must be a
+\code{matrix} if \code{y} is null.}
 
 \item{y}{A \code{numeric vector} or \code{matrix}. If null, correlations will
 be calculated for columns of \code{x}.}
@@ -25,16 +25,16 @@ be calculated for columns of \code{x}.}
 \code{matrix}.}
 
 \item{corType}{A \code{character(1)} indicating which correlation statistic
-to use in the calculation. Potential values include \code{pearson} and
-\code{bicor}.}
+to use in the calculation. Potential values include \code{pearson}
+and \code{bicor}.}
 
 \item{maxPOutliers}{A \code{numeric(1)} specifying the maximum percentile that
 can be considered outliers on each side of the median for the
 \code{bicor} statistic.}
 
-\item{robustY}{A \code{logical(1)} indicating whether to use robust calculation
-for \code{y} for the \code{bicor} statistic. \code{FALSE} is recommended
-if \code{y} is a binary variable.}
+\item{robustY}{A \code{logical(1)} indicating whether to use robust
+calculation for \code{y} for the \code{bicor} statistic. \code{FALSE}
+is recommended if \code{y} is a binary variable.}
 
 \item{verbose}{A \code{logical(1)} indicating whether messages should be
 printed.}
@@ -43,9 +43,9 @@ printed.}
 A \code{numeric matrix}.
 }
 \description{
-\code{getCor()} calculates correlation coefficients using either \code{pearson}
-or \code{bicor} methods. Calculations can be done between columns of a single
-matrix or between two vectors or matrices.
+\code{getCor()} calculates correlation coefficients using either
+\code{pearson} or \code{bicor} methods. Calculations can be done between
+columns of a single matrix or between two vectors or matrices.
 }
 \details{
 The first input argument can be optionally transposed. The correlation

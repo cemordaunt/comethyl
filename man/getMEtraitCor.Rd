@@ -24,16 +24,16 @@ include the same set of values as the row names of \code{colData}.}
 columns are sample traits with numeric values.}
 
 \item{corType}{A \code{character(1)} indicating which correlation statistic
-to use in the calculation. Potential values include \code{pearson} and
-\code{bicor}.}
+to use in the calculation. Potential values include \code{pearson}
+and \code{bicor}.}
 
-\item{maxPOutliers}{A \code{numeric(1)} specifying the maximum percentile that
-can be considered outliers on each side of the median for the
+\item{maxPOutliers}{A \code{numeric(1)} specifying the maximum percentile
+that can be considered outliers on each side of the median for the
 \code{bicor} statistic.}
 
-\item{robustY}{A \code{logical(1)} indicating whether to use robust calculation
-for \code{y} for the \code{bicor} statistic. \code{FALSE} is recommended
-if \code{y} is a binary variable.}
+\item{robustY}{A \code{logical(1)} indicating whether to use robust
+calculation for \code{y} for the \code{bicor} statistic. \code{FALSE}
+is recommended if \code{y} is a binary variable.}
 
 \item{save}{A \code{logical(1)} indicating whether to save the
 \code{data.frame}.}
@@ -45,21 +45,22 @@ if \code{y} is a binary variable.}
 printed.}
 }
 \value{
-A \code{data.frame} giving correlation statistics for each module-trait
-pair.
+A \code{data.frame} giving correlation statistics for each
+module-trait pair.
 }
 \description{
-\code{getMEtraitCor()} calculates correlation coefficients and p-values between
-eigennode values for all modules and all sample traits and saves it as a .txt
-file. Correlations are performed using either \code{pearson} or \code{bicor}
-methods.
+\code{getMEtraitCor()} calculates correlation coefficients and p-values
+between eigennode values for all modules and all sample traits and saves it
+as a .txt file. Correlations are performed using either \code{pearson} or
+\code{bicor} methods.
 }
 \details{
 \code{getMEtraitCor()} is designed to be used in combination with
 \code{\link[=getModules]{getModules()}}. The correlation calculations are performed by
 \code{\link[WGCNA:corAndPvalue]{WGCNA::corAndPvalue()}} and \code{\link[WGCNA:bicorAndPvalue]{WGCNA::bicorAndPvalue()}}. \code{getMEtraitCor()}
 can also be used to calculate pairwise correlation coefficients and p-values
-between module eigennode values (see examples).
+between module eigennode values, or between top adjusted PCs and sample
+traits (see examples).
 }
 \examples{
 \dontrun{
@@ -77,6 +78,10 @@ MEtraitCor <- getMEtraitCor(MEs, colData = colData, corType = "bicor",
 moduleCorStats <- getMEtraitCor(MEs, colData = MEs, corType = "bicor",
                                 robustY = TRUE,
                                 file = "Module_Correlation_Stats.txt")
+
+# Compare Top PCs to Sample Traits
+MEtraitCor <- getMEtraitCor(PCs, colData = colData, corType = "bicor",
+                            file = "PC_Trait_Correlation_Stats.txt")
 
 # Examine Correlations between Sample Traits
 traitDendro <- getCor(MEs, y = colData, corType = "bicor",

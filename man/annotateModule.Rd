@@ -23,8 +23,8 @@ annotateModule(
 )
 }
 \arguments{
-\item{regions}{A \code{data.frame} of regions with module assignments, typically
-obtained from \code{\link[=getModules]{getModules()}}.}
+\item{regions}{A \code{data.frame} of regions with module assignments,
+typically obtained from \code{\link[=getModules]{getModules()}}.}
 
 \item{module}{A \code{character} giving the name of one or more modules to
 annotate. If null, all modules will be annotated.}
@@ -65,9 +65,9 @@ downstream of the TSS (in kb) to define the maximum extension of the
 regulatory domain in the \code{oneClosest} rule.}
 
 \item{version}{A \code{character(1)} specifying the version of GREAT to use
-for gene annotation. Possible values include \code{4.0.4}, \code{3.0.0},
-and \code{2.0.2}. Different versions of GREAT support different
-genomes. See \code{Details}.}
+for gene annotation. Possible values include \code{4.0.4},
+\code{3.0.0}, and \code{2.0.2}. Different versions of GREAT support
+different genomes. See \code{Details}.}
 
 \item{save}{A \code{logical(1)} indicating whether to save the
 \code{data.frame}.}
@@ -96,11 +96,11 @@ grey (unassigned) module can be excluded. Gene annotation is performed by the
 \pkg{rGREAT} package, which allows for different annotation rules and versions
 of GREAT. The default \code{basalPlusExt} annotation rule associates a gene
 with a region if the region is within the basal regulatory domain of the gene
-(5 kb upstream and 1 kb downstream of the TSS) or if it is within 1 Mb upstream
-or downstream of the TSS and not in the basal regulatory domain of another gene.
-Other rules include \code{twoClosest} and \code{oneClosest}, which effectively
-assign the two nearest genes or one nearest genes, respectively. See
-\code{\link[rGREAT:submitGreatJob]{rGREAT::submitGreatJob()}} for more details.
+(5 kb upstream and 1 kb downstream of the TSS) or if it is within 1 Mb
+upstream or downstream of the TSS and not in the basal regulatory domain of
+another gene. Other rules include \code{twoClosest} and \code{oneClosest},
+which effectively assign the two nearest genes or one nearest genes,
+respectively. See \code{\link[rGREAT:submitGreatJob]{rGREAT::submitGreatJob()}} for more details.
 
 GREAT supports different genomes depending on the version:
 \describe{
@@ -111,8 +111,8 @@ GREAT supports different genomes depending on the version:
 
 Gene information is provided by the \pkg{biomaRt} package, which adds the gene
 description along with Ensembl and NCBI Entrez gene IDs. Regulatory context
-is added by the \pkg{annotatr} package. This provides positional context of the
-region relative to nearby genes, enhancers, and CpG islands. Note that
+is added by the \pkg{annotatr} package. This provides positional context of
+the region relative to nearby genes, enhancers, and CpG islands. Note that
 \pkg{annotatr} does not support the \code{hg18} or \code{danRer7} genomes.
 }
 \examples{

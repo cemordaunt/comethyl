@@ -90,9 +90,9 @@ plotSDstats(regions, maxQuantile = 0.99,
 \seealso{
 \itemize{
 \item \code{\link[=getRegions]{getRegions()}} to generate the set of regions.
-\item \code{\link[=plotRegionStats]{plotRegionStats()}}, \code{\link[=getRegionTotals]{getRegionTotals()}}, and \code{\link[=plotRegionTotals]{plotRegionTotals()}}
-for more help visualizing region characteristics and setting
-cutoffs for filtering.
+\item \code{\link[=plotRegionStats]{plotRegionStats()}}, \code{\link[=getRegionTotals]{getRegionTotals()}}, and
+\code{\link[=plotRegionTotals]{plotRegionTotals()}} for more help visualizing region
+characteristics and setting cutoffs for filtering.
 \item \code{\link[=filterRegions]{filterRegions()}} for filtering regions by minimum coverage and
 methylation standard deviation.
 }

@@ -24,8 +24,8 @@ plotMEtraitScatter(
 )
 }
 \arguments{
-\item{ME}{A \code{numeric} of module eigennode values. \code{ME} must be in the
-same order as \code{trait}.}
+\item{ME}{A \code{numeric} of module eigennode values. \code{ME} must be in
+the same order as \code{trait}.}
 
 \item{trait}{A \code{numeric} of continuous sample trait values.}
 
@@ -68,9 +68,9 @@ A \code{ggplot} object.
 }
 \description{
 \code{plotMEtraitScatter()} takes a \code{vector} of module eigennode values
-and a \code{vector} of continuous sample trait values, generates a scatter plot,
-and then saves it as a .pdf. \code{ME} and \code{trait} must be in the same
-order.
+and a \code{vector} of continuous sample trait values, generates a scatter
+plot, and then saves it as a .pdf. \code{ME} and \code{trait} must be in the
+same order.
 }
 \details{
 The values in \code{ME} and \code{trait} are plotted as points along with a
