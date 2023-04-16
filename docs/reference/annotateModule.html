@@ -20,7 +20,7 @@ mm9, and danRer7."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aja
     
     <a class="navbar-brand me-2" href="../index.html">comethyl</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,8 +97,8 @@ genomes, including <code>hg38</code>, <code>hg19</code>, <code>hg18</code>, <cod
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>regions</dt>
-<dd><p>A <code>data.frame</code> of regions with module assignments, typically
-obtained from <code><a href="getModules.html">getModules()</a></code>.</p></dd>
+<dd><p>A <code>data.frame</code> of regions with module assignments,
+typically obtained from <code><a href="getModules.html">getModules()</a></code>.</p></dd>
 <dt>module</dt>
 <dd><p>A <code>character</code> giving the name of one or more modules to
 annotate. If null, all modules will be annotated.</p></dd>
@@ -139,9 +139,9 @@ downstream of the TSS (in kb) to define the maximum extension of the
 regulatory domain in the <code>oneClosest</code> rule.</p></dd>
 <dt>version</dt>
 <dd><p>A <code>character(1)</code> specifying the version of GREAT to use
-for gene annotation. Possible values include <code>4.0.4</code>, <code>3.0.0</code>,
-and <code>2.0.2</code>. Different versions of GREAT support different
-genomes. See <code>Details</code>.</p></dd>
+for gene annotation. Possible values include <code>4.0.4</code>,
+<code>3.0.0</code>, and <code>2.0.2</code>. Different versions of GREAT support
+different genomes. See <code>Details</code>.</p></dd>
 <dt>save</dt>
 <dd><p>A <code>logical(1)</code> indicating whether to save the
 <code>data.frame</code>.</p></dd>
@@ -164,11 +164,11 @@ grey (unassigned) module can be excluded. Gene annotation is performed by the
 <span class="pkg">rGREAT</span> package, which allows for different annotation rules and versions
 of GREAT. The default <code>basalPlusExt</code> annotation rule associates a gene
 with a region if the region is within the basal regulatory domain of the gene
-(5 kb upstream and 1 kb downstream of the TSS) or if it is within 1 Mb upstream
-or downstream of the TSS and not in the basal regulatory domain of another gene.
-Other rules include <code>twoClosest</code> and <code>oneClosest</code>, which effectively
-assign the two nearest genes or one nearest genes, respectively. See
-<code><a href="https://rdrr.io/pkg/rGREAT/man/submitGreatJob.html" class="external-link">rGREAT::submitGreatJob()</a></code> for more details.</p>
+(5 kb upstream and 1 kb downstream of the TSS) or if it is within 1 Mb
+upstream or downstream of the TSS and not in the basal regulatory domain of
+another gene. Other rules include <code>twoClosest</code> and <code>oneClosest</code>,
+which effectively assign the two nearest genes or one nearest genes,
+respectively. See <code><a href="https://rdrr.io/pkg/rGREAT/man/submitGreatJob.html" class="external-link">rGREAT::submitGreatJob()</a></code> for more details.</p>
 <p>GREAT supports different genomes depending on the version:</p><dl><dt>GREAT v4.0.4</dt>
 <dd><p><code>hg38</code>, <code>hg19</code>, <code>mm10</code>, <code>mm9</code></p></dd>
 
@@ -181,8 +181,8 @@ assign the two nearest genes or one nearest genes, respectively. See
 
 </dl><p>Gene information is provided by the <span class="pkg">biomaRt</span> package, which adds the gene
 description along with Ensembl and NCBI Entrez gene IDs. Regulatory context
-is added by the <span class="pkg">annotatr</span> package. This provides positional context of the
-region relative to nearby genes, enhancers, and CpG islands. Note that
+is added by the <span class="pkg">annotatr</span> package. This provides positional context of
+the region relative to nearby genes, enhancers, and CpG islands. Note that
 <span class="pkg">annotatr</span> does not support the <code>hg18</code> or <code>danRer7</code> genomes.</p>
     </div>
     <div class="section level2">
