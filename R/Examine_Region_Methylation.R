@@ -75,10 +75,11 @@ getRegionMeth <- function(regions, bs, type = c("raw", "smooth"), save = TRUE,
 #' methylation data, and then saves it as a .rds file.
 #'
 #' \code{getPCs()} uses [sva::num.sv()] to identify the number of top
-#' principal components and then [svd()] to calculate them. This is the same
-#' approach used by [sva::sva_network()]. More information on the function and
-#' approach is given in the documentation and publications related to the
-#' \pkg{sva} package.
+#' principal components and then [svd()] to calculate them, after centering
+#' methylation values within each gene. This is the same approach used by
+#' [sva::sva_network()]. More information on the function and approach is
+#' given in the documentation and publications related to the \pkg{sva}
+#' package.
 #'
 #' @param meth A \code{numeric matrix}, where each row is a region and each
 #'         column is a sample. This is typically obtained from [getRegionMeth()].
@@ -121,10 +122,16 @@ getRegionMeth <- function(regions, bs, type = c("raw", "smooth"), save = TRUE,
 #' # Compare Top PCs to Sample Traits
 #' MEtraitCor <- getMEtraitCor(PCs, colData = colData, corType = "bicor",
 #'                             file = "PC_Trait_Correlation_Stats.txt")
+#' PCdendro <- getDendro(PCs, distance = "bicor")
+#' PCtraitDendro <- getCor(PCs, y = colData, corType = "bicor", robustY = FALSE) %>%
+#'         getDendro(transpose = TRUE)
+#' plotMEtraitCor(PCtraitCor, moduleOrder = PCdendro$order,
+#'                traitOrder = PCtraitDendro$order,
+#'                file = "PC_Trait_Correlation_Heatmap.pdf")
 #'
 #' # Assess Sample Similarity
 #' getDendro(methAdj, distance = "euclidean") %>%
-#'           plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25,0.08))
+#'          plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25,0.08))
 #'
 #' # Select Soft Power Threshold
 #' sft <- getSoftPower(methAdj, corType = "pearson", file = "Soft_Power.rds")
@@ -152,7 +159,8 @@ getPCs <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
                         " principal components")
         }
         meth_t <- t(meth)
-        ss <- svd(meth_t - colMeans(meth_t))
+        meth_t_centered <- scale(meth_t, center = TRUE, scale = FALSE)
+        ss <- svd(meth_t_centered)
         PCs <- ss$u[, 1:n.pc]
         dimnames(PCs) <- list(dimnames(meth_t)[[1]], paste0("PC_", 1:n.pc))
         if(save){
@@ -216,6 +224,12 @@ getPCs <- function(meth, mod = matrix(1, nrow = ncol(meth), ncol = 1),
 #' # Compare Top PCs to Sample Traits
 #' MEtraitCor <- getMEtraitCor(PCs, colData = colData, corType = "bicor",
 #'                             file = "PC_Trait_Correlation_Stats.txt")
+#' PCdendro <- getDendro(PCs, distance = "bicor")
+#' PCtraitDendro <- getCor(PCs, y = colData, corType = "bicor", robustY = FALSE) %>%
+#'         getDendro(transpose = TRUE)
+#' plotMEtraitCor(PCtraitCor, moduleOrder = PCdendro$order,
+#'                traitOrder = PCtraitDendro$order,
+#'                file = "PC_Trait_Correlation_Heatmap.pdf")
 #'
 #' # Assess Sample Similarity
 #' getDendro(methAdj, distance = "euclidean") %>%

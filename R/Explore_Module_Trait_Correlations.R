@@ -64,6 +64,12 @@
 #' # Compare Top PCs to Sample Traits
 #' MEtraitCor <- getMEtraitCor(PCs, colData = colData, corType = "bicor",
 #'                             file = "PC_Trait_Correlation_Stats.txt")
+#' PCdendro <- getDendro(PCs, distance = "bicor")
+#' PCtraitDendro <- getCor(PCs, y = colData, corType = "bicor", robustY = FALSE) %>%
+#'         getDendro(transpose = TRUE)
+#' plotMEtraitCor(PCtraitCor, moduleOrder = PCdendro$order,
+#'                traitOrder = PCtraitDendro$order,
+#'                file = "PC_Trait_Correlation_Heatmap.pdf")
 #'
 #' # Examine Correlations between Sample Traits
 #' traitDendro <- getCor(MEs, y = colData, corType = "bicor",
@@ -223,6 +229,16 @@ getMEtraitCor <- function(MEs, colData, corType = c("bicor", "pearson"),
 #' MEtraitCor <- getMEtraitCor(MEs, colData = colData, corType = "bicor",
 #'                             file = "ME_Trait_Correlation_Stats.txt")
 #'
+#' # Compare Top PCs to Sample Traits
+#' MEtraitCor <- getMEtraitCor(PCs, colData = colData, corType = "bicor",
+#'                             file = "PC_Trait_Correlation_Stats.txt")
+#' PCdendro <- getDendro(PCs, distance = "bicor")
+#' PCtraitDendro <- getCor(PCs, y = colData, corType = "bicor", robustY = FALSE) %>%
+#'         getDendro(transpose = TRUE)
+#' plotMEtraitCor(PCtraitCor, moduleOrder = PCdendro$order,
+#'                traitOrder = PCtraitDendro$order,
+#'                file = "PC_Trait_Correlation_Heatmap.pdf")
+#'
 #' # Examine Correlations between Sample Traits
 #' traitDendro <- getCor(MEs, y = colData, corType = "bicor",
 #'                       robustY = FALSE) %>%
@@ -303,6 +319,8 @@ plotMEtraitCor <- function(MEtraitCor,
         if(is.null(limit)){
                 limit <- max(abs(corData))
         }
+        colModules <- sum(MEtraitCor$module %in% colors()) == length(MEtraitCor$module)
+        hmMarginB <- ifelse(colModules, yes = 2, no = 0)
         heatmap <- ggplot(data = MEtraitCor) +
                 geom_tile(aes(x = module, y = trait, color = corData,
                               fill = corData)) +
@@ -315,11 +333,12 @@ plotMEtraitCor <- function(MEtraitCor,
                                    values = c("TRUE" = 1, "FALSE" = 0),
                                    guide = "none") +
                 theme_bw(base_size = 24) +
-                theme(axis.text.x = element_blank(),
+                theme(axis.text.x = element_text(size = axis.text.size,
+                                                 color = "black", angle = 90,
+                                                 vjust = 0.5),
                       axis.text.y = element_text(size = axis.text.size,
                                                  color = "black"),
-                      axis.ticks.x = element_blank(),
-                      axis.ticks.y = element_line(size = 0.8, color = "black"),
+                      axis.ticks = element_line(size = 0.8, color = "black"),
                       axis.title = element_blank(),
                       legend.background = element_blank(),
                       legend.position = legend.position,
@@ -329,7 +348,7 @@ plotMEtraitCor <- function(MEtraitCor,
                       panel.border = element_rect(color = "black", size = 1.25),
                       panel.grid = element_blank(),
                       plot.background = element_blank(),
-                      plot.margin = unit(c(1,6,1,1), "lines"))
+                      plot.margin = unit(c(1,6,hmMarginB,1), "lines"))
         if(label.type == "p"){
                 heatmap <- heatmap +
                         geom_text(aes(x = module, y = trait, alpha = significant,
@@ -342,14 +361,23 @@ plotMEtraitCor <- function(MEtraitCor,
                                   label = "*", color = "black", size = label.size,
                                   nudge_y = label.nudge_y)
         }
-        colColors <- ggplot(data = data.frame(x = 1:length(levels(MEtraitCor$module)),
-                                              y = 0,
-                                              color = levels(MEtraitCor$module))) +
-                geom_tile(aes(x = x, y = y, color = color, fill = color)) +
-                scale_fill_identity(aesthetics = c("color", "fill")) +
-                theme_void() +
-                theme(legend.position = "none",
-                      plot.margin = unit(colColorMargins, "lines"))
+        colColors <- NULL
+        if(colModules){
+                if(verbose){
+                        message("[plotMEtraitCor] Using colors in column names for x-axis labels")
+                }
+                colColors <- ggplot(data = data.frame(x = 1:length(levels(MEtraitCor$module)),
+                                                      y = 0,
+                                                      color = levels(MEtraitCor$module))) +
+                        geom_tile(aes(x = x, y = y, color = color,
+                                      fill = color)) +
+                        scale_fill_identity(aesthetics = c("color", "fill")) +
+                        theme_void() +
+                        theme(legend.position = "none",
+                              plot.margin = unit(colColorMargins, "lines"))
+                heatmap <- heatmap + theme(axis.text.x = element_blank(),
+                                           axis.ticks.x = element_blank())
+        }
         gg <- plot_grid(heatmap, colColors, nrow = 2, rel_heights = c(1, 0.045))
         if(save){
                 if(verbose){
@@ -512,11 +540,14 @@ plotMEtraitDot <- function(ME, trait, traitCode = NULL, colors = NULL,
                                            values = colors,
                                            aesthetics = c("color", "fill"))
         }
-        if(verbose){
-                message("[plotMEtraitDot] Saving file as ", file)
+        if(save){
+                if(verbose){
+                        message("[plotMEtraitDot] Saving plot as ", file)
+                }
+                ggsave(filename = file, plot = dotplot, dpi = 600, width = width,
+                       height = height, units = "in")
         }
-        ggsave(file, plot = dotplot, dpi = 600, width = width, height = height,
-               units = "in")
+        return(dotplot)
 }
 
 #' Visualize a Module Eigennode - Trait Correlation as a Scatter Plot
@@ -635,11 +666,14 @@ plotMEtraitScatter <- function(ME, trait, color = "#132B43", xlim = NULL,
                       plot.margin = unit(c(1,1,1,1), "lines")) +
                 xlab(xlab) +
                 ylab(ylab)
-        if(verbose){
-                message("[plotMEtraitScatter] Saving file as ", file)
+        if(save){
+                if(verbose){
+                        message("[plotMEtraitScatter] Saving plot as ", file)
+                }
+                ggsave(filename = file, plot = scatterplot, dpi = 600,
+                       width = width, height = height, units = "in")
         }
-        ggsave(file, plot = scatterplot, dpi = 600, width = width,
-               height = height, units = "in")
+        return(scatterplot)
 }
 
 #' Plot Module Methylation Values By a Sample Trait
@@ -850,10 +884,11 @@ plotMethTrait <- function(module, regions, meth, trait, discrete = NULL,
         gg <- plot_grid(heatmap, colColors, nrow = 2, rel_heights = c(1,0.15))
         if(save){
                 if(verbose){
-                        message("[plotMethTrait] Saving file as ", file)
+                        message("[plotMethTrait] Saving plot as ", file)
                 }
                 ggsave(filename = file, plot = gg, dpi = 600, width = width,
                        height = height, units = "in")
         }
+        return(gg)
 }
 

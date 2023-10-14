@@ -57,6 +57,12 @@ methAdj <- adjustRegionMeth(meth, PCs = PCs,
 # Compare Top PCs to Sample Traits
 MEtraitCor <- getMEtraitCor(PCs, colData = colData, corType = "bicor",
                             file = "PC_Trait_Correlation_Stats.txt")
+PCdendro <- getDendro(PCs, distance = "bicor")
+PCtraitDendro <- getCor(PCs, y = colData, corType = "bicor", robustY = FALSE) \%>\%
+        getDendro(transpose = TRUE)
+plotMEtraitCor(PCtraitCor, moduleOrder = PCdendro$order,
+               traitOrder = PCtraitDendro$order,
+               file = "PC_Trait_Correlation_Heatmap.pdf")
 
 # Assess Sample Similarity
 getDendro(methAdj, distance = "euclidean") \%>\%

@@ -12,7 +12,7 @@ principal components, transposes it, and then saves it as a .rds file."><!-- mat
     
     <a class="navbar-brand me-2" href="../index.html">comethyl</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -135,6 +135,12 @@ modules of comethylated regions.</p></li>
 <span class="r-in"><span class="co"># Compare Top PCs to Sample Traits</span></span>
 <span class="r-in"><span class="va">MEtraitCor</span> <span class="op">&lt;-</span> <span class="fu"><a href="getMEtraitCor.html">getMEtraitCor</a></span><span class="op">(</span><span class="va">PCs</span>, colData <span class="op">=</span> <span class="va">colData</span>, corType <span class="op">=</span> <span class="st">"bicor"</span>,</span>
 <span class="r-in">                            file <span class="op">=</span> <span class="st">"PC_Trait_Correlation_Stats.txt"</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">PCdendro</span> <span class="op">&lt;-</span> <span class="fu"><a href="getDendro.html">getDendro</a></span><span class="op">(</span><span class="va">PCs</span>, distance <span class="op">=</span> <span class="st">"bicor"</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">PCtraitDendro</span> <span class="op">&lt;-</span> <span class="fu"><a href="getCor.html">getCor</a></span><span class="op">(</span><span class="va">PCs</span>, y <span class="op">=</span> <span class="va">colData</span>, corType <span class="op">=</span> <span class="st">"bicor"</span>, robustY <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span class="r-in">        <span class="fu"><a href="getDendro.html">getDendro</a></span><span class="op">(</span>transpose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu"><a href="plotMEtraitCor.html">plotMEtraitCor</a></span><span class="op">(</span><span class="va">PCtraitCor</span>, moduleOrder <span class="op">=</span> <span class="va">PCdendro</span><span class="op">$</span><span class="va">order</span>,</span>
+<span class="r-in">               traitOrder <span class="op">=</span> <span class="va">PCtraitDendro</span><span class="op">$</span><span class="va">order</span>,</span>
+<span class="r-in">               file <span class="op">=</span> <span class="st">"PC_Trait_Correlation_Heatmap.pdf"</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Assess Sample Similarity</span></span>
 <span class="r-in"><span class="fu"><a href="getDendro.html">getDendro</a></span><span class="op">(</span><span class="va">methAdj</span>, distance <span class="op">=</span> <span class="st">"euclidean"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>

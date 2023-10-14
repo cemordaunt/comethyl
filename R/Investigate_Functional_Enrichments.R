@@ -446,10 +446,13 @@ plotEnrichment <- function(enrichment, nTerms = 15, fill = "#132B43",
                       axis.title.y = element_blank(),
                       plot.margin = unit(c(1,1,0.5,1), "lines")) +
                 ylab(expression(-log[10]*(italic(p)-value)))
-        if(verbose){
-                message("[plotEnrichment] Saving file as ", file)
+        if(save){
+                if(verbose){
+                        message("[plotEnrichment] Saving plot as ", file)
+                }
+                ggsave(filename = file, plot = barplot, dpi = 600, width = width,
+                       height = height, units = "in")
         }
-        ggsave(file, plot = barplot, dpi = 600, width = width, height = height,
-               units = "in")
+        return(barplot)
 }
 

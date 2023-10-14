@@ -37,10 +37,11 @@ methylation data, and then saves it as a .rds file.
 }
 \details{
 \code{getPCs()} uses \code{\link[sva:num.sv]{sva::num.sv()}} to identify the number of top
-principal components and then \code{\link[=svd]{svd()}} to calculate them. This is the same
-approach used by \code{\link[sva:sva_network]{sva::sva_network()}}. More information on the function and
-approach is given in the documentation and publications related to the
-\pkg{sva} package.
+principal components and then \code{\link[=svd]{svd()}} to calculate them, after centering
+methylation values within each gene. This is the same approach used by
+\code{\link[sva:sva_network]{sva::sva_network()}}. More information on the function and approach is
+given in the documentation and publications related to the \pkg{sva}
+package.
 }
 \examples{
 \dontrun{
@@ -57,10 +58,16 @@ methAdj <- adjustRegionMeth(meth, PCs = PCs,
 # Compare Top PCs to Sample Traits
 MEtraitCor <- getMEtraitCor(PCs, colData = colData, corType = "bicor",
                             file = "PC_Trait_Correlation_Stats.txt")
+PCdendro <- getDendro(PCs, distance = "bicor")
+PCtraitDendro <- getCor(PCs, y = colData, corType = "bicor", robustY = FALSE) \%>\%
+        getDendro(transpose = TRUE)
+plotMEtraitCor(PCtraitCor, moduleOrder = PCdendro$order,
+               traitOrder = PCtraitDendro$order,
+               file = "PC_Trait_Correlation_Heatmap.pdf")
 
 # Assess Sample Similarity
 getDendro(methAdj, distance = "euclidean") \%>\%
-          plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25,0.08))
+         plotDendro(file = "Sample_Dendrogram.pdf", expandY = c(0.25,0.08))
 
 # Select Soft Power Threshold
 sft <- getSoftPower(methAdj, corType = "pearson", file = "Soft_Power.rds")

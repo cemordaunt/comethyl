@@ -43,7 +43,17 @@ plotSDstats(regions, maxQuantile = 0.99, file = "Filtered_SD_Plots.pdf")
 # Adjust Methylation Data for PCs ####
 meth <- getRegionMeth(regions, bs = bs, file = "Region_Methylation.rds")
 mod <- model.matrix(~1, data = pData(bs))
+
 PCs <- getPCs(meth, mod = mod, file = "Top_Principal_Components.rds")
+PCtraitCor <- getMEtraitCor(PCs, colData = colData, corType = "bicor",
+                            file = "PC_Trait_Correlation_Stats.txt")
+PCdendro <- getDendro(PCs, distance = "bicor")
+PCtraitDendro <- getCor(PCs, y = colData, corType = "bicor", robustY = FALSE) %>%
+        getDendro(transpose = TRUE)
+plotMEtraitCor(PCtraitCor, moduleOrder = PCdendro$order,
+               traitOrder = PCtraitDendro$order,
+               file = "PC_Trait_Correlation_Heatmap.pdf")
+
 methAdj <- adjustRegionMeth(meth, PCs = PCs,
                             file = "Adjusted_Region_Methylation.rds")
 getDendro(methAdj, distance = "euclidean") %>%

@@ -12,7 +12,7 @@ methylation data, and then saves it as a .rds file."><!-- mathjax --><script src
     
     <a class="navbar-brand me-2" href="../index.html">comethyl</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,10 +97,11 @@ is a principal component.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p><code>getPCs()</code> uses <code><a href="https://rdrr.io/pkg/sva/man/num.sv.html" class="external-link">sva::num.sv()</a></code> to identify the number of top
-principal components and then <code><a href="https://rdrr.io/r/base/svd.html" class="external-link">svd()</a></code> to calculate them. This is the same
-approach used by <code><a href="https://rdrr.io/pkg/sva/man/sva_network.html" class="external-link">sva::sva_network()</a></code>. More information on the function and
-approach is given in the documentation and publications related to the
-<span class="pkg">sva</span> package.</p>
+principal components and then <code><a href="https://rdrr.io/r/base/svd.html" class="external-link">svd()</a></code> to calculate them, after centering
+methylation values within each gene. This is the same approach used by
+<code><a href="https://rdrr.io/pkg/sva/man/sva_network.html" class="external-link">sva::sva_network()</a></code>. More information on the function and approach is
+given in the documentation and publications related to the <span class="pkg">sva</span>
+package.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -135,10 +136,16 @@ modules of comethylated regions.</p></li>
 <span class="r-in"><span class="co"># Compare Top PCs to Sample Traits</span></span>
 <span class="r-in"><span class="va">MEtraitCor</span> <span class="op">&lt;-</span> <span class="fu"><a href="getMEtraitCor.html">getMEtraitCor</a></span><span class="op">(</span><span class="va">PCs</span>, colData <span class="op">=</span> <span class="va">colData</span>, corType <span class="op">=</span> <span class="st">"bicor"</span>,</span>
 <span class="r-in">                            file <span class="op">=</span> <span class="st">"PC_Trait_Correlation_Stats.txt"</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">PCdendro</span> <span class="op">&lt;-</span> <span class="fu"><a href="getDendro.html">getDendro</a></span><span class="op">(</span><span class="va">PCs</span>, distance <span class="op">=</span> <span class="st">"bicor"</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">PCtraitDendro</span> <span class="op">&lt;-</span> <span class="fu"><a href="getCor.html">getCor</a></span><span class="op">(</span><span class="va">PCs</span>, y <span class="op">=</span> <span class="va">colData</span>, corType <span class="op">=</span> <span class="st">"bicor"</span>, robustY <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span class="r-in">        <span class="fu"><a href="getDendro.html">getDendro</a></span><span class="op">(</span>transpose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu"><a href="plotMEtraitCor.html">plotMEtraitCor</a></span><span class="op">(</span><span class="va">PCtraitCor</span>, moduleOrder <span class="op">=</span> <span class="va">PCdendro</span><span class="op">$</span><span class="va">order</span>,</span>
+<span class="r-in">               traitOrder <span class="op">=</span> <span class="va">PCtraitDendro</span><span class="op">$</span><span class="va">order</span>,</span>
+<span class="r-in">               file <span class="op">=</span> <span class="st">"PC_Trait_Correlation_Heatmap.pdf"</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Assess Sample Similarity</span></span>
 <span class="r-in"><span class="fu"><a href="getDendro.html">getDendro</a></span><span class="op">(</span><span class="va">methAdj</span>, distance <span class="op">=</span> <span class="st">"euclidean"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span class="r-in">          <span class="fu"><a href="plotDendro.html">plotDendro</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"Sample_Dendrogram.pdf"</span>, expandY <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>,<span class="fl">0.08</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in">         <span class="fu"><a href="plotDendro.html">plotDendro</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"Sample_Dendrogram.pdf"</span>, expandY <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>,<span class="fl">0.08</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Select Soft Power Threshold</span></span>
 <span class="r-in"><span class="va">sft</span> <span class="op">&lt;-</span> <span class="fu"><a href="getSoftPower.html">getSoftPower</a></span><span class="op">(</span><span class="va">methAdj</span>, corType <span class="op">=</span> <span class="st">"pearson"</span>, file <span class="op">=</span> <span class="st">"Soft_Power.rds"</span><span class="op">)</span></span>
